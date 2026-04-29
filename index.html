@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SmartID Assist</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Roboto;
+      background: #111;
+      color: white;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      font-size: 26px;
+      font-weight: bold;
+      background: #141414;
+    }
+
+    .logo {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    .category {
+      font-size: 20px;
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
+    .row {
+      display: flex;
+      gap: 15px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .card {
+      min-width: 250px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    video {
+      width: 100%;
+    }
+
+    .title {
+      padding: 10px;
+    }
+
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+    }
+
+    .popup-content {
+      margin: 50px auto;
+      width: 80%;
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input {
+      width: 80%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px;
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="logo.png" class="logo">
+  SmartID Assist
+</div>
+
+<!-- CATEGORY 1 -->
+<div class="category">Hipermarket</div>
+<div class="row">
+
+  <div class="card" onclick="openPopup('Restart NCR','videos/restart.mp4')">
+    <video src="videos/restart.mp4"></video>
+    <div class="title">Restart NCR</div>
+  </div>
+
+</div>
+
+<!-- CATEGORY 2 -->
+<div class="category">Supermarket</div>
+<div class="row">
+
+  <div class="card" onclick="openPopup('Scanner nu merge','videos/scanner.mp4')">
+    <video src="videos/scanner.mp4"></video>
+    <div class="title">Scanner nu merge</div>
+  </div>
+
+</div>
+<!-- CATEGORY 3 -->
+<div class="category">Express</div>
+<div class="row">
+
+  <div class="card" onclick="openPopup('Scanner nu merge','videos/scanner.mp4')">
+    <video src="videos/scanner.mp4"></video>
+    <div class="title">Scanner nu merge</div>
+  </div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <div class="popup-content" id="popupContent"></div>
+</div>
+
+<script>
+function openPopup(title, video){
+  document.getElementById("popupContent").innerHTML = `
+    <h2>${title}</h2>
+
+    <video controls src="${video}" style="width:100%"></video>
+
+    <ul>
+      <li>Pas 1</li>
+      <li>Pas 2</li>
+      <li>Pas 3</li>
+    </ul>
+
+    <input placeholder="Scrie feedback...">
+    <br>
+    <button onclick="closePopup()">Închide</button>
+  `;
+
+  document.getElementById("popup").style.display = "block";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}
+</script>
+
+</body>
+</html>
