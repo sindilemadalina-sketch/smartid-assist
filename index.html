@@ -1,134 +1,171 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <title>SmartID Assist</title>
+<meta charset="UTF-8">
+<title>SmartID Assist</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #16001f;
-      color: white;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #14001f;
+  color: white;
+}
 
-    .header {
-      background: linear-gradient(90deg, #3b005c, #7b1fa2);
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: #1d002b;
+}
 
-    .logo {
-      width: 45px;
-      height: 45px;
-      background: white;
-      border-radius: 8px;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    h1 {
-      margin: 0;
-    }
+.logo img {
+  width: 40px;
+}
 
-    .section {
-      padding: 20px;
-    }
+.nav a {
+  margin-left: 20px;
+  color: #d1a3ff;
+  text-decoration: none;
+}
 
-    .category {
-      font-size: 22px;
-      margin-bottom: 10px;
-      border-left: 5px solid #b45cff;
-      padding-left: 10px;
-    }
+/* HERO */
+.hero {
+  padding: 60px 40px;
+  background: linear-gradient(90deg, #3b005c, #7b1fa2);
+}
 
-    .sub {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
+.hero h1 {
+  margin: 0;
+  font-size: 40px;
+}
 
-    .sub div {
-      background: #2c003d;
-      padding: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+.hero p {
+  margin-top: 10px;
+  font-size: 18px;
+}
 
-    .row {
-      display: flex;
-      gap: 15px;
-      overflow-x: auto;
-    }
+/* SECTION */
+.section {
+  padding: 30px 40px;
+}
 
-    .card {
-      min-width: 250px;
-      background: #250033;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-    }
+.section h2 {
+  border-left: 5px solid #b45cff;
+  padding-left: 10px;
+}
 
-    video {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-    }
+/* SUBCATEGORIES */
+.sub {
+  margin: 15px 0;
+}
 
-    .title {
-      padding: 10px;
-    }
+.sub button {
+  background: #2c003d;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  margin-right: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
-    .popup {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-    }
+.sub button:hover {
+  background: #7b1fa2;
+}
 
-    .popup-content {
-      background: #240033;
-      max-width: 700px;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 10px;
-    }
+/* CARDS */
+.row {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+}
 
-    textarea {
-      width: 100%;
-      height: 70px;
-      margin-top: 10px;
-    }
+.card {
+  min-width: 250px;
+  background: #250033;
+  border-radius: 12px;
+  cursor: pointer;
+}
 
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      background: #9c27b0;
-      color: white;
-      border: none;
-    }
+.card video {
+  width: 100%;
+}
 
-  </style>
+.title {
+  padding: 10px;
+}
+
+/* POPUP */
+.popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+}
+
+.popup-content {
+  background: #240033;
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+textarea {
+  width: 100%;
+  height: 70px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  background: #9c27b0;
+  border: none;
+  color: white;
+}
+</style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <img src="logo.png" class="logo">
+  <div class="logo">
+    <img src="logo.png">
+    <b>SmartID Assist</b>
+  </div>
+
+  <div class="nav">
+    <a href="#">Proceduri</a>
+    <a href="#">Videoclipuri</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
   <h1>SmartID Assist</h1>
+  <p>Platformă pentru proceduri și utilizarea echipamentelor NCR</p>
 </div>
 
 <!-- PROCEDURI -->
 <div class="section">
-  <div class="category">PROCEDURI</div>
+  <h2>PROCEDURI</h2>
 
   <div class="sub">
-    <div>Carrefour Franciză</div>
-    <div>Carrefour</div>
-    <div>Hipermarket</div>
-    <div>Supermarket</div>
-    <div>Express</div>
+    <button>Carrefour Franciză</button>
+    <button>Carrefour</button>
+    <button>Hipermarket</button>
+    <button>Supermarket</button>
+    <button>Express</button>
   </div>
 
   <div class="row">
@@ -139,16 +176,16 @@
   </div>
 </div>
 
-<!-- VIDEOCLIPURI -->
+<!-- VIDEO -->
 <div class="section">
-  <div class="category">VIDEOCLIPURI</div>
+  <h2>VIDEOCLIPURI</h2>
 
   <div class="sub">
-    <div>Carrefour Franciză</div>
-    <div>Carrefour</div>
-    <div>Hipermarket</div>
-    <div>Supermarket</div>
-    <div>Express</div>
+    <button>Carrefour Franciză</button>
+    <button>Carrefour</button>
+    <button>Hipermarket</button>
+    <button>Supermarket</button>
+    <button>Express</button>
   </div>
 
   <div class="row">
@@ -168,16 +205,14 @@
 function openPopup(title, video){
   document.getElementById("popupContent").innerHTML = `
     <h2>${title}</h2>
-
     <video controls src="${video}" style="width:100%"></video>
 
     <p>Urmează pașii din video.</p>
 
-    <textarea placeholder="Lasă feedback..."></textarea>
+    <textarea placeholder="Feedback..."></textarea>
     <br>
     <button onclick="closePopup()">Închide</button>
   `;
-
   document.getElementById("popup").style.display = "block";
 }
 
