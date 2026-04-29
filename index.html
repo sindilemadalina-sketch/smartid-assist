@@ -7,11 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:'Roboto',sans-serif;
-  background:#f3f4f8;
-  color:#1f2937;
+  background:#eef1f8;
+  color:#172033;
 }
 
 .loginPage{
@@ -19,206 +21,246 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#ffffff,#f3e8ff);
+  background:linear-gradient(135deg,#ece7ff,#ffffff);
 }
 
 .loginBox{
+  width:420px;
   background:white;
-  width:380px;
-  padding:35px;
-  border-radius:26px;
-  box-shadow:0 20px 60px rgba(0,0,0,.15);
+  padding:40px;
+  border-radius:32px;
   text-align:center;
+  box-shadow:0 25px 70px rgba(76,29,149,.22);
+}
+
+.loginBox img{
+  width:110px;
+  margin-bottom:15px;
 }
 
 .loginBox h1{
-  color:#5b21b6;
-  font-size:36px;
+  font-size:38px;
+  margin:0;
+  background:linear-gradient(90deg,#4c1d95,#9333ea,#ec4899);
+  -webkit-background-clip:text;
+  color:transparent;
 }
 
 .loginBox input{
-  width:90%;
-  padding:14px;
-  margin:8px 0;
-  border-radius:12px;
+  width:100%;
+  padding:15px;
+  margin-top:12px;
   border:1px solid #ddd;
+  border-radius:14px;
 }
 
 button{
-  background:#6d28d9;
-  color:white;
   border:none;
-  border-radius:12px;
-  padding:13px 20px;
+  border-radius:15px;
+  padding:14px 22px;
+  background:linear-gradient(135deg,#6d28d9,#9333ea);
+  color:white;
+  font-weight:800;
   cursor:pointer;
-  font-weight:700;
 }
 
-button:hover{background:#4c1d95;}
-
-.app{
-  display:none;
+button:hover{
+  transform:translateY(-2px);
 }
 
-.topbar{
-  height:75px;
-  background:white;
+.app{display:none}
+
+.hero{
+  position:relative;
+  padding:55px 50px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#2e1065,#6d28d9,#a855f7);
+  color:white;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:420px;
+  height:420px;
+  right:-120px;
+  top:-120px;
+  background:rgba(255,255,255,.12);
+  border-radius:50%;
+}
+
+.heroContent{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 35px;
-  box-shadow:0 4px 20px rgba(0,0,0,.08);
+  gap:30px;
 }
 
-.brand{
+.brandBox{
   display:flex;
   align-items:center;
-  gap:12px;
-  font-weight:900;
-  font-size:24px;
-  color:#4c1d95;
+  gap:22px;
 }
 
-.brand img{
-  width:50px;
-  height:50px;
-  border-radius:12px;
+.brandBox img{
+  width:120px;
+  height:120px;
+  object-fit:contain;
+  background:white;
+  border-radius:28px;
+  padding:12px;
+  box-shadow:0 20px 45px rgba(0,0,0,.25);
 }
 
-.hero{
-  padding:45px;
-  text-align:center;
-  background:linear-gradient(135deg,#4c1d95,#9333ea);
-  color:white;
-}
-
-.hero h1{
-  font-size:50px;
+.brandBox h1{
+  font-size:58px;
   margin:0;
+  font-weight:900;
 }
 
-.hero p{
-  font-size:18px;
+.brandBox p{
+  font-size:19px;
   opacity:.9;
 }
 
-.searchBox{
-  margin-top:25px;
-}
-
 .searchBox input{
-  width:420px;
-  padding:15px;
-  border-radius:14px;
+  width:380px;
+  padding:17px;
   border:none;
+  border-radius:18px;
   font-size:16px;
 }
 
 .container{
-  padding:35px;
+  padding:35px 50px;
 }
 
-.grid{
+.categoryGrid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:30px;
+  gap:28px;
 }
 
-.panel{
+.categoryCard{
   background:white;
-  border-radius:26px;
+  border-radius:30px;
   padding:28px;
-  box-shadow:0 12px 35px rgba(0,0,0,.08);
+  box-shadow:0 18px 45px rgba(0,0,0,.10);
+  cursor:pointer;
+  transition:.2s;
 }
 
-.panel h2{
-  text-align:center;
+.categoryCard:hover{
+  transform:translateY(-5px);
+}
+
+.categoryCard h2{
+  font-size:34px;
+  margin:0 0 10px;
+  color:#4c1d95;
+}
+
+.categoryCard p{
+  color:#667085;
+}
+
+.filters{
+  margin-top:20px;
+  display:flex;
+  gap:12px;
+}
+
+.filter{
+  background:#f3e8ff;
   color:#5b21b6;
-  font-size:30px;
+  padding:12px 18px;
+  border-radius:999px;
+  font-weight:800;
 }
 
-.group{
-  background:#f7f3ff;
-  padding:20px;
-  border-radius:20px;
-  margin-top:18px;
+.active{
+  background:#6d28d9;
+  color:white;
 }
 
-.group h3{
-  margin-top:0;
-  color:#6d28d9;
+.sectionTitle{
+  margin-top:40px;
+  font-size:26px;
+  color:#111827;
 }
 
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-  gap:18px;
-  margin-top:25px;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:22px;
+  margin-top:20px;
 }
 
 .card{
   background:white;
-  border-radius:20px;
+  border-radius:24px;
   overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  box-shadow:0 12px 35px rgba(0,0,0,.10);
   cursor:pointer;
 }
 
 .card video{
   width:100%;
-  height:150px;
+  height:165px;
   object-fit:cover;
   background:black;
 }
 
 .cardBody{
-  padding:15px;
+  padding:18px;
 }
 
 .tag{
   background:#ede9fe;
   color:#5b21b6;
-  padding:5px 10px;
-  border-radius:20px;
+  padding:6px 12px;
+  border-radius:999px;
   font-size:12px;
+  font-weight:800;
 }
 
 .popup{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.8);
-  padding:40px;
+  background:rgba(0,0,0,.82);
+  padding:35px;
   z-index:10;
 }
 
 .popupContent{
   background:white;
-  max-width:850px;
+  max-width:900px;
   margin:auto;
+  border-radius:30px;
   padding:30px;
-  border-radius:28px;
 }
 
 .popupContent video{
   width:100%;
-  border-radius:18px;
+  border-radius:20px;
   background:black;
 }
 
 textarea{
   width:100%;
-  height:80px;
-  border-radius:14px;
+  height:85px;
+  border-radius:16px;
   border:1px solid #ddd;
   padding:12px;
 }
 
 .comment{
   background:#f3f4f6;
-  padding:10px;
-  border-radius:12px;
-  margin-top:8px;
+  padding:12px;
+  border-radius:14px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -227,10 +269,12 @@ textarea{
 
 <div class="loginPage" id="loginPage">
   <div class="loginBox">
+    <img src="logo.png">
     <h1>SmartID Assist</h1>
     <p>Platformă internă NCR</p>
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Parolă">
+    <br><br>
     <button onclick="login()">Autentificare</button>
     <p id="loginError" style="color:red;"></p>
   </div>
@@ -238,52 +282,47 @@ textarea{
 
 <div class="app" id="app">
 
-  <div class="topbar">
-    <div class="brand">
-      <img src="logo.png">
-      SmartID Assist
-    </div>
-    <button onclick="logout()">Logout</button>
-  </div>
-
   <div class="hero">
-    <h1>SmartID Assist</h1>
-    <p>Platformă pentru videoclipuri și proceduri NCR</p>
-    <div class="searchBox">
-      <input id="search" placeholder="Caută după tag: restart, scanner, plata..." oninput="loadItems()">
+    <div class="heroContent">
+      <div class="brandBox">
+        <img src="logo.png">
+        <div>
+          <h1>SmartID Assist</h1>
+          <p>Knowledge platform pentru echipamente NCR Self Service</p>
+        </div>
+      </div>
+
+      <div class="searchBox">
+        <input id="search" placeholder="Caută după tag: restart, scanner, plată..." oninput="loadItems()">
+      </div>
     </div>
   </div>
 
   <div class="container">
-    <div class="grid">
 
-      <div class="panel">
-        <h2>VIDEOCLIPURI</h2>
-        <div class="group">
-          <h3>Carrefour</h3>
-          <button onclick="filterItems('videoclip','carrefour')">Vezi Carrefour</button>
-        </div>
-        <div class="group">
-          <h3>Franciză</h3>
-          <button onclick="filterItems('videoclip','franciza')">Vezi Franciză</button>
+    <div class="categoryGrid">
+      <div class="categoryCard" onclick="setType('videoclip')">
+        <h2>🎬 Videoclipuri</h2>
+        <p>Materiale video pentru instruire rapidă în magazine.</p>
+        <div class="filters">
+          <span class="filter" onclick="setCategory(event,'carrefour')">Carrefour</span>
+          <span class="filter" onclick="setCategory(event,'franciza')">Franciză</span>
         </div>
       </div>
 
-      <div class="panel">
-        <h2>PROCEDURI</h2>
-        <div class="group">
-          <h3>Carrefour</h3>
-          <button onclick="filterItems('procedura','carrefour')">Vezi Carrefour</button>
-        </div>
-        <div class="group">
-          <h3>Franciză</h3>
-          <button onclick="filterItems('procedura','franciza')">Vezi Franciză</button>
+      <div class="categoryCard" onclick="setType('procedura')">
+        <h2>📘 Proceduri</h2>
+        <p>Instrucțiuni operaționale pentru utilizarea echipamentelor.</p>
+        <div class="filters">
+          <span class="filter" onclick="setCategory(event,'carrefour')">Carrefour</span>
+          <span class="filter" onclick="setCategory(event,'franciza')">Franciză</span>
         </div>
       </div>
-
     </div>
 
+    <h2 class="sectionTitle" id="resultTitle">Materiale disponibile</h2>
     <div class="cards" id="cards"></div>
+
   </div>
 </div>
 
@@ -309,7 +348,7 @@ textarea{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -326,7 +365,8 @@ const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let currentFilter = {};
+let currentType = "";
+let currentCategory = "";
 let currentId = null;
 
 window.login = async function(){
@@ -340,13 +380,15 @@ window.login = async function(){
   }
 }
 
-window.logout = async function(){
-  await signOut(auth);
-  location.reload();
+window.setType = function(type){
+  currentType = type;
+  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
+  loadItems();
 }
 
-window.filterItems = function(type, category){
-  currentFilter = {type, category};
+window.setCategory = function(event, category){
+  event.stopPropagation();
+  currentCategory = category;
   loadItems();
 }
 
@@ -359,8 +401,8 @@ window.loadItems = async function(){
     const v = d.data();
     const tags = (v.tags || "").toLowerCase();
 
-    if(currentFilter.type && v.type !== currentFilter.type) return;
-    if(currentFilter.category && v.category !== currentFilter.category) return;
+    if(currentType && v.type !== currentType) return;
+    if(currentCategory && v.category !== currentCategory) return;
     if(searchValue && !tags.includes(searchValue)) return;
 
     html += `
@@ -375,7 +417,7 @@ window.loadItems = async function(){
     `;
   });
 
-  cards.innerHTML = html || "<p>Nu există încă materiale. Adaugă un document în Firestore → videos.</p>";
+  cards.innerHTML = html || "<p>Nu există materiale pentru filtrul ales.</p>";
 }
 
 window.openItem = async function(id,title,url,likes,dislikes){
