@@ -1,91 +1,316 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 <head>
 <meta charset="UTF-8">
 <title>SmartID Assist</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
 body{
-  font-family:'Roboto';
   margin:0;
-  background:#f5f6fa;
+  font-family:'Roboto',sans-serif;
+  background:#f3f4f8;
+  color:#1f2937;
 }
 
-.header{
+.loginPage{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#ffffff,#f3e8ff);
+}
+
+.loginBox{
+  background:white;
+  width:380px;
+  padding:35px;
+  border-radius:26px;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
   text-align:center;
-  padding:30px;
 }
 
-h1{
-  font-size:42px;
+.loginBox h1{
+  color:#5b21b6;
+  font-size:36px;
 }
 
-.login{
-  text-align:center;
-  margin-top:40px;
-}
-
-input{
-  padding:10px;
-  margin:5px;
+.loginBox input{
+  width:90%;
+  padding:14px;
+  margin:8px 0;
+  border-radius:12px;
+  border:1px solid #ddd;
 }
 
 button{
-  padding:10px;
   background:#6d28d9;
   color:white;
   border:none;
+  border-radius:12px;
+  padding:13px 20px;
+  cursor:pointer;
+  font-weight:700;
 }
 
-.main{
+button:hover{background:#4c1d95;}
+
+.app{
   display:none;
-  padding:30px;
 }
 
-.search{
+.topbar{
+  height:75px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 35px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:900;
+  font-size:24px;
+  color:#4c1d95;
+}
+
+.brand img{
+  width:50px;
+  height:50px;
+  border-radius:12px;
+}
+
+.hero{
+  padding:45px;
   text-align:center;
-  margin-bottom:20px;
+  background:linear-gradient(135deg,#4c1d95,#9333ea);
+  color:white;
+}
+
+.hero h1{
+  font-size:50px;
+  margin:0;
+}
+
+.hero p{
+  font-size:18px;
+  opacity:.9;
+}
+
+.searchBox{
+  margin-top:25px;
+}
+
+.searchBox input{
+  width:420px;
+  padding:15px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+}
+
+.container{
+  padding:35px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+}
+
+.panel{
+  background:white;
+  border-radius:26px;
+  padding:28px;
+  box-shadow:0 12px 35px rgba(0,0,0,.08);
+}
+
+.panel h2{
+  text-align:center;
+  color:#5b21b6;
+  font-size:30px;
+}
+
+.group{
+  background:#f7f3ff;
+  padding:20px;
+  border-radius:20px;
+  margin-top:18px;
+}
+
+.group h3{
+  margin-top:0;
+  color:#6d28d9;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:18px;
+  margin-top:25px;
 }
 
 .card{
   background:white;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  cursor:pointer;
+}
+
+.card video{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  background:black;
+}
+
+.cardBody{
   padding:15px;
-  margin:10px;
-  border-radius:10px;
+}
+
+.tag{
+  background:#ede9fe;
+  color:#5b21b6;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  padding:40px;
+  z-index:10;
+}
+
+.popupContent{
+  background:white;
+  max-width:850px;
+  margin:auto;
+  padding:30px;
+  border-radius:28px;
+}
+
+.popupContent video{
+  width:100%;
+  border-radius:18px;
+  background:black;
+}
+
+textarea{
+  width:100%;
+  height:80px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  padding:12px;
+}
+
+.comment{
+  background:#f3f4f6;
+  padding:10px;
+  border-radius:12px;
+  margin-top:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <h1>SmartID Assist</h1>
+<div class="loginPage" id="loginPage">
+  <div class="loginBox">
+    <h1>SmartID Assist</h1>
+    <p>Platformă internă NCR</p>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Parolă">
+    <button onclick="login()">Autentificare</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
 </div>
 
-<div class="login">
-  <input id="email" placeholder="email">
-  <input id="pass" type="password" placeholder="parola">
-  <br>
-  <button onclick="login()">Login</button>
-</div>
+<div class="app" id="app">
 
-<div class="main" id="main">
-
-  <div class="search">
-    <input id="search" placeholder="Caută după tag..." oninput="loadVideos()">
+  <div class="topbar">
+    <div class="brand">
+      <img src="logo.png">
+      SmartID Assist
+    </div>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <div id="videos"></div>
+  <div class="hero">
+    <h1>SmartID Assist</h1>
+    <p>Platformă pentru videoclipuri și proceduri NCR</p>
+    <div class="searchBox">
+      <input id="search" placeholder="Caută după tag: restart, scanner, plata..." oninput="loadItems()">
+    </div>
+  </div>
 
+  <div class="container">
+    <div class="grid">
+
+      <div class="panel">
+        <h2>VIDEOCLIPURI</h2>
+        <div class="group">
+          <h3>Carrefour</h3>
+          <button onclick="filterItems('videoclip','carrefour')">Vezi Carrefour</button>
+        </div>
+        <div class="group">
+          <h3>Franciză</h3>
+          <button onclick="filterItems('videoclip','franciza')">Vezi Franciză</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>PROCEDURI</h2>
+        <div class="group">
+          <h3>Carrefour</h3>
+          <button onclick="filterItems('procedura','carrefour')">Vezi Carrefour</button>
+        </div>
+        <div class="group">
+          <h3>Franciză</h3>
+          <button onclick="filterItems('procedura','franciza')">Vezi Franciză</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cards" id="cards"></div>
+  </div>
+</div>
+
+<div class="popup" id="popup">
+  <div class="popupContent">
+    <h2 id="popupTitle"></h2>
+    <video id="popupVideo" controls></video>
+
+    <p>
+      <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
+      <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
+    </p>
+
+    <h3>Comentarii</h3>
+    <textarea id="commentText" placeholder="Scrie comentariu..."></textarea>
+    <br><br>
+    <button onclick="addComment()">Trimite comentariu</button>
+    <button onclick="closePopup()">Închide</button>
+
+    <div id="comments"></div>
+  </div>
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
@@ -93,76 +318,109 @@ const firebaseConfig = {
   projectId: "smart-id-assist",
   storageBucket: "smart-id-assist.firebasestorage.app",
   messagingSenderId: "812376610238",
-  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
+  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef",
+  measurementId: "G-CJ5J3CHZC0"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const appFirebase = initializeApp(firebaseConfig);
+const auth = getAuth(appFirebase);
+const db = getFirestore(appFirebase);
+
+let currentFilter = {};
+let currentId = null;
 
 window.login = async function(){
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("pass").value;
-
-  await signInWithEmailAndPassword(auth,email,pass);
-
-  document.querySelector(".login").style.display="none";
-  document.getElementById("main").style.display="block";
-
-  loadVideos();
+  try{
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    loginPage.style.display="none";
+    app.style.display="block";
+    loadItems();
+  }catch(e){
+    loginError.innerText="Email sau parolă greșită.";
+  }
 }
 
-window.loadVideos = async function(){
+window.logout = async function(){
+  await signOut(auth);
+  location.reload();
+}
 
-  const search = document.getElementById("search").value.toLowerCase();
+window.filterItems = function(type, category){
+  currentFilter = {type, category};
+  loadItems();
+}
 
-  const snapshot = await getDocs(collection(db,"videos"));
+window.loadItems = async function(){
+  const searchValue = document.getElementById("search").value.toLowerCase();
+  const snap = await getDocs(collection(db,"videos"));
+  let html = "";
 
-  let html="";
+  snap.forEach(d=>{
+    const v = d.data();
+    const tags = (v.tags || "").toLowerCase();
 
-  snapshot.forEach(doc=>{
-    const v = doc.data();
-
-    if(search && !v.tags.includes(search)) return;
+    if(currentFilter.type && v.type !== currentFilter.type) return;
+    if(currentFilter.category && v.category !== currentFilter.category) return;
+    if(searchValue && !tags.includes(searchValue)) return;
 
     html += `
-      <div class="card">
-        <h3>${v.title}</h3>
-        <video controls width="300" src="${v.url}"></video>
-        <p>Tag: ${v.tags}</p>
-
-        <button onclick="like('${doc.id}')">👍</button>
-        <button onclick="dislike('${doc.id}')">👎</button>
-
-        <br><br>
-        <input id="c${doc.id}" placeholder="comentariu">
-        <button onclick="comment('${doc.id}')">Trimite</button>
+      <div class="card" onclick="openItem('${d.id}','${v.title}','${v.url}',${v.likes||0},${v.dislikes||0})">
+        <video src="${v.url}"></video>
+        <div class="cardBody">
+          <span class="tag">${v.category || "general"}</span>
+          <h3>${v.title}</h3>
+          <p>Tag-uri: ${v.tags || ""}</p>
+        </div>
       </div>
     `;
   });
 
-  document.getElementById("videos").innerHTML = html;
+  cards.innerHTML = html || "<p>Nu există încă materiale. Adaugă un document în Firestore → videos.</p>";
 }
 
-window.like = function(id){
-  alert("like salvat (demo)");
+window.openItem = async function(id,title,url,likes,dislikes){
+  currentId = id;
+  popupTitle.innerText = title;
+  popupVideo.src = url;
+  likeCount.innerText = likes;
+  dislikeCount.innerText = dislikes;
+  popup.style.display="block";
+  loadComments();
 }
 
-window.dislike = function(id){
-  alert("dislike salvat (demo)");
+window.closePopup = function(){
+  popup.style.display="none";
 }
 
-window.comment = async function(id){
-  const text = document.getElementById("c"+id).value;
+window.like = async function(){
+  await updateDoc(doc(db,"videos",currentId),{likes:increment(1)});
+  likeCount.innerText = Number(likeCount.innerText)+1;
+}
 
+window.dislike = async function(){
+  await updateDoc(doc(db,"videos",currentId),{dislikes:increment(1)});
+  dislikeCount.innerText = Number(dislikeCount.innerText)+1;
+}
+
+window.addComment = async function(){
+  if(!commentText.value.trim()) return;
   await addDoc(collection(db,"comments"),{
-    videoId:id,
-    text:text
+    videoId: currentId,
+    text: commentText.value
   });
-
-  alert("comentariu salvat");
+  commentText.value="";
+  loadComments();
 }
 
+async function loadComments(){
+  const q = query(collection(db,"comments"), where("videoId","==",currentId));
+  const snap = await getDocs(q);
+  let html="";
+  snap.forEach(d=>{
+    html += `<div class="comment">${d.data().text}</div>`;
+  });
+  comments.innerHTML = html;
+}
 </script>
 
 </body>
