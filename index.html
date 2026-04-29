@@ -1,53 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 <head>
+  <meta charset="UTF-8">
   <title>SmartID Assist</title>
 
   <style>
     body {
       margin: 0;
-      font-family: Roboto;
-      background: #111;
+      font-family: Arial, sans-serif;
+      background: #16001f;
       color: white;
     }
 
     .header {
+      background: linear-gradient(90deg, #3b005c, #7b1fa2);
+      padding: 20px;
       display: flex;
       align-items: center;
-      padding: 20px;
-      font-size: 26px;
-      font-weight: bold;
-      background: #141414;
+      gap: 15px;
     }
 
     .logo {
-      width: 40px;
-      margin-right: 10px;
+      width: 45px;
+      height: 45px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .section {
+      padding: 20px;
     }
 
     .category {
-      font-size: 20px;
-      padding-left: 20px;
-      margin-top: 10px;
+      font-size: 22px;
+      margin-bottom: 10px;
+      border-left: 5px solid #b45cff;
+      padding-left: 10px;
+    }
+
+    .sub {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .sub div {
+      background: #2c003d;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
     }
 
     .row {
       display: flex;
       gap: 15px;
-      padding: 20px;
       overflow-x: auto;
     }
 
     .card {
       min-width: 250px;
-      background: #222;
-      border-radius: 10px;
+      background: #250033;
+      border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
     }
 
     video {
       width: 100%;
+      height: 150px;
+      object-fit: cover;
     }
 
     .title {
@@ -55,32 +81,32 @@
     }
 
     .popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
     }
 
     .popup-content {
+      background: #240033;
+      max-width: 700px;
       margin: 50px auto;
-      width: 80%;
-      background: #222;
       padding: 20px;
       border-radius: 10px;
     }
 
-    input {
-      width: 80%;
-      padding: 8px;
+    textarea {
+      width: 100%;
+      height: 70px;
       margin-top: 10px;
     }
 
     button {
-      padding: 8px;
       margin-top: 10px;
+      padding: 10px;
+      background: #9c27b0;
+      color: white;
+      border: none;
     }
 
   </style>
@@ -88,42 +114,49 @@
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <img src="logo.png" class="logo">
-  SmartID Assist
+  <h1>SmartID Assist</h1>
 </div>
 
-<!-- CATEGORY 1 -->
-<div class="category">Hipermarket</div>
-<div class="row">
+<!-- PROCEDURI -->
+<div class="section">
+  <div class="category">PROCEDURI</div>
 
-  <div class="card" onclick="openPopup('Restart NCR','videos/restart.mp4')">
-    <video src="videos/restart.mp4"></video>
-    <div class="title">Restart NCR</div>
+  <div class="sub">
+    <div>Carrefour Franciză</div>
+    <div>Carrefour</div>
+    <div>Hipermarket</div>
+    <div>Supermarket</div>
+    <div>Express</div>
   </div>
 
+  <div class="row">
+    <div class="card" onclick="openPopup('Restart NCR','videos/restart.mp4')">
+      <video src="videos/restart.mp4"></video>
+      <div class="title">Restart echipament</div>
+    </div>
+  </div>
 </div>
 
-<!-- CATEGORY 2 -->
-<div class="category">Supermarket</div>
-<div class="row">
+<!-- VIDEOCLIPURI -->
+<div class="section">
+  <div class="category">VIDEOCLIPURI</div>
 
-  <div class="card" onclick="openPopup('Scanner nu merge','videos/scanner.mp4')">
-    <video src="videos/scanner.mp4"></video>
-    <div class="title">Scanner nu merge</div>
+  <div class="sub">
+    <div>Carrefour Franciză</div>
+    <div>Carrefour</div>
+    <div>Hipermarket</div>
+    <div>Supermarket</div>
+    <div>Express</div>
   </div>
 
-</div>
-<!-- CATEGORY 3 -->
-<div class="category">Express</div>
-<div class="row">
-
-  <div class="card" onclick="openPopup('Scanner nu merge','videos/scanner.mp4')">
-    <video src="videos/scanner.mp4"></video>
-    <div class="title">Scanner nu merge</div>
+  <div class="row">
+    <div class="card" onclick="openPopup('Utilizare NCR','videos/restart.mp4')">
+      <video src="videos/restart.mp4"></video>
+      <div class="title">Utilizare echipament</div>
+    </div>
   </div>
-
 </div>
 
 <!-- POPUP -->
@@ -138,13 +171,9 @@ function openPopup(title, video){
 
     <video controls src="${video}" style="width:100%"></video>
 
-    <ul>
-      <li>Pas 1</li>
-      <li>Pas 2</li>
-      <li>Pas 3</li>
-    </ul>
+    <p>Urmează pașii din video.</p>
 
-    <input placeholder="Scrie feedback...">
+    <textarea placeholder="Lasă feedback..."></textarea>
     <br>
     <button onclick="closePopup()">Închide</button>
   `;
