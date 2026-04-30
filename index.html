@@ -7,13 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:'Roboto',sans-serif;
-  background:#eef1f8;
-  color:#172033;
+  background:
+    linear-gradient(rgba(240,242,250,.95), rgba(240,242,250,.95)),
+    url("logo.png");
+  background-size:500px;
+  background-position:center 150px;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
 }
 
 .loginPage{
@@ -21,246 +24,111 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#ece7ff,#ffffff);
 }
 
 .loginBox{
-  width:420px;
   background:white;
   padding:40px;
-  border-radius:32px;
+  border-radius:25px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
   text-align:center;
-  box-shadow:0 25px 70px rgba(76,29,149,.22);
-}
-
-.loginBox img{
-  width:110px;
-  margin-bottom:15px;
 }
 
 .loginBox h1{
-  font-size:38px;
+  font-size:40px;
   margin:0;
-  background:linear-gradient(90deg,#4c1d95,#9333ea,#ec4899);
-  -webkit-background-clip:text;
-  color:transparent;
+  color:#4c1d95;
 }
 
-.loginBox input{
-  width:100%;
-  padding:15px;
-  margin-top:12px;
-  border:1px solid #ddd;
-  border-radius:14px;
+input{
+  padding:12px;
+  margin:10px;
+  width:250px;
 }
 
 button{
-  border:none;
-  border-radius:15px;
-  padding:14px 22px;
-  background:linear-gradient(135deg,#6d28d9,#9333ea);
+  padding:12px;
+  background:#6d28d9;
   color:white;
-  font-weight:800;
-  cursor:pointer;
-}
-
-button:hover{
-  transform:translateY(-2px);
+  border:none;
+  border-radius:10px;
 }
 
 .app{display:none}
 
 .hero{
-  position:relative;
-  padding:55px 50px;
-  overflow:hidden;
-  background:linear-gradient(135deg,#2e1065,#6d28d9,#a855f7);
-  color:white;
+  text-align:center;
+  padding:60px;
 }
 
-.hero::before{
-  content:"";
-  position:absolute;
-  width:420px;
-  height:420px;
-  right:-120px;
-  top:-120px;
-  background:rgba(255,255,255,.12);
-  border-radius:50%;
-}
-
-.heroContent{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:30px;
-}
-
-.brandBox{
-  display:flex;
-  align-items:center;
-  gap:22px;
-}
-
-.brandBox img{
-  width:120px;
-  height:120px;
-  object-fit:contain;
-  background:white;
-  border-radius:28px;
-  padding:12px;
-  box-shadow:0 20px 45px rgba(0,0,0,.25);
-}
-
-.brandBox h1{
-  font-size:58px;
-  margin:0;
-  font-weight:900;
-}
-
-.brandBox p{
-  font-size:19px;
-  opacity:.9;
-}
-
-.searchBox input{
-  width:380px;
-  padding:17px;
-  border:none;
-  border-radius:18px;
-  font-size:16px;
-}
-
-.container{
-  padding:35px 50px;
-}
-
-.categoryGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:28px;
-}
-
-.categoryCard{
-  background:white;
-  border-radius:30px;
-  padding:28px;
-  box-shadow:0 18px 45px rgba(0,0,0,.10);
-  cursor:pointer;
-  transition:.2s;
-}
-
-.categoryCard:hover{
-  transform:translateY(-5px);
-}
-
-.categoryCard h2{
-  font-size:34px;
-  margin:0 0 10px;
+.hero h1{
+  font-size:50px;
   color:#4c1d95;
 }
 
-.categoryCard p{
-  color:#667085;
+.hero p{
+  font-size:18px;
+  color:#555;
+}
+
+.search input{
+  padding:15px;
+  width:350px;
+  border-radius:12px;
+}
+
+.container{
+  padding:30px;
 }
 
 .filters{
-  margin-top:20px;
-  display:flex;
-  gap:12px;
+  text-align:center;
+  margin:20px;
 }
 
 .filter{
-  background:#f3e8ff;
-  color:#5b21b6;
-  padding:12px 18px;
-  border-radius:999px;
-  font-weight:800;
-}
-
-.active{
-  background:#6d28d9;
-  color:white;
-}
-
-.sectionTitle{
-  margin-top:40px;
-  font-size:26px;
-  color:#111827;
+  padding:10px 15px;
+  margin:5px;
+  background:#ddd;
+  border-radius:20px;
+  cursor:pointer;
 }
 
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:22px;
-  margin-top:20px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:20px;
 }
 
 .card{
   background:white;
-  border-radius:24px;
-  overflow:hidden;
-  box-shadow:0 12px 35px rgba(0,0,0,.10);
+  border-radius:15px;
+  padding:10px;
   cursor:pointer;
 }
 
 .card video{
   width:100%;
-  height:165px;
-  object-fit:cover;
-  background:black;
-}
-
-.cardBody{
-  padding:18px;
-}
-
-.tag{
-  background:#ede9fe;
-  color:#5b21b6;
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:800;
 }
 
 .popup{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.82);
-  padding:35px;
-  z-index:10;
+  background:rgba(0,0,0,.8);
 }
 
 .popupContent{
   background:white;
-  max-width:900px;
-  margin:auto;
-  border-radius:30px;
-  padding:30px;
-}
-
-.popupContent video{
-  width:100%;
-  border-radius:20px;
-  background:black;
+  max-width:800px;
+  margin:50px auto;
+  padding:20px;
+  border-radius:15px;
 }
 
 textarea{
   width:100%;
-  height:85px;
-  border-radius:16px;
-  border:1px solid #ddd;
-  padding:12px;
-}
-
-.comment{
-  background:#f3f4f6;
-  padding:12px;
-  border-radius:14px;
-  margin-top:10px;
+  height:80px;
 }
 </style>
 </head>
@@ -269,77 +137,50 @@ textarea{
 
 <div class="loginPage" id="loginPage">
   <div class="loginBox">
-    <img src="logo.png">
     <h1>SmartID Assist</h1>
-    <p>Platformă internă NCR</p>
+    <p>Ghid de utilizare echipamente NCR</p>
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Parolă">
-    <br><br>
-    <button onclick="login()">Autentificare</button>
-    <p id="loginError" style="color:red;"></p>
+    <br>
+    <button onclick="login()">Login</button>
+    <p id="err" style="color:red;"></p>
   </div>
 </div>
 
 <div class="app" id="app">
 
-  <div class="hero">
-    <div class="heroContent">
-      <div class="brandBox">
-        <img src="logo.png">
-        <div>
-          <h1>SmartID Assist</h1>
-          <p>Knowledge platform pentru echipamente NCR Self Service</p>
-        </div>
-      </div>
+<div class="hero">
+  <h1>SmartID Assist</h1>
+  <p>Ghid de utilizare echipamente NCR</p>
 
-      <div class="searchBox">
-        <input id="search" placeholder="Caută după tag: restart, scanner, plată..." oninput="loadItems()">
-      </div>
-    </div>
+  <div class="search">
+    <input id="search" placeholder="Caută după tag..." oninput="loadItems()">
   </div>
+</div>
 
-  <div class="container">
+<div class="filters">
+  <span class="filter" onclick="setCategory('carrefour')">Carrefour</span>
+  <span class="filter" onclick="setCategory('franciza')">Franciză</span>
+</div>
 
-    <div class="categoryGrid">
-      <div class="categoryCard" onclick="setType('videoclip')">
-        <h2>🎬 Videoclipuri</h2>
-        <p>Materiale video pentru instruire rapidă în magazine.</p>
-        <div class="filters">
-          <span class="filter" onclick="setCategory(event,'carrefour')">Carrefour</span>
-          <span class="filter" onclick="setCategory(event,'franciza')">Franciză</span>
-        </div>
-      </div>
+<div class="container">
+  <div class="cards" id="cards"></div>
+</div>
 
-      <div class="categoryCard" onclick="setType('procedura')">
-        <h2>📘 Proceduri</h2>
-        <p>Instrucțiuni operaționale pentru utilizarea echipamentelor.</p>
-        <div class="filters">
-          <span class="filter" onclick="setCategory(event,'carrefour')">Carrefour</span>
-          <span class="filter" onclick="setCategory(event,'franciza')">Franciză</span>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="sectionTitle" id="resultTitle">Materiale disponibile</h2>
-    <div class="cards" id="cards"></div>
-
-  </div>
 </div>
 
 <div class="popup" id="popup">
   <div class="popupContent">
-    <h2 id="popupTitle"></h2>
-    <video id="popupVideo" controls></video>
+    <h2 id="title"></h2>
+    <video id="video" controls></video>
 
     <p>
-      <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
-      <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
+      <button onclick="like()">👍 <span id="l">0</span></button>
+      <button onclick="dislike()">👎 <span id="d">0</span></button>
     </p>
 
-    <h3>Comentarii</h3>
-    <textarea id="commentText" placeholder="Scrie comentariu..."></textarea>
-    <br><br>
-    <button onclick="addComment()">Trimite comentariu</button>
+    <textarea id="c"></textarea>
+    <button onclick="comment()">Comentariu</button>
     <button onclick="closePopup()">Închide</button>
 
     <div id="comments"></div>
@@ -347,6 +188,7 @@ textarea{
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -357,112 +199,81 @@ const firebaseConfig = {
   projectId: "smart-id-assist",
   storageBucket: "smart-id-assist.firebasestorage.app",
   messagingSenderId: "812376610238",
-  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef",
-  measurementId: "G-CJ5J3CHZC0"
+  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
 };
 
 const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let currentType = "";
-let currentCategory = "";
-let currentId = null;
+let cat="";
+let current="";
 
 window.login = async function(){
   try{
-    await signInWithEmailAndPassword(auth, email.value, password.value);
+    await signInWithEmailAndPassword(auth,email.value,password.value);
     loginPage.style.display="none";
     app.style.display="block";
     loadItems();
-  }catch(e){
-    loginError.innerText="Email sau parolă greșită.";
+  }catch{
+    err.innerText="Login greșit";
   }
 }
 
-window.setType = function(type){
-  currentType = type;
-  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
-  loadItems();
-}
-
-window.setCategory = function(event, category){
-  event.stopPropagation();
-  currentCategory = category;
-  loadItems();
-}
+window.setCategory=function(c){cat=c;loadItems();}
 
 window.loadItems = async function(){
-  const searchValue = document.getElementById("search").value.toLowerCase();
+  const s = search.value.toLowerCase();
   const snap = await getDocs(collection(db,"videos"));
-  let html = "";
-
+  let html="";
   snap.forEach(d=>{
-    const v = d.data();
-    const tags = (v.tags || "").toLowerCase();
-
-    if(currentType && v.type !== currentType) return;
-    if(currentCategory && v.category !== currentCategory) return;
-    if(searchValue && !tags.includes(searchValue)) return;
-
-    html += `
-      <div class="card" onclick="openItem('${d.id}','${v.title}','${v.url}',${v.likes||0},${v.dislikes||0})">
-        <video src="${v.url}"></video>
-        <div class="cardBody">
-          <span class="tag">${v.category || "general"}</span>
-          <h3>${v.title}</h3>
-          <p>Tag-uri: ${v.tags || ""}</p>
-        </div>
-      </div>
-    `;
+    const v=d.data();
+    if(cat && v.category!=cat) return;
+    if(s && !v.tags.includes(s)) return;
+    html+=`
+    <div class="card" onclick="openItem('${d.id}','${v.title}','${v.url}',${v.likes||0},${v.dislikes||0})">
+      <video src="${v.url}"></video>
+      <h3>${v.title}</h3>
+      <p>${v.tags}</p>
+    </div>`;
   });
-
-  cards.innerHTML = html || "<p>Nu există materiale pentru filtrul ales.</p>";
+  cards.innerHTML=html;
 }
 
-window.openItem = async function(id,title,url,likes,dislikes){
-  currentId = id;
-  popupTitle.innerText = title;
-  popupVideo.src = url;
-  likeCount.innerText = likes;
-  dislikeCount.innerText = dislikes;
+window.openItem=function(id,t,u,l,dv){
+  current=id;
+  title.innerText=t;
+  video.src=u;
+  lspan=l;
+  dspan=dv;
   popup.style.display="block";
   loadComments();
 }
 
-window.closePopup = function(){
-  popup.style.display="none";
+window.closePopup=function(){popup.style.display="none";}
+
+window.like=async function(){
+  await updateDoc(doc(db,"videos",current),{likes:increment(1)});
 }
 
-window.like = async function(){
-  await updateDoc(doc(db,"videos",currentId),{likes:increment(1)});
-  likeCount.innerText = Number(likeCount.innerText)+1;
+window.dislike=async function(){
+  await updateDoc(doc(db,"videos",current),{dislikes:increment(1)});
 }
 
-window.dislike = async function(){
-  await updateDoc(doc(db,"videos",currentId),{dislikes:increment(1)});
-  dislikeCount.innerText = Number(dislikeCount.innerText)+1;
-}
-
-window.addComment = async function(){
-  if(!commentText.value.trim()) return;
-  await addDoc(collection(db,"comments"),{
-    videoId: currentId,
-    text: commentText.value
-  });
-  commentText.value="";
+window.comment=async function(){
+  await addDoc(collection(db,"comments"),{videoId:current,text:c.value});
+  c.value="";
   loadComments();
 }
 
 async function loadComments(){
-  const q = query(collection(db,"comments"), where("videoId","==",currentId));
-  const snap = await getDocs(q);
-  let html="";
-  snap.forEach(d=>{
-    html += `<div class="comment">${d.data().text}</div>`;
-  });
-  comments.innerHTML = html;
+  const q=query(collection(db,"comments"),where("videoId","==",current));
+  const snap=await getDocs(q);
+  let h="";
+  snap.forEach(d=>h+=`<div>${d.data().text}</div>`);
+  comments.innerHTML=h;
 }
+
 </script>
 
 </body>
