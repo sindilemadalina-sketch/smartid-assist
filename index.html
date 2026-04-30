@@ -7,128 +7,357 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:'Roboto',sans-serif;
+  color:#172033;
   background:
-    linear-gradient(rgba(240,242,250,.95), rgba(240,242,250,.95)),
+    linear-gradient(rgba(245,247,252,.94), rgba(245,247,252,.94)),
     url("logo.png");
-  background-size:500px;
-  background-position:center 150px;
+  background-size:620px;
+  background-position:center 190px;
   background-repeat:no-repeat;
   background-attachment:fixed;
 }
 
+button{
+  border:none;
+  cursor:pointer;
+  font-family:'Roboto',sans-serif;
+}
+
+/* LOGIN */
 .loginPage{
   height:100vh;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
+  background:
+    linear-gradient(rgba(255,255,255,.90), rgba(255,255,255,.90)),
+    url("logo.png");
+  background-size:520px;
+  background-position:center;
+  background-repeat:no-repeat;
 }
 
 .loginBox{
-  background:white;
-  padding:40px;
-  border-radius:25px;
-  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  width:420px;
+  padding:42px;
   text-align:center;
+  border-radius:32px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 30px 90px rgba(76,29,149,.22);
+  backdrop-filter:blur(12px);
 }
 
 .loginBox h1{
-  font-size:40px;
   margin:0;
+  font-size:42px;
+  font-weight:900;
+  background:linear-gradient(90deg,#4c1d95,#7e22ce,#c026d3);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.loginBox p{
+  color:#667085;
+}
+
+.loginBox input{
+  width:100%;
+  padding:15px;
+  margin-top:12px;
+  border-radius:16px;
+  border:1px solid #ddd6fe;
+  outline:none;
+}
+
+.loginBox button{
+  width:100%;
+  margin-top:18px;
+  padding:15px;
+  border-radius:16px;
+  color:white;
+  font-weight:900;
+  background:linear-gradient(135deg,#5b21b6,#9333ea);
+}
+
+/* APP */
+.app{
+  display:none;
+}
+
+/* TOP BAR */
+.topbar{
+  height:82px;
+  padding:0 42px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 8px 35px rgba(0,0,0,.08);
+  backdrop-filter:blur(12px);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+.brand{
+  font-size:25px;
+  font-weight:900;
   color:#4c1d95;
 }
 
-input{
-  padding:12px;
-  margin:10px;
-  width:250px;
+.searchArea{
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
-button{
-  padding:12px;
-  background:#6d28d9;
+.searchBox{
+  width:330px;
+  padding:14px 18px;
+  border-radius:999px;
+  border:1px solid #ddd6fe;
+  outline:none;
+  font-size:15px;
+  background:white;
+}
+
+.logout{
+  padding:12px 18px;
+  border-radius:999px;
+  background:#111827;
   color:white;
-  border:none;
-  border-radius:10px;
+  font-weight:800;
 }
 
-.app{display:none}
-
+/* HERO */
 .hero{
+  padding:55px 45px 35px;
   text-align:center;
-  padding:60px;
 }
 
 .hero h1{
-  font-size:50px;
-  color:#4c1d95;
+  margin:0;
+  font-size:64px;
+  font-weight:900;
+  letter-spacing:-2px;
+  background:linear-gradient(90deg,#3b0764,#6d28d9,#c026d3);
+  -webkit-background-clip:text;
+  color:transparent;
 }
 
 .hero p{
-  font-size:18px;
-  color:#555;
+  font-size:20px;
+  color:#667085;
 }
 
-.search input{
-  padding:15px;
-  width:350px;
-  border-radius:12px;
-}
-
+/* MAIN */
 .container{
-  padding:30px;
+  padding:20px 45px 50px;
 }
 
-.filters{
-  text-align:center;
-  margin:20px;
+.mainGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
 }
 
-.filter{
-  padding:10px 15px;
-  margin:5px;
-  background:#ddd;
-  border-radius:20px;
-  cursor:pointer;
+.bigCard{
+  min-height:230px;
+  padding:32px;
+  border-radius:34px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 18px 55px rgba(0,0,0,.09);
+  border:1px solid #ede9fe;
+  transition:.2s;
+}
+
+.bigCard:hover{
+  transform:translateY(-6px);
+  box-shadow:0 28px 70px rgba(76,29,149,.18);
+}
+
+.bigCard h2{
+  margin:0;
+  font-size:35px;
+  color:#4c1d95;
+}
+
+.bigCard p{
+  color:#667085;
+  font-size:16px;
+}
+
+.filterRow{
+  display:flex;
+  gap:12px;
+  margin-top:25px;
+  flex-wrap:wrap;
+}
+
+.filterBtn{
+  padding:13px 20px;
+  border-radius:999px;
+  background:#f3e8ff;
+  color:#5b21b6;
+  font-weight:900;
+}
+
+.filterBtn:hover,
+.filterBtn.active{
+  background:linear-gradient(135deg,#5b21b6,#9333ea);
+  color:white;
+}
+
+/* RESULTS */
+.resultsHeader{
+  margin-top:42px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.resultsHeader h2{
+  margin:0;
+  font-size:28px;
+  color:#111827;
+}
+
+.badge{
+  background:#ede9fe;
+  color:#5b21b6;
+  padding:9px 15px;
+  border-radius:999px;
+  font-weight:900;
 }
 
 .cards{
+  margin-top:22px;
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:24px;
 }
 
 .card{
   background:white;
-  border-radius:15px;
-  padding:10px;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 14px 40px rgba(0,0,0,.10);
   cursor:pointer;
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-5px) scale(1.01);
 }
 
 .card video{
   width:100%;
+  height:170px;
+  object-fit:cover;
+  background:black;
 }
 
+.cardBody{
+  padding:18px;
+}
+
+.cardBody h3{
+  margin:10px 0 6px;
+}
+
+.tag{
+  display:inline-block;
+  background:#f3e8ff;
+  color:#6d28d9;
+  padding:6px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+}
+
+/* POPUP */
 .popup{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.8);
+  padding:35px;
+  background:rgba(17,24,39,.86);
+  z-index:20;
 }
 
 .popupContent{
+  max-width:920px;
+  margin:auto;
+  padding:30px;
+  border-radius:34px;
   background:white;
-  max-width:800px;
-  margin:50px auto;
-  padding:20px;
-  border-radius:15px;
+  box-shadow:0 30px 90px rgba(0,0,0,.35);
+}
+
+.popupContent h2{
+  margin-top:0;
+  color:#4c1d95;
+  font-size:32px;
+}
+
+.popupContent video{
+  width:100%;
+  max-height:430px;
+  border-radius:22px;
+  background:black;
+}
+
+.actions{
+  margin:18px 0;
+  display:flex;
+  gap:12px;
+}
+
+.actions button{
+  padding:12px 18px;
+  border-radius:999px;
+  background:#f3e8ff;
+  color:#5b21b6;
+  font-weight:900;
 }
 
 textarea{
   width:100%;
-  height:80px;
+  height:90px;
+  border-radius:18px;
+  padding:14px;
+  border:1px solid #ddd6fe;
+  outline:none;
+  font-family:'Roboto';
+}
+
+.comment{
+  margin-top:10px;
+  padding:13px;
+  border-radius:16px;
+  background:#f9fafb;
+  border-left:5px solid #9333ea;
+}
+
+.closeBtn{
+  margin-top:14px;
+  padding:13px 18px;
+  border-radius:16px;
+  color:white;
+  background:#111827;
+  font-weight:900;
+}
+
+.empty{
+  padding:25px;
+  background:white;
+  border-radius:22px;
+  color:#667085;
 }
 </style>
 </head>
@@ -139,58 +368,90 @@ textarea{
   <div class="loginBox">
     <h1>SmartID Assist</h1>
     <p>Ghid de utilizare echipamente NCR</p>
+
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Parolă">
-    <br>
-    <button onclick="login()">Login</button>
-    <p id="err" style="color:red;"></p>
+
+    <button onclick="login()">Autentificare</button>
+    <p id="loginError" style="color:red;"></p>
   </div>
 </div>
 
 <div class="app" id="app">
 
-<div class="hero">
-  <h1>SmartID Assist</h1>
-  <p>Ghid de utilizare echipamente NCR</p>
+  <div class="topbar">
+    <div class="brand">SmartID Assist</div>
 
-  <div class="search">
-    <input id="search" placeholder="Caută după tag..." oninput="loadItems()">
+    <div class="searchArea">
+      <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="loadItems()">
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
   </div>
-</div>
 
-<div class="filters">
-  <span class="filter" onclick="setCategory('carrefour')">Carrefour</span>
-  <span class="filter" onclick="setCategory('franciza')">Franciză</span>
-</div>
+  <div class="hero">
+    <h1>SmartID Assist</h1>
+    <p>Ghid de utilizare echipamente NCR</p>
+  </div>
 
-<div class="container">
-  <div class="cards" id="cards"></div>
-</div>
+  <div class="container">
 
+    <div class="mainGrid">
+
+      <div class="bigCard" onclick="setType('videoclip')">
+        <h2>🎬 Videoclipuri</h2>
+        <p>Clipuri scurte pentru instruire rapidă și suport operațional.</p>
+
+        <div class="filterRow">
+          <button class="filterBtn" onclick="setFilter(event,'videoclip','carrefour')">Carrefour</button>
+          <button class="filterBtn" onclick="setFilter(event,'videoclip','franciza')">Franciză</button>
+        </div>
+      </div>
+
+      <div class="bigCard" onclick="setType('procedura')">
+        <h2>📘 Proceduri</h2>
+        <p>Pași de lucru și materiale pentru utilizarea echipamentelor NCR.</p>
+
+        <div class="filterRow">
+          <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
+          <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="resultsHeader">
+      <h2 id="resultTitle">Materiale disponibile</h2>
+      <span class="badge" id="activeFilter">Toate</span>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+  </div>
 </div>
 
 <div class="popup" id="popup">
   <div class="popupContent">
-    <h2 id="title"></h2>
-    <video id="video" controls></video>
+    <h2 id="popupTitle"></h2>
+    <video id="popupVideo" controls></video>
 
-    <p>
-      <button onclick="like()">👍 <span id="l">0</span></button>
-      <button onclick="dislike()">👎 <span id="d">0</span></button>
-    </p>
+    <div class="actions">
+      <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
+      <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
+    </div>
 
-    <textarea id="c"></textarea>
-    <button onclick="comment()">Comentariu</button>
-    <button onclick="closePopup()">Închide</button>
+    <h3>Comentarii</h3>
+    <textarea id="commentText" placeholder="Scrie un comentariu..."></textarea>
+    <br><br>
+    <button onclick="addComment()">Trimite comentariu</button>
+    <button class="closeBtn" onclick="closePopup()">Închide</button>
 
     <div id="comments"></div>
   </div>
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -199,81 +460,144 @@ const firebaseConfig = {
   projectId: "smart-id-assist",
   storageBucket: "smart-id-assist.firebasestorage.app",
   messagingSenderId: "812376610238",
-  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
+  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef",
+  measurementId: "G-CJ5J3CHZC0"
 };
 
 const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let cat="";
-let current="";
+let currentType = "";
+let currentCategory = "";
+let currentId = null;
+let items = [];
 
 window.login = async function(){
   try{
-    await signInWithEmailAndPassword(auth,email.value,password.value);
-    loginPage.style.display="none";
-    app.style.display="block";
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    loginPage.style.display = "none";
+    app.style.display = "block";
     loadItems();
-  }catch{
-    err.innerText="Login greșit";
+  }catch(e){
+    loginError.innerText = "Email sau parolă greșită.";
   }
 }
 
-window.setCategory=function(c){cat=c;loadItems();}
-
-window.loadItems = async function(){
-  const s = search.value.toLowerCase();
-  const snap = await getDocs(collection(db,"videos"));
-  let html="";
-  snap.forEach(d=>{
-    const v=d.data();
-    if(cat && v.category!=cat) return;
-    if(s && !v.tags.includes(s)) return;
-    html+=`
-    <div class="card" onclick="openItem('${d.id}','${v.title}','${v.url}',${v.likes||0},${v.dislikes||0})">
-      <video src="${v.url}"></video>
-      <h3>${v.title}</h3>
-      <p>${v.tags}</p>
-    </div>`;
-  });
-  cards.innerHTML=html;
+window.logout = async function(){
+  await signOut(auth);
+  location.reload();
 }
 
-window.openItem=function(id,t,u,l,dv){
-  current=id;
-  title.innerText=t;
-  video.src=u;
-  lspan=l;
-  dspan=dv;
-  popup.style.display="block";
+window.setType = function(type){
+  currentType = type;
+  currentCategory = "";
+  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
+  activeFilter.innerText = type === "videoclip" ? "Videoclipuri" : "Proceduri";
+  loadItems();
+}
+
+window.setFilter = function(event,type,category){
+  event.stopPropagation();
+  currentType = type;
+  currentCategory = category;
+  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
+  activeFilter.innerText = category === "carrefour" ? "Carrefour" : "Franciză";
+  loadItems();
+}
+
+window.loadItems = async function(){
+  const searchValue = document.getElementById("search").value.toLowerCase();
+  const snap = await getDocs(collection(db,"videos"));
+
+  items = [];
+  let html = "";
+
+  snap.forEach(d=>{
+    const v = d.data();
+    const tags = (v.tags || "").toLowerCase();
+
+    if(currentType && v.type !== currentType) return;
+    if(currentCategory && v.category !== currentCategory) return;
+    if(searchValue && !tags.includes(searchValue)) return;
+
+    const item = {
+      id:d.id,
+      title:v.title || "Fără titlu",
+      url:v.url || "",
+      tags:v.tags || "",
+      category:v.category || "general",
+      likes:v.likes || 0,
+      dislikes:v.dislikes || 0
+    };
+
+    items.push(item);
+  });
+
+  items.forEach((v,index)=>{
+    html += `
+      <div class="card" onclick="openItem(${index})">
+        <video src="${v.url}"></video>
+        <div class="cardBody">
+          <span class="tag">${v.category}</span>
+          <h3>${v.title}</h3>
+          <p>Tag-uri: ${v.tags}</p>
+        </div>
+      </div>
+    `;
+  });
+
+  cards.innerHTML = html || `<div class="empty">Nu există materiale pentru filtrul ales.</div>`;
+}
+
+window.openItem = async function(index){
+  const v = items[index];
+  currentId = v.id;
+  popupTitle.innerText = v.title;
+  popupVideo.src = v.url;
+  likeCount.innerText = v.likes;
+  dislikeCount.innerText = v.dislikes;
+  popup.style.display = "block";
   loadComments();
 }
 
-window.closePopup=function(){popup.style.display="none";}
-
-window.like=async function(){
-  await updateDoc(doc(db,"videos",current),{likes:increment(1)});
+window.closePopup = function(){
+  popup.style.display = "none";
 }
 
-window.dislike=async function(){
-  await updateDoc(doc(db,"videos",current),{dislikes:increment(1)});
+window.like = async function(){
+  await updateDoc(doc(db,"videos",currentId),{likes:increment(1)});
+  likeCount.innerText = Number(likeCount.innerText) + 1;
 }
 
-window.comment=async function(){
-  await addDoc(collection(db,"comments"),{videoId:current,text:c.value});
-  c.value="";
+window.dislike = async function(){
+  await updateDoc(doc(db,"videos",currentId),{dislikes:increment(1)});
+  dislikeCount.innerText = Number(dislikeCount.innerText) + 1;
+}
+
+window.addComment = async function(){
+  if(!commentText.value.trim()) return;
+
+  await addDoc(collection(db,"comments"),{
+    videoId:currentId,
+    text:commentText.value
+  });
+
+  commentText.value = "";
   loadComments();
 }
 
 async function loadComments(){
-  const q=query(collection(db,"comments"),where("videoId","==",current));
-  const snap=await getDocs(q);
-  let h="";
-  snap.forEach(d=>h+=`<div>${d.data().text}</div>`);
-  comments.innerHTML=h;
-}
+  const q = query(collection(db,"comments"), where("videoId","==",currentId));
+  const snap = await getDocs(q);
 
+  let html = "";
+  snap.forEach(d=>{
+    html += `<div class="comment">${d.data().text}</div>`;
+  });
+
+  comments.innerHTML = html;
+}
 </script>
 
 </body>
