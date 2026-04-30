@@ -7,398 +7,50 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:'Roboto',sans-serif;
-  background:linear-gradient(135deg,#f7f7fb,#eef1f8);
-  color:#172033;
-}
-
-button{
-  border:none;
-  cursor:pointer;
-  font-family:'Roboto',sans-serif;
-}
-
-.loginPage{
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:radial-gradient(circle at top,#ede9fe,#ffffff 55%,#eef1f8);
-}
-
-.loginBox{
-  width:430px;
-  padding:42px;
-  text-align:center;
-  border-radius:32px;
-  background:white;
-  box-shadow:0 30px 90px rgba(76,29,149,.18);
-}
-
-.logoMark{
-  width:82px;
-  height:82px;
-  margin:0 auto 18px;
-  border-radius:24px;
-  background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  font-size:32px;
-  font-weight:900;
-  box-shadow:0 20px 45px rgba(76,29,149,.25);
-}
-
-.loginBox h1{
-  margin:0;
-  font-size:42px;
-  font-weight:900;
-  color:#4c1d95;
-}
-
-.loginBox p{
-  color:#667085;
-}
-
-.loginBox input{
-  width:100%;
-  padding:15px;
-  margin-top:12px;
-  border-radius:16px;
-  border:1px solid #ddd6fe;
-  outline:none;
-}
-
-.loginBox button{
-  width:100%;
-  margin-top:18px;
-  padding:15px;
-  border-radius:16px;
-  color:white;
-  font-weight:900;
-  background:linear-gradient(135deg,#5b21b6,#9333ea);
-}
-
+body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#172033}
+button{border:none;cursor:pointer;font-weight:800;border-radius:14px;padding:12px 18px;background:#6d28d9;color:white}
+input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;font-family:Roboto}
+.loginPage{height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#ede9fe,#fff 55%,#eef1f8)}
+.loginBox{width:430px;background:white;padding:42px;border-radius:32px;text-align:center;box-shadow:0 30px 90px rgba(76,29,149,.18)}
+.logoMark,.brandIcon{background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;font-weight:900;display:flex;align-items:center;justify-content:center}
+.logoMark{width:82px;height:82px;border-radius:24px;margin:0 auto 18px;font-size:32px}
+.brandIcon{width:45px;height:45px;border-radius:15px}
+.loginBox h1,.hero h1{color:#4c1d95}
+.loginBox input{width:100%;margin-top:12px}
+.loginBox button{width:100%;margin-top:18px}
 .app{display:none}
-
-.topbar{
-  height:82px;
-  padding:0 42px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:white;
-  box-shadow:0 8px 35px rgba(0,0,0,.08);
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:25px;
-  font-weight:900;
-  color:#4c1d95;
-}
-
-.brandIcon{
-  width:45px;
-  height:45px;
-  border-radius:15px;
-  background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-}
-
-.searchArea{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.searchBox{
-  width:330px;
-  padding:14px 18px;
-  border-radius:999px;
-  border:1px solid #ddd6fe;
-  outline:none;
-  font-size:15px;
-  background:white;
-}
-
-.logout{
-  padding:12px 18px;
-  border-radius:999px;
-  background:#111827;
-  color:white;
-  font-weight:800;
-}
-
-.hero{
-  padding:55px 45px 35px;
-  text-align:center;
-  background:linear-gradient(135deg,#ffffff,#f5f3ff);
-}
-
-.hero h1{
-  margin:0;
-  font-size:64px;
-  font-weight:900;
-  letter-spacing:-2px;
-  background:linear-gradient(90deg,#3b0764,#6d28d9,#c026d3);
-  -webkit-background-clip:text;
-  color:transparent;
-}
-
-.hero p{
-  font-size:20px;
-  color:#667085;
-}
-
-.container{
-  padding:30px 45px 60px;
-}
-
-.adminPanel{
-  display:none;
-  background:white;
-  border-radius:28px;
-  padding:26px;
-  margin-bottom:28px;
-  box-shadow:0 15px 45px rgba(0,0,0,.08);
-}
-
-.adminPanel h2{
-  color:#4c1d95;
-  margin-top:0;
-}
-
-.adminGrid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-}
-
-.adminGrid input,
-.adminGrid select{
-  padding:13px;
-  border-radius:14px;
-  border:1px solid #ddd6fe;
-}
-
-.adminPanel button{
-  margin-top:14px;
-  padding:13px 22px;
-  border-radius:14px;
-  color:white;
-  font-weight:900;
-  background:linear-gradient(135deg,#5b21b6,#9333ea);
-}
-
-.mainGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:28px;
-}
-
-.bigCard{
-  min-height:220px;
-  padding:32px;
-  border-radius:34px;
-  background:white;
-  box-shadow:0 18px 55px rgba(0,0,0,.09);
-  border:1px solid #ede9fe;
-  transition:.2s;
-}
-
-.bigCard:hover{
-  transform:translateY(-6px);
-  box-shadow:0 28px 70px rgba(76,29,149,.18);
-}
-
-.bigCard h2{
-  margin:0;
-  font-size:35px;
-  color:#4c1d95;
-}
-
-.bigCard p{
-  color:#667085;
-  font-size:16px;
-}
-
-.filterRow{
-  display:flex;
-  gap:12px;
-  margin-top:25px;
-  flex-wrap:wrap;
-}
-
-.filterBtn{
-  padding:13px 20px;
-  border-radius:999px;
-  background:#f3e8ff;
-  color:#5b21b6;
-  font-weight:900;
-}
-
-.filterBtn:hover{
-  background:linear-gradient(135deg,#5b21b6,#9333ea);
-  color:white;
-}
-
-.resultsHeader{
-  margin-top:42px;
-}
-
-.resultsHeader h2{
-  margin:0;
-  font-size:28px;
-  color:#111827;
-}
-
-.cards{
-  margin-top:22px;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
-  gap:24px;
-}
-
-.card{
-  background:white;
-  border-radius:28px;
-  overflow:hidden;
-  box-shadow:0 14px 40px rgba(0,0,0,.10);
-  cursor:pointer;
-  transition:.2s;
-}
-
-.card:hover{
-  transform:translateY(-5px) scale(1.01);
-}
-
-.card video{
-  width:100%;
-  height:170px;
-  object-fit:cover;
-  background:#111827;
-}
-
-.cardBody{
-  padding:18px;
-}
-
-.cardBody h3{
-  margin:10px 0 6px;
-}
-
-.tag{
-  display:inline-block;
-  background:#f3e8ff;
-  color:#6d28d9;
-  padding:6px 11px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:900;
-  margin-right:5px;
-}
-
-.deleteBtn{
-  margin-top:10px;
-  background:#dc2626;
-  color:white;
-  border-radius:12px;
-  padding:9px 12px;
-  font-weight:800;
-}
-
-.popup{
-  display:none;
-  position:fixed;
-  inset:0;
-  padding:35px;
-  background:rgba(17,24,39,.86);
-  z-index:20;
-}
-
-.popupContent{
-  max-width:920px;
-  margin:auto;
-  padding:30px;
-  border-radius:34px;
-  background:white;
-  box-shadow:0 30px 90px rgba(0,0,0,.35);
-}
-
-.popupContent h2{
-  margin-top:0;
-  color:#4c1d95;
-  font-size:32px;
-}
-
-.popupContent video{
-  width:100%;
-  max-height:430px;
-  border-radius:22px;
-  background:black;
-}
-
-.actions{
-  margin:18px 0;
-  display:flex;
-  gap:12px;
-}
-
-.actions button{
-  padding:12px 18px;
-  border-radius:999px;
-  background:#f3e8ff;
-  color:#5b21b6;
-  font-weight:900;
-}
-
-textarea{
-  width:100%;
-  height:90px;
-  border-radius:18px;
-  padding:14px;
-  border:1px solid #ddd6fe;
-  outline:none;
-  font-family:'Roboto';
-}
-
-.comment{
-  margin-top:10px;
-  padding:13px;
-  border-radius:16px;
-  background:#f9fafb;
-  border-left:5px solid #9333ea;
-}
-
-.closeBtn{
-  margin-top:14px;
-  padding:13px 18px;
-  border-radius:16px;
-  color:white;
-  background:#111827;
-  font-weight:900;
-}
-
-.empty{
-  padding:25px;
-  background:white;
-  border-radius:22px;
-  color:#667085;
-}
+.topbar{height:82px;padding:0 42px;background:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 35px rgba(0,0,0,.08)}
+.brand{display:flex;gap:12px;align-items:center;font-size:25px;font-weight:900;color:#4c1d95}
+.searchArea{display:flex;gap:12px;align-items:center}
+.searchBox{width:330px;border-radius:999px}
+.logout{background:#111827}
+.hero{text-align:center;padding:55px;background:linear-gradient(135deg,#fff,#f5f3ff)}
+.hero h1{font-size:60px;margin:0;font-weight:900}
+.hero p{font-size:20px;color:#667085}
+.container{padding:30px 45px 60px}
+.panel{background:white;border-radius:28px;padding:26px;margin-bottom:28px;box-shadow:0 15px 45px rgba(0,0,0,.08)}
+.panel h2{color:#4c1d95;margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09)}
+.bigCard h2{font-size:35px;color:#4c1d95;margin:0}
+.filterRow{display:flex;gap:12px;margin-top:25px}
+.filterBtn{background:#f3e8ff;color:#5b21b6;border-radius:999px}
+.cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:24px}
+.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer}
+.card video{width:100%;height:170px;object-fit:cover;background:#111827}
+.cardBody{padding:18px}
+.tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900;margin-right:5px}
+.deleteBtn{background:#dc2626;margin-top:10px}
+.popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20}
+.popupContent{max-width:920px;margin:auto;padding:30px;border-radius:34px;background:white}
+.popupContent video{width:100%;max-height:430px;border-radius:22px;background:black}
+textarea{width:100%;height:90px}
+.comment{margin-top:10px;padding:13px;border-radius:16px;background:#f9fafb;border-left:5px solid #9333ea}
+.closeBtn{background:#111827}
+.empty{padding:25px;background:white;border-radius:22px;color:#667085}
+.userRow{display:flex;justify-content:space-between;align-items:center;background:#f9fafb;padding:12px;border-radius:14px;margin-top:10px}
+.small{font-size:13px;color:#667085}
 </style>
 </head>
 
@@ -409,23 +61,16 @@ textarea{
     <div class="logoMark">SA</div>
     <h1>SmartID Assist</h1>
     <p>Ghid de utilizare echipamente NCR</p>
-
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Parolă">
-
     <button onclick="login()">Autentificare</button>
     <p id="loginError" style="color:red;"></p>
   </div>
 </div>
 
 <div class="app" id="app">
-
   <div class="topbar">
-    <div class="brand">
-      <div class="brandIcon">SA</div>
-      SmartID Assist
-    </div>
-
+    <div class="brand"><div class="brandIcon">SA</div>SmartID Assist</div>
     <div class="searchArea">
       <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="loadItems()">
       <button class="logout" onclick="logout()">Logout</button>
@@ -435,14 +80,16 @@ textarea{
   <div class="hero">
     <h1>SmartID Assist</h1>
     <p>Ghid de utilizare echipamente NCR</p>
+    <p class="small" id="roleInfo"></p>
   </div>
 
   <div class="container">
 
-    <div class="adminPanel" id="adminPanel">
-      <h2>Adaugă material</h2>
+    <div class="panel" id="adminPanel" style="display:none">
+      <h2>Admin Panel</h2>
 
-      <div class="adminGrid">
+      <h3>Adaugă material</h3>
+      <div class="grid">
         <input id="newTitle" placeholder="Titlu">
         <select id="newType">
           <option value="videoclip">Videoclip</option>
@@ -455,16 +102,36 @@ textarea{
         <input id="newTags" placeholder="Tag-uri: restart, scanner">
         <input id="newUrl" placeholder="Link video MP4">
       </div>
-
       <button onclick="addMaterial()">Adaugă material</button>
+
+      <hr><br>
+
+      <h3>Setează rol user</h3>
+      <p class="small">Userul trebuie creat înainte în Firebase Authentication → Add user.</p>
+      <div class="grid">
+        <input id="roleEmail" placeholder="Email user">
+        <select id="roleSelect">
+          <option value="admin">admin</option>
+          <option value="suport">suport</option>
+          <option value="carrefour">carrefour</option>
+          <option value="franciza">franciza</option>
+        </select>
+        <select id="categorySelect">
+          <option value="all">all</option>
+          <option value="carrefour">carrefour</option>
+          <option value="franciza">franciza</option>
+        </select>
+      </div>
+      <button onclick="saveUserRole()">Salvează rol</button>
+
+      <h3>Useri cu roluri</h3>
+      <div id="usersList"></div>
     </div>
 
     <div class="mainGrid">
-
       <div class="bigCard" onclick="setType('videoclip')">
         <h2>🎬 Videoclipuri</h2>
         <p>Clipuri scurte pentru instruire rapidă și suport operațional.</p>
-
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'videoclip','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'videoclip','franciza')">Franciză</button>
@@ -474,21 +141,15 @@ textarea{
       <div class="bigCard" onclick="setType('procedura')">
         <h2>📘 Proceduri</h2>
         <p>Pași de lucru și materiale pentru utilizarea echipamentelor NCR.</p>
-
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
         </div>
       </div>
-
     </div>
 
-    <div class="resultsHeader">
-      <h2 id="resultTitle">Materiale disponibile</h2>
-    </div>
-
+    <h2 id="resultTitle">Materiale disponibile</h2>
     <div class="cards" id="cards"></div>
-
   </div>
 </div>
 
@@ -496,18 +157,15 @@ textarea{
   <div class="popupContent">
     <h2 id="popupTitle"></h2>
     <video id="popupVideo" controls></video>
-
-    <div class="actions">
+    <p>
       <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
       <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
-    </div>
-
+    </p>
     <h3>Comentarii</h3>
     <textarea id="commentText" placeholder="Scrie un comentariu..."></textarea>
     <br><br>
     <button onclick="addComment()">Trimite comentariu</button>
     <button class="closeBtn" onclick="closePopup()">Închide</button>
-
     <div id="comments"></div>
   </div>
 </div>
@@ -515,7 +173,7 @@ textarea{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc, setDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
@@ -523,8 +181,7 @@ const firebaseConfig = {
   projectId: "smart-id-assist",
   storageBucket: "smart-id-assist.firebasestorage.app",
   messagingSenderId: "812376610238",
-  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef",
-  measurementId: "G-CJ5J3CHZC0"
+  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
 };
 
 const appFirebase = initializeApp(firebaseConfig);
@@ -535,23 +192,29 @@ let currentType = "";
 let currentCategory = "";
 let currentId = null;
 let items = [];
-let currentUserRole = "carrefour";
-let currentUserCategory = "carrefour";
+let currentUserRole = "";
+let currentUserCategory = "";
 
 window.login = async function(){
   try{
-    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
-    const userEmail = userCredential.user.email;
+    const cred = await signInWithEmailAndPassword(auth,email.value,password.value);
+    const userEmail = cred.user.email;
 
     const userDoc = await getDoc(doc(db,"users",userEmail));
 
-    if(userDoc.exists()){
-      currentUserRole = userDoc.data().role || "carrefour";
-      currentUserCategory = userDoc.data().category || "carrefour";
+    if(!userDoc.exists()){
+      loginError.innerText = "Userul există, dar nu are rol setat în Firestore.";
+      return;
     }
+
+    currentUserRole = userDoc.data().role;
+    currentUserCategory = userDoc.data().category;
+
+    roleInfo.innerText = "Rol: " + currentUserRole + " | Acces: " + currentUserCategory;
 
     if(currentUserRole === "admin" || currentUserRole === "suport"){
       adminPanel.style.display = "block";
+      loadUsers();
     }
 
     loginPage.style.display = "none";
@@ -566,6 +229,41 @@ window.login = async function(){
 window.logout = async function(){
   await signOut(auth);
   location.reload();
+}
+
+window.saveUserRole = async function(){
+  if(currentUserRole !== "admin"){
+    alert("Doar adminul poate seta roluri.");
+    return;
+  }
+
+  await setDoc(doc(db,"users",roleEmail.value),{
+    role: roleSelect.value,
+    category: categorySelect.value
+  });
+
+  roleEmail.value = "";
+  loadUsers();
+  alert("Rol salvat.");
+}
+
+async function loadUsers(){
+  const snap = await getDocs(collection(db,"users"));
+  let html = "";
+
+  snap.forEach(d=>{
+    const u = d.data();
+    html += `
+      <div class="userRow">
+        <div>
+          <b>${d.id}</b><br>
+          <span class="small">rol: ${u.role} | acces: ${u.category}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  usersList.innerHTML = html;
 }
 
 window.setType = function(type){
@@ -607,9 +305,8 @@ window.addMaterial = async function(){
 }
 
 window.loadItems = async function(){
-  const searchValue = document.getElementById("search").value.toLowerCase();
+  const searchValue = search.value.toLowerCase();
   const snap = await getDocs(collection(db,"videos"));
-
   items = [];
   let html = "";
 
@@ -689,12 +386,12 @@ window.closePopup = function(){
 
 window.like = async function(){
   await updateDoc(doc(db,"videos",currentId),{likes:increment(1)});
-  likeCount.innerText = Number(likeCount.innerText) + 1;
+  likeCount.innerText = Number(likeCount.innerText)+1;
 }
 
 window.dislike = async function(){
   await updateDoc(doc(db,"videos",currentId),{dislikes:increment(1)});
-  dislikeCount.innerText = Number(dislikeCount.innerText) + 1;
+  dislikeCount.innerText = Number(dislikeCount.innerText)+1;
 }
 
 window.addComment = async function(){
@@ -705,7 +402,7 @@ window.addComment = async function(){
     text:commentText.value
   });
 
-  commentText.value = "";
+  commentText.value="";
   loadComments();
 }
 
