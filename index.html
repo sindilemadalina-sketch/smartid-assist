@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>SmartID Assist</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
@@ -12,14 +11,8 @@
 body{
   margin:0;
   font-family:'Roboto',sans-serif;
+  background:linear-gradient(135deg,#f7f7fb,#eef1f8);
   color:#172033;
-  background:
-    linear-gradient(rgba(245,247,252,.94), rgba(245,247,252,.94)),
-    url("logo.png");
-  background-size:620px;
-  background-position:center 190px;
-  background-repeat:no-repeat;
-  background-attachment:fixed;
 }
 
 button{
@@ -28,37 +21,43 @@ button{
   font-family:'Roboto',sans-serif;
 }
 
-/* LOGIN */
 .loginPage{
   height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:
-    linear-gradient(rgba(255,255,255,.90), rgba(255,255,255,.90)),
-    url("logo.png");
-  background-size:520px;
-  background-position:center;
-  background-repeat:no-repeat;
+  background:radial-gradient(circle at top,#ede9fe,#ffffff 55%,#eef1f8);
 }
 
 .loginBox{
-  width:420px;
+  width:430px;
   padding:42px;
   text-align:center;
   border-radius:32px;
-  background:rgba(255,255,255,.92);
-  box-shadow:0 30px 90px rgba(76,29,149,.22);
-  backdrop-filter:blur(12px);
+  background:white;
+  box-shadow:0 30px 90px rgba(76,29,149,.18);
+}
+
+.logoMark{
+  width:82px;
+  height:82px;
+  margin:0 auto 18px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:32px;
+  font-weight:900;
+  box-shadow:0 20px 45px rgba(76,29,149,.25);
 }
 
 .loginBox h1{
   margin:0;
   font-size:42px;
   font-weight:900;
-  background:linear-gradient(90deg,#4c1d95,#7e22ce,#c026d3);
-  -webkit-background-clip:text;
-  color:transparent;
+  color:#4c1d95;
 }
 
 .loginBox p{
@@ -84,30 +83,40 @@ button{
   background:linear-gradient(135deg,#5b21b6,#9333ea);
 }
 
-/* APP */
-.app{
-  display:none;
-}
+.app{display:none}
 
-/* TOP BAR */
 .topbar{
   height:82px;
   padding:0 42px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  background:rgba(255,255,255,.88);
+  background:white;
   box-shadow:0 8px 35px rgba(0,0,0,.08);
-  backdrop-filter:blur(12px);
   position:sticky;
   top:0;
   z-index:5;
 }
 
 .brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
   font-size:25px;
   font-weight:900;
   color:#4c1d95;
+}
+
+.brandIcon{
+  width:45px;
+  height:45px;
+  border-radius:15px;
+  background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
 }
 
 .searchArea{
@@ -134,10 +143,10 @@ button{
   font-weight:800;
 }
 
-/* HERO */
 .hero{
   padding:55px 45px 35px;
   text-align:center;
+  background:linear-gradient(135deg,#ffffff,#f5f3ff);
 }
 
 .hero h1{
@@ -155,9 +164,44 @@ button{
   color:#667085;
 }
 
-/* MAIN */
 .container{
-  padding:20px 45px 50px;
+  padding:30px 45px 60px;
+}
+
+.adminPanel{
+  display:none;
+  background:white;
+  border-radius:28px;
+  padding:26px;
+  margin-bottom:28px;
+  box-shadow:0 15px 45px rgba(0,0,0,.08);
+}
+
+.adminPanel h2{
+  color:#4c1d95;
+  margin-top:0;
+}
+
+.adminGrid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
+
+.adminGrid input,
+.adminGrid select{
+  padding:13px;
+  border-radius:14px;
+  border:1px solid #ddd6fe;
+}
+
+.adminPanel button{
+  margin-top:14px;
+  padding:13px 22px;
+  border-radius:14px;
+  color:white;
+  font-weight:900;
+  background:linear-gradient(135deg,#5b21b6,#9333ea);
 }
 
 .mainGrid{
@@ -167,10 +211,10 @@ button{
 }
 
 .bigCard{
-  min-height:230px;
+  min-height:220px;
   padding:32px;
   border-radius:34px;
-  background:rgba(255,255,255,.92);
+  background:white;
   box-shadow:0 18px 55px rgba(0,0,0,.09);
   border:1px solid #ede9fe;
   transition:.2s;
@@ -207,32 +251,19 @@ button{
   font-weight:900;
 }
 
-.filterBtn:hover,
-.filterBtn.active{
+.filterBtn:hover{
   background:linear-gradient(135deg,#5b21b6,#9333ea);
   color:white;
 }
 
-/* RESULTS */
 .resultsHeader{
   margin-top:42px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
 }
 
 .resultsHeader h2{
   margin:0;
   font-size:28px;
   color:#111827;
-}
-
-.badge{
-  background:#ede9fe;
-  color:#5b21b6;
-  padding:9px 15px;
-  border-radius:999px;
-  font-weight:900;
 }
 
 .cards{
@@ -259,7 +290,7 @@ button{
   width:100%;
   height:170px;
   object-fit:cover;
-  background:black;
+  background:#111827;
 }
 
 .cardBody{
@@ -278,9 +309,18 @@ button{
   border-radius:999px;
   font-size:12px;
   font-weight:900;
+  margin-right:5px;
 }
 
-/* POPUP */
+.deleteBtn{
+  margin-top:10px;
+  background:#dc2626;
+  color:white;
+  border-radius:12px;
+  padding:9px 12px;
+  font-weight:800;
+}
+
 .popup{
   display:none;
   position:fixed;
@@ -366,6 +406,7 @@ textarea{
 
 <div class="loginPage" id="loginPage">
   <div class="loginBox">
+    <div class="logoMark">SA</div>
     <h1>SmartID Assist</h1>
     <p>Ghid de utilizare echipamente NCR</p>
 
@@ -380,7 +421,10 @@ textarea{
 <div class="app" id="app">
 
   <div class="topbar">
-    <div class="brand">SmartID Assist</div>
+    <div class="brand">
+      <div class="brandIcon">SA</div>
+      SmartID Assist
+    </div>
 
     <div class="searchArea">
       <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="loadItems()">
@@ -394,6 +438,26 @@ textarea{
   </div>
 
   <div class="container">
+
+    <div class="adminPanel" id="adminPanel">
+      <h2>Adaugă material</h2>
+
+      <div class="adminGrid">
+        <input id="newTitle" placeholder="Titlu">
+        <select id="newType">
+          <option value="videoclip">Videoclip</option>
+          <option value="procedura">Procedură</option>
+        </select>
+        <select id="newCategory">
+          <option value="carrefour">Carrefour</option>
+          <option value="franciza">Franciză</option>
+        </select>
+        <input id="newTags" placeholder="Tag-uri: restart, scanner">
+        <input id="newUrl" placeholder="Link video MP4">
+      </div>
+
+      <button onclick="addMaterial()">Adaugă material</button>
+    </div>
 
     <div class="mainGrid">
 
@@ -421,7 +485,6 @@ textarea{
 
     <div class="resultsHeader">
       <h2 id="resultTitle">Materiale disponibile</h2>
-      <span class="badge" id="activeFilter">Toate</span>
     </div>
 
     <div class="cards" id="cards"></div>
@@ -452,7 +515,7 @@ textarea{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
@@ -472,13 +535,29 @@ let currentType = "";
 let currentCategory = "";
 let currentId = null;
 let items = [];
+let currentUserRole = "carrefour";
+let currentUserCategory = "carrefour";
 
 window.login = async function(){
   try{
-    await signInWithEmailAndPassword(auth, email.value, password.value);
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+    const userEmail = userCredential.user.email;
+
+    const userDoc = await getDoc(doc(db,"users",userEmail));
+
+    if(userDoc.exists()){
+      currentUserRole = userDoc.data().role || "carrefour";
+      currentUserCategory = userDoc.data().category || "carrefour";
+    }
+
+    if(currentUserRole === "admin" || currentUserRole === "suport"){
+      adminPanel.style.display = "block";
+    }
+
     loginPage.style.display = "none";
     app.style.display = "block";
     loadItems();
+
   }catch(e){
     loginError.innerText = "Email sau parolă greșită.";
   }
@@ -493,7 +572,6 @@ window.setType = function(type){
   currentType = type;
   currentCategory = "";
   resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
-  activeFilter.innerText = type === "videoclip" ? "Videoclipuri" : "Proceduri";
   loadItems();
 }
 
@@ -502,8 +580,30 @@ window.setFilter = function(event,type,category){
   currentType = type;
   currentCategory = category;
   resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
-  activeFilter.innerText = category === "carrefour" ? "Carrefour" : "Franciză";
   loadItems();
+}
+
+window.addMaterial = async function(){
+  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
+    alert("Nu ai drepturi pentru adăugare.");
+    return;
+  }
+
+  await addDoc(collection(db,"videos"),{
+    title:newTitle.value,
+    type:newType.value,
+    category:newCategory.value,
+    tags:newTags.value.toLowerCase(),
+    url:newUrl.value,
+    likes:0,
+    dislikes:0
+  });
+
+  newTitle.value="";
+  newTags.value="";
+  newUrl.value="";
+  loadItems();
+  alert("Material adăugat.");
 }
 
 window.loadItems = async function(){
@@ -517,6 +617,9 @@ window.loadItems = async function(){
     const v = d.data();
     const tags = (v.tags || "").toLowerCase();
 
+    if(currentUserRole === "carrefour" && v.category !== "carrefour") return;
+    if(currentUserRole === "franciza" && v.category !== "franciza") return;
+
     if(currentType && v.type !== currentType) return;
     if(currentCategory && v.category !== currentCategory) return;
     if(searchValue && !tags.includes(searchValue)) return;
@@ -527,6 +630,7 @@ window.loadItems = async function(){
       url:v.url || "",
       tags:v.tags || "",
       category:v.category || "general",
+      type:v.type || "videoclip",
       likes:v.likes || 0,
       dislikes:v.dislikes || 0
     };
@@ -535,19 +639,37 @@ window.loadItems = async function(){
   });
 
   items.forEach((v,index)=>{
+    const deleteButton = (currentUserRole === "admin" || currentUserRole === "suport")
+      ? `<button class="deleteBtn" onclick="deleteMaterial(event,'${v.id}')">Șterge</button>`
+      : "";
+
     html += `
       <div class="card" onclick="openItem(${index})">
         <video src="${v.url}"></video>
         <div class="cardBody">
+          <span class="tag">${v.type}</span>
           <span class="tag">${v.category}</span>
           <h3>${v.title}</h3>
           <p>Tag-uri: ${v.tags}</p>
+          ${deleteButton}
         </div>
       </div>
     `;
   });
 
   cards.innerHTML = html || `<div class="empty">Nu există materiale pentru filtrul ales.</div>`;
+}
+
+window.deleteMaterial = async function(event,id){
+  event.stopPropagation();
+
+  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
+    alert("Nu ai drepturi pentru ștergere.");
+    return;
+  }
+
+  await deleteDoc(doc(db,"videos",id));
+  loadItems();
 }
 
 window.openItem = async function(index){
