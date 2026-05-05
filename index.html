@@ -240,7 +240,7 @@ function youtubeId(url){
 function youtubeEmbed(url){
   const id = youtubeId(url);
   if(!id) return "";
-  return `https://www.youtube.com/embed/${id}`;
+ return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
 }
 
 function previewHtml(url, type){
