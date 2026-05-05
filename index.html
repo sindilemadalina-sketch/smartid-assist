@@ -7,7 +7,7 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#172033}
+body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#111827}
 button{border:none;cursor:pointer;font-weight:800;border-radius:14px;padding:12px 18px;background:#6d28d9;color:white}
 input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;font-family:Roboto}
 .loginPage{height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#ede9fe,#fff 55%,#eef1f8)}
@@ -15,42 +15,49 @@ input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;f
 .logoMark,.brandIcon{background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;font-weight:900;display:flex;align-items:center;justify-content:center}
 .logoMark{width:82px;height:82px;border-radius:24px;margin:0 auto 18px;font-size:32px}
 .brandIcon{width:45px;height:45px;border-radius:15px}
-.loginBox h1,.hero h1{color:#4c1d95}
+.loginBox h1{font-size:42px;color:#4c1d95;margin:0}
 .loginBox input{width:100%;margin-top:12px}
 .loginBox button{width:100%;margin-top:18px}
 .app{display:none}
-.topbar{height:82px;padding:0 42px;background:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 35px rgba(0,0,0,.08)}
+.topbar{height:82px;padding:0 42px;background:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 35px rgba(0,0,0,.08);position:sticky;top:0;z-index:5}
 .brand{display:flex;gap:12px;align-items:center;font-size:25px;font-weight:900;color:#4c1d95}
 .searchArea{display:flex;gap:12px;align-items:center}
 .searchBox{width:330px;border-radius:999px}
 .logout{background:#111827}
-.hero{text-align:center;padding:55px;background:linear-gradient(135deg,#fff,#f5f3ff)}
-.hero h1{font-size:60px;margin:0;font-weight:900}
+.hero{text-align:center;padding:60px;background:linear-gradient(135deg,#ffffff,#f5f3ff)}
+.hero h1{font-size:64px;margin:0;font-weight:900;background:linear-gradient(90deg,#4c1d95,#9333ea,#c026d3);-webkit-background-clip:text;color:transparent}
 .hero p{font-size:20px;color:#667085}
-.container{padding:30px 45px 60px}
+.container{padding:35px 45px 70px}
 .panel{background:white;border-radius:28px;padding:26px;margin-bottom:28px;box-shadow:0 15px 45px rgba(0,0,0,.08)}
 .panel h2{color:#4c1d95;margin-top:0}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-.bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09)}
+.bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09);transition:.2s}
+.bigCard:hover{transform:translateY(-5px)}
 .bigCard h2{font-size:35px;color:#4c1d95;margin:0}
+.bigCard p{color:#667085}
 .filterRow{display:flex;gap:12px;margin-top:25px}
 .filterBtn{background:#f3e8ff;color:#5b21b6;border-radius:999px}
-.cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:24px}
-.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer}
-.card video{width:100%;height:170px;object-fit:cover;background:#111827}
+.cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-5px)}
+.videoThumb{width:100%;height:175px;background:#111827;display:flex;align-items:center;justify-content:center;color:white;font-size:48px}
+.card iframe,.card video{width:100%;height:175px;background:#111827;border:none}
 .cardBody{padding:18px}
 .tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900;margin-right:5px}
 .deleteBtn{background:#dc2626;margin-top:10px}
-.popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20}
-.popupContent{max-width:920px;margin:auto;padding:30px;border-radius:34px;background:white}
-.popupContent video{width:100%;max-height:430px;border-radius:22px;background:black}
+.approveBtn{background:#16a34a}
+.rejectBtn{background:#dc2626}
+.popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20;overflow:auto}
+.popupContent{max-width:950px;margin:auto;padding:30px;border-radius:34px;background:white;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.videoBox iframe,.videoBox video{width:100%;height:430px;border-radius:22px;background:black;border:none}
 textarea{width:100%;height:90px}
 .comment{margin-top:10px;padding:13px;border-radius:16px;background:#f9fafb;border-left:5px solid #9333ea}
 .closeBtn{background:#111827}
 .empty{padding:25px;background:white;border-radius:22px;color:#667085}
 .userRow{display:flex;justify-content:space-between;align-items:center;background:#f9fafb;padding:12px;border-radius:14px;margin-top:10px}
 .small{font-size:13px;color:#667085}
+hr{border:none;border-top:1px solid #eee;margin:28px 0}
 </style>
 </head>
 
@@ -80,15 +87,33 @@ textarea{width:100%;height:90px}
   <div class="hero">
     <h1>SmartID Assist</h1>
     <p>Ghid de utilizare echipamente NCR</p>
-    <p class="small" id="roleInfo"></p>
   </div>
 
   <div class="container">
 
+    <div class="panel">
+      <h2>Trimite material pentru aprobare</h2>
+      <p class="small">Colegul pune link YouTube nelistat, tag-uri și categoria. Adminul aprobă înainte să apară în platformă.</p>
+      <div class="grid">
+        <input id="submitTitle" placeholder="Titlu">
+        <select id="submitType">
+          <option value="videoclip">Videoclip</option>
+          <option value="procedura">Procedură</option>
+        </select>
+        <select id="submitCategory">
+          <option value="carrefour">Carrefour</option>
+          <option value="franciza">Franciză</option>
+        </select>
+        <input id="submitTags" placeholder="Tag-uri: restart, scanner">
+        <input id="submitUrl" placeholder="Link YouTube">
+      </div>
+      <button onclick="submitMaterial()">Trimite spre aprobare</button>
+    </div>
+
     <div class="panel" id="adminPanel" style="display:none">
       <h2>Admin Panel</h2>
 
-      <h3>Adaugă material</h3>
+      <h3>Adaugă material direct</h3>
       <div class="grid">
         <input id="newTitle" placeholder="Titlu">
         <select id="newType">
@@ -99,12 +124,17 @@ textarea{width:100%;height:90px}
           <option value="carrefour">Carrefour</option>
           <option value="franciza">Franciză</option>
         </select>
-        <input id="newTags" placeholder="Tag-uri: restart, scanner">
-        <input id="newUrl" placeholder="Link video MP4">
+        <input id="newTags" placeholder="Tag-uri">
+        <input id="newUrl" placeholder="Link YouTube">
       </div>
       <button onclick="addMaterial()">Adaugă material</button>
 
-      <hr><br>
+      <hr>
+
+      <h3>Materiale în așteptare</h3>
+      <div id="pendingList"></div>
+
+      <hr>
 
       <h3>Setează rol user</h3>
       <p class="small">Userul trebuie creat înainte în Firebase Authentication → Add user.</p>
@@ -140,7 +170,7 @@ textarea{width:100%;height:90px}
 
       <div class="bigCard" onclick="setType('procedura')">
         <h2>📘 Proceduri</h2>
-        <p>Pași de lucru și materiale pentru utilizarea echipamentelor NCR.</p>
+        <p>Materiale și pași de lucru pentru echipamentele NCR.</p>
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
@@ -156,7 +186,7 @@ textarea{width:100%;height:90px}
 <div class="popup" id="popup">
   <div class="popupContent">
     <h2 id="popupTitle"></h2>
-    <video id="popupVideo" controls></video>
+    <div class="videoBox" id="popupVideoBox"></div>
     <p>
       <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
       <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
@@ -194,13 +224,38 @@ let currentId = null;
 let items = [];
 let currentUserRole = "";
 let currentUserCategory = "";
+let currentUserEmail = "";
+
+function youtubeId(url){
+  if(!url) return "";
+  if(url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
+  if(url.includes("watch?v=")) return url.split("watch?v=")[1].split("&")[0];
+  if(url.includes("/embed/")) return url.split("/embed/")[1].split("?")[0];
+  return "";
+}
+
+function videoPreview(url){
+  const id = youtubeId(url);
+  if(id){
+    return `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
+  }
+  return `<video src="${url}"></video>`;
+}
+
+function popupVideo(url){
+  const id = youtubeId(url);
+  if(id){
+    return `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
+  }
+  return `<video src="${url}" controls></video>`;
+}
 
 window.login = async function(){
   try{
     const cred = await signInWithEmailAndPassword(auth,email.value,password.value);
-    const userEmail = cred.user.email;
+    currentUserEmail = cred.user.email;
 
-    const userDoc = await getDoc(doc(db,"users",userEmail));
+    const userDoc = await getDoc(doc(db,"users",currentUserEmail));
 
     if(!userDoc.exists()){
       loginError.innerText = "Userul există, dar nu are rol setat în Firestore.";
@@ -210,11 +265,10 @@ window.login = async function(){
     currentUserRole = userDoc.data().role;
     currentUserCategory = userDoc.data().category;
 
-    roleInfo.innerText = "Rol: " + currentUserRole + " | Acces: " + currentUserCategory;
-
     if(currentUserRole === "admin" || currentUserRole === "suport"){
       adminPanel.style.display = "block";
       loadUsers();
+      loadPending();
     }
 
     loginPage.style.display = "none";
@@ -231,6 +285,99 @@ window.logout = async function(){
   location.reload();
 }
 
+window.submitMaterial = async function(){
+  if(!submitTitle.value || !submitUrl.value){
+    alert("Completează titlul și linkul.");
+    return;
+  }
+
+  await addDoc(collection(db,"pending"),{
+    title:submitTitle.value,
+    type:submitType.value,
+    category:submitCategory.value,
+    tags:submitTags.value.toLowerCase(),
+    url:submitUrl.value,
+    submittedBy:currentUserEmail,
+    status:"pending"
+  });
+
+  submitTitle.value="";
+  submitTags.value="";
+  submitUrl.value="";
+  alert("Material trimis pentru aprobare.");
+}
+
+window.addMaterial = async function(){
+  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
+    alert("Nu ai drepturi pentru adăugare.");
+    return;
+  }
+
+  await addDoc(collection(db,"videos"),{
+    title:newTitle.value,
+    type:newType.value,
+    category:newCategory.value,
+    tags:newTags.value.toLowerCase(),
+    url:newUrl.value,
+    likes:0,
+    dislikes:0
+  });
+
+  newTitle.value="";
+  newTags.value="";
+  newUrl.value="";
+  loadItems();
+  alert("Material adăugat.");
+}
+
+async function loadPending(){
+  const snap = await getDocs(collection(db,"pending"));
+  let html = "";
+
+  snap.forEach(d=>{
+    const v = d.data();
+    html += `
+      <div class="userRow">
+        <div>
+          <b>${v.title}</b><br>
+          <span class="small">${v.type} | ${v.category} | ${v.tags}</span><br>
+          <span class="small">trimis de: ${v.submittedBy || "necunoscut"}</span>
+        </div>
+        <div>
+          <button class="approveBtn" onclick="approveMaterial('${d.id}')">Aprobă</button>
+          <button class="rejectBtn" onclick="rejectMaterial('${d.id}')">Respinge</button>
+        </div>
+      </div>
+    `;
+  });
+
+  pendingList.innerHTML = html || `<div class="empty">Nu există materiale în așteptare.</div>`;
+}
+
+window.approveMaterial = async function(id){
+  const refDoc = doc(db,"pending",id);
+  const data = (await getDoc(refDoc)).data();
+
+  await addDoc(collection(db,"videos"),{
+    title:data.title,
+    type:data.type,
+    category:data.category,
+    tags:data.tags,
+    url:data.url,
+    likes:0,
+    dislikes:0
+  });
+
+  await deleteDoc(refDoc);
+  loadPending();
+  loadItems();
+}
+
+window.rejectMaterial = async function(id){
+  await deleteDoc(doc(db,"pending",id));
+  loadPending();
+}
+
 window.saveUserRole = async function(){
   if(currentUserRole !== "admin"){
     alert("Doar adminul poate seta roluri.");
@@ -238,11 +385,11 @@ window.saveUserRole = async function(){
   }
 
   await setDoc(doc(db,"users",roleEmail.value),{
-    role: roleSelect.value,
-    category: categorySelect.value
+    role:roleSelect.value,
+    category:categorySelect.value
   });
 
-  roleEmail.value = "";
+  roleEmail.value="";
   loadUsers();
   alert("Rol salvat.");
 }
@@ -281,29 +428,6 @@ window.setFilter = function(event,type,category){
   loadItems();
 }
 
-window.addMaterial = async function(){
-  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
-    alert("Nu ai drepturi pentru adăugare.");
-    return;
-  }
-
-  await addDoc(collection(db,"videos"),{
-    title:newTitle.value,
-    type:newType.value,
-    category:newCategory.value,
-    tags:newTags.value.toLowerCase(),
-    url:newUrl.value,
-    likes:0,
-    dislikes:0
-  });
-
-  newTitle.value="";
-  newTags.value="";
-  newUrl.value="";
-  loadItems();
-  alert("Material adăugat.");
-}
-
 window.loadItems = async function(){
   const searchValue = search.value.toLowerCase();
   const snap = await getDocs(collection(db,"videos"));
@@ -316,12 +440,11 @@ window.loadItems = async function(){
 
     if(currentUserRole === "carrefour" && v.category !== "carrefour") return;
     if(currentUserRole === "franciza" && v.category !== "franciza") return;
-
     if(currentType && v.type !== currentType) return;
     if(currentCategory && v.category !== currentCategory) return;
     if(searchValue && !tags.includes(searchValue)) return;
 
-    const item = {
+    items.push({
       id:d.id,
       title:v.title || "Fără titlu",
       url:v.url || "",
@@ -330,9 +453,7 @@ window.loadItems = async function(){
       type:v.type || "videoclip",
       likes:v.likes || 0,
       dislikes:v.dislikes || 0
-    };
-
-    items.push(item);
+    });
   });
 
   items.forEach((v,index)=>{
@@ -342,7 +463,7 @@ window.loadItems = async function(){
 
     html += `
       <div class="card" onclick="openItem(${index})">
-        <video src="${v.url}"></video>
+        ${videoPreview(v.url)}
         <div class="cardBody">
           <span class="tag">${v.type}</span>
           <span class="tag">${v.category}</span>
@@ -359,12 +480,7 @@ window.loadItems = async function(){
 
 window.deleteMaterial = async function(event,id){
   event.stopPropagation();
-
-  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
-    alert("Nu ai drepturi pentru ștergere.");
-    return;
-  }
-
+  if(currentUserRole !== "admin" && currentUserRole !== "suport") return;
   await deleteDoc(doc(db,"videos",id));
   loadItems();
 }
@@ -373,7 +489,7 @@ window.openItem = async function(index){
   const v = items[index];
   currentId = v.id;
   popupTitle.innerText = v.title;
-  popupVideo.src = v.url;
+  popupVideoBox.innerHTML = popupVideo(v.url);
   likeCount.innerText = v.likes;
   dislikeCount.innerText = v.dislikes;
   popup.style.display = "block";
@@ -382,6 +498,7 @@ window.openItem = async function(index){
 
 window.closePopup = function(){
   popup.style.display = "none";
+  popupVideoBox.innerHTML = "";
 }
 
 window.like = async function(){
@@ -399,7 +516,8 @@ window.addComment = async function(){
 
   await addDoc(collection(db,"comments"),{
     videoId:currentId,
-    text:commentText.value
+    text:commentText.value,
+    user:currentUserEmail
   });
 
   commentText.value="";
@@ -409,10 +527,11 @@ window.addComment = async function(){
 async function loadComments(){
   const q = query(collection(db,"comments"), where("videoId","==",currentId));
   const snap = await getDocs(q);
-
   let html = "";
+
   snap.forEach(d=>{
-    html += `<div class="comment">${d.data().text}</div>`;
+    const c = d.data();
+    html += `<div class="comment"><b>${c.user || "user"}</b><br>${c.text}</div>`;
   });
 
   comments.innerHTML = html;
