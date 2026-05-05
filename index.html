@@ -28,9 +28,10 @@ input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;f
 .hero h1{font-size:64px;margin:0;font-weight:900;background:linear-gradient(90deg,#4c1d95,#9333ea,#c026d3);-webkit-background-clip:text;color:transparent}
 .hero p{font-size:20px;color:#667085}
 .container{padding:35px 45px 70px}
-.panel{background:white;border-radius:28px;padding:26px;margin-bottom:28px;box-shadow:0 15px 45px rgba(0,0,0,.08)}
+.panel{background:white;border-radius:28px;padding:28px;margin-bottom:30px;box-shadow:0 15px 45px rgba(0,0,0,.08);max-width:1200px;margin-left:auto;margin-right:auto}
 .panel h2{color:#4c1d95;margin-top:0}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1 / -1}
 .mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09);transition:.2s}
 .bigCard:hover{transform:translateY(-5px)}
@@ -41,8 +42,7 @@ input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;f
 .cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 .card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer;transition:.2s}
 .card:hover{transform:translateY(-5px)}
-.videoThumb{width:100%;height:175px;background:#111827;display:flex;align-items:center;justify-content:center;color:white;font-size:48px}
-.card iframe,.card video{width:100%;height:175px;background:#111827;border:none}
+.preview{height:175px;background:linear-gradient(135deg,#111827,#4c1d95);display:flex;align-items:center;justify-content:center;color:white;font-size:48px}
 .cardBody{padding:18px}
 .tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900;margin-right:5px}
 .deleteBtn{background:#dc2626;margin-top:10px}
@@ -50,7 +50,8 @@ input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;f
 .rejectBtn{background:#dc2626}
 .popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20;overflow:auto}
 .popupContent{max-width:950px;margin:auto;padding:30px;border-radius:34px;background:white;box-shadow:0 30px 90px rgba(0,0,0,.35)}
-.videoBox iframe,.videoBox video{width:100%;height:430px;border-radius:22px;background:black;border:none}
+.linkBox{background:#f3f4f6;border-radius:18px;padding:18px;margin:15px 0}
+.openLink{display:inline-block;margin-top:10px;background:#6d28d9;color:white;text-decoration:none;padding:12px 18px;border-radius:14px;font-weight:900}
 textarea{width:100%;height:90px}
 .comment{margin-top:10px;padding:13px;border-radius:16px;background:#f9fafb;border-left:5px solid #9333ea}
 .closeBtn{background:#111827}
@@ -93,9 +94,10 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 
     <div class="panel">
       <h2>Trimite material pentru aprobare</h2>
-      <p class="small">Colegul pune link YouTube nelistat, tag-uri și categoria. Adminul aprobă înainte să apară în platformă.</p>
+      <p class="small">Colegii încarcă fișierul în SharePoint, copiază linkul și îl trimit aici. Adminul aprobă înainte să apară în platformă.</p>
       <div class="grid">
-        <input id="submitTitle" placeholder="Titlu">
+        <input id="submitTitle" placeholder="Titlu material">
+        <input id="submitUrl" placeholder="Link SharePoint către material">
         <select id="submitType">
           <option value="videoclip">Videoclip</option>
           <option value="procedura">Procedură</option>
@@ -104,8 +106,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
           <option value="carrefour">Carrefour</option>
           <option value="franciza">Franciză</option>
         </select>
-        <input id="submitTags" placeholder="Tag-uri: restart, scanner">
-        <input id="submitUrl" placeholder="Link YouTube">
+        <input class="full" id="submitTags" placeholder="Tag-uri: restart, scanner, recycler">
       </div>
       <button onclick="submitMaterial()">Trimite spre aprobare</button>
     </div>
@@ -116,6 +117,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
       <h3>Adaugă material direct</h3>
       <div class="grid">
         <input id="newTitle" placeholder="Titlu">
+        <input id="newUrl" placeholder="Link SharePoint către material">
         <select id="newType">
           <option value="videoclip">Videoclip</option>
           <option value="procedura">Procedură</option>
@@ -124,8 +126,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
           <option value="carrefour">Carrefour</option>
           <option value="franciza">Franciză</option>
         </select>
-        <input id="newTags" placeholder="Tag-uri">
-        <input id="newUrl" placeholder="Link YouTube">
+        <input class="full" id="newTags" placeholder="Tag-uri: restart, scanner, recycler">
       </div>
       <button onclick="addMaterial()">Adaugă material</button>
 
@@ -161,7 +162,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
     <div class="mainGrid">
       <div class="bigCard" onclick="setType('videoclip')">
         <h2>🎬 Videoclipuri</h2>
-        <p>Clipuri scurte pentru instruire rapidă și suport operațional.</p>
+        <p>Clipuri din SharePoint pentru instruire rapidă și suport operațional.</p>
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'videoclip','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'videoclip','franciza')">Franciză</button>
@@ -170,7 +171,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 
       <div class="bigCard" onclick="setType('procedura')">
         <h2>📘 Proceduri</h2>
-        <p>Materiale și pași de lucru pentru echipamentele NCR.</p>
+        <p>Documente și pași de lucru din SharePoint pentru echipamentele NCR.</p>
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
@@ -186,11 +187,18 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 <div class="popup" id="popup">
   <div class="popupContent">
     <h2 id="popupTitle"></h2>
-    <div class="videoBox" id="popupVideoBox"></div>
+
+    <div class="linkBox">
+      <p><b>Material SharePoint</b></p>
+      <p id="popupTags"></p>
+      <a id="popupLink" class="openLink" target="_blank">Deschide materialul</a>
+    </div>
+
     <p>
       <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
       <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
     </p>
+
     <h3>Comentarii</h3>
     <textarea id="commentText" placeholder="Scrie un comentariu..."></textarea>
     <br><br>
@@ -226,28 +234,8 @@ let currentUserRole = "";
 let currentUserCategory = "";
 let currentUserEmail = "";
 
-function youtubeId(url){
-  if(!url) return "";
-  if(url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
-  if(url.includes("watch?v=")) return url.split("watch?v=")[1].split("&")[0];
-  if(url.includes("/embed/")) return url.split("/embed/")[1].split("?")[0];
-  return "";
-}
-
-function videoPreview(url){
-  const id = youtubeId(url);
-  if(id){
-    return `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
-  }
-  return `<video src="${url}"></video>`;
-}
-
-function popupVideo(url){
-  const id = youtubeId(url);
-  if(id){
-    return `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
-  }
-  return `<video src="${url}" controls></video>`;
+function previewIcon(type){
+  return type === "procedura" ? "📘" : "🎬";
 }
 
 window.login = async function(){
@@ -287,7 +275,7 @@ window.logout = async function(){
 
 window.submitMaterial = async function(){
   if(!submitTitle.value || !submitUrl.value){
-    alert("Completează titlul și linkul.");
+    alert("Completează titlul și linkul SharePoint.");
     return;
   }
 
@@ -310,6 +298,11 @@ window.submitMaterial = async function(){
 window.addMaterial = async function(){
   if(currentUserRole !== "admin" && currentUserRole !== "suport"){
     alert("Nu ai drepturi pentru adăugare.");
+    return;
+  }
+
+  if(!newTitle.value || !newUrl.value){
+    alert("Completează titlul și linkul SharePoint.");
     return;
   }
 
@@ -463,7 +456,7 @@ window.loadItems = async function(){
 
     html += `
       <div class="card" onclick="openItem(${index})">
-        ${videoPreview(v.url)}
+        <div class="preview">${previewIcon(v.type)}</div>
         <div class="cardBody">
           <span class="tag">${v.type}</span>
           <span class="tag">${v.category}</span>
@@ -489,7 +482,9 @@ window.openItem = async function(index){
   const v = items[index];
   currentId = v.id;
   popupTitle.innerText = v.title;
-  popupVideoBox.innerHTML = popupVideo(v.url);
+  popupTags.innerText = "Tag-uri: " + v.tags + " | Categorie: " + v.category;
+  popupLink.href = v.url;
+  popupLink.innerText = v.type === "procedura" ? "Deschide procedura în SharePoint" : "Deschide videoclipul în SharePoint";
   likeCount.innerText = v.likes;
   dislikeCount.innerText = v.dislikes;
   popup.style.display = "block";
@@ -498,7 +493,6 @@ window.openItem = async function(index){
 
 window.closePopup = function(){
   popup.style.display = "none";
-  popupVideoBox.innerHTML = "";
 }
 
 window.like = async function(){
