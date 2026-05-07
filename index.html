@@ -2,555 +2,307 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<title>SmartID Assist</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SmartID Academy</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#111827}
-button{border:none;cursor:pointer;font-weight:800;border-radius:14px;padding:12px 18px;background:#6d28d9;color:white}
-input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;font-family:Roboto}
-.loginPage{height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#ede9fe,#fff 55%,#eef1f8)}
-.loginBox{width:430px;background:white;padding:42px;border-radius:32px;text-align:center;box-shadow:0 30px 90px rgba(76,29,149,.18)}
-.logoMark,.brandIcon{background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;font-weight:900;display:flex;align-items:center;justify-content:center}
-.logoMark{width:82px;height:82px;border-radius:24px;margin:0 auto 18px;font-size:32px}
-.brandIcon{width:45px;height:45px;border-radius:15px}
-.loginBox h1{font-size:42px;color:#4c1d95;margin:0}
-.loginBox input{width:100%;margin-top:12px}
-.loginBox button{width:100%;margin-top:18px}
-.app{display:none}
-.topbar{height:82px;padding:0 42px;background:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 35px rgba(0,0,0,.08);position:sticky;top:0;z-index:5}
-.brand{display:flex;gap:12px;align-items:center;font-size:25px;font-weight:900;color:#4c1d95}
-.searchArea{display:flex;gap:12px;align-items:center}
-.searchBox{width:330px;border-radius:999px}
-.logout{background:#111827}
-.hero{text-align:center;padding:60px;background:linear-gradient(135deg,#ffffff,#f5f3ff)}
-.hero h1{font-size:64px;margin:0;font-weight:900;background:linear-gradient(90deg,#4c1d95,#9333ea,#c026d3);-webkit-background-clip:text;color:transparent}
-.hero p{font-size:20px;color:#667085}
-.container{padding:35px 45px 70px}
-.panel{background:white;border-radius:28px;padding:28px;margin-bottom:30px;box-shadow:0 15px 45px rgba(0,0,0,.08);max-width:1200px;margin-left:auto;margin-right:auto}
-.panel h2{color:#4c1d95;margin-top:0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.full{grid-column:1 / -1}
-.mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-.bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09);transition:.2s}
-.bigCard:hover{transform:translateY(-5px)}
-.bigCard h2{font-size:35px;color:#4c1d95;margin:0}
-.bigCard p{color:#667085}
-.filterRow{display:flex;gap:12px;margin-top:25px}
-.filterBtn{background:#f3e8ff;color:#5b21b6;border-radius:999px}
-.cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer;transition:.2s}
-.card:hover{transform:translateY(-5px)}
-.card iframe{width:100%;height:175px;border:none;background:#111827}
-.preview{height:175px;background:linear-gradient(135deg,#111827,#4c1d95);display:flex;align-items:center;justify-content:center;color:white;font-size:48px}
-.cardBody{padding:18px}
-.tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900;margin-right:5px}
-.deleteBtn{background:#dc2626;margin-top:10px}
-.approveBtn{background:#16a34a}
-.rejectBtn{background:#dc2626}
-.popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20;overflow:auto}
-.popupContent{max-width:950px;margin:auto;padding:30px;border-radius:34px;background:white;box-shadow:0 30px 90px rgba(0,0,0,.35)}
-.videoBox iframe{width:100%;height:430px;border-radius:22px;background:black;border:none}
-textarea{width:100%;height:90px}
-.comment{margin-top:10px;padding:13px;border-radius:16px;background:#f9fafb;border-left:5px solid #9333ea}
-.closeBtn{background:#111827}
-.empty{padding:25px;background:white;border-radius:22px;color:#667085}
-.userRow{display:flex;justify-content:space-between;align-items:center;background:#f9fafb;padding:12px;border-radius:14px;margin-top:10px}
-.small{font-size:13px;color:#667085}
-hr{border:none;border-top:1px solid #eee;margin:28px 0}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f3f4f8;
+    color:#1f2937;
+}
+
+header{
+    background:#ffffff;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo{
+    font-size:30px;
+    font-weight:700;
+    color:#6d28d9;
+}
+
+.search{
+    width:300px;
+    padding:12px 18px;
+    border-radius:30px;
+    border:1px solid #ddd;
+    outline:none;
+}
+
+.hero{
+    text-align:center;
+    padding:80px 20px;
+    background:linear-gradient(to right,#ede9fe,#f5f3ff);
+}
+
+.hero h1{
+    font-size:64px;
+    color:#5b21b6;
+    margin-bottom:10px;
+}
+
+.hero p{
+    font-size:22px;
+    color:#64748b;
+}
+
+.section{
+    padding:50px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:30px;
+}
+
+.card{
+    background:white;
+    border-radius:24px;
+    padding:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h2{
+    font-size:34px;
+    margin-bottom:10px;
+    color:#5b21b6;
+}
+
+.card p{
+    color:#64748b;
+    margin-bottom:20px;
+}
+
+.tags{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.tag{
+    background:#ede9fe;
+    color:#5b21b6;
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.materials{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:25px;
+}
+
+.material{
+    background:white;
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+}
+
+.material iframe{
+    width:100%;
+    height:220px;
+    border:none;
+}
+
+.material-content{
+    padding:20px;
+}
+
+.material-content h3{
+    margin-bottom:10px;
+    color:#111827;
+}
+
+.material-content p{
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:15px;
+}
+
+.btn{
+    display:inline-block;
+    background:#6d28d9;
+    color:white;
+    padding:12px 20px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#5b21b6;
+}
+
+footer{
+    margin-top:60px;
+    text-align:center;
+    padding:30px;
+    color:#94a3b8;
+}
 </style>
 </head>
 
 <body>
 
-<div class="loginPage" id="loginPage">
-  <div class="loginBox">
-    <div class="logoMark">SA</div>
-    <h1>SmartID Assist</h1>
-    <p>Ghid de utilizare echipamente NCR</p>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Parolă">
-    <button onclick="login()">Autentificare</button>
-    <p id="loginError" style="color:red;"></p>
-  </div>
-</div>
+<header>
+    <div class="logo">SmartID Academy</div>
 
-<div class="app" id="app">
-  <div class="topbar">
-    <div class="brand"><div class="brandIcon">SA</div>SmartID Assist</div>
-    <div class="searchArea">
-      <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="loadItems()">
-      <button class="logout" onclick="logout()">Logout</button>
-    </div>
-  </div>
+    <input 
+        type="text" 
+        class="search" 
+        placeholder="Caută după tag..."
+        id="searchInput"
+    >
+</header>
 
-  <div class="hero">
-    <h1>SmartID Assist</h1>
-    <p>Ghid de utilizare echipamente NCR</p>
-  </div>
+<section class="hero">
+    <h1>SmartID Academy</h1>
+    <p>Platformă internă pentru training și proceduri NCR</p>
+</section>
 
-  <div class="container">
+<section class="section">
 
-    <div class="panel" id="submitPanel" style="display:none">
-      <h2>Trimite material pentru aprobare</h2>
-      <p class="small">Adminul sau suportul adaugă link YouTube nelistat. După aprobare, materialul apare în platformă.</p>
-      <div class="grid">
-        <input id="submitTitle" placeholder="Titlu material">
-        <input id="submitUrl" placeholder="Link YouTube nelistat">
-        <select id="submitType">
-          <option value="videoclip">Videoclip</option>
-          <option value="procedura">Procedură</option>
-        </select>
-        <select id="submitCategory">
-          <option value="carrefour">Carrefour</option>
-          <option value="franciza">Franciză</option>
-        </select>
-        <input class="full" id="submitTags" placeholder="Tag-uri: restart, scanner, recycler">
-      </div>
-      <button onclick="submitMaterial()">Trimite spre aprobare</button>
-    </div>
+    <div class="grid">
 
-    <div class="panel" id="adminPanel" style="display:none">
-      <h2>Admin Panel</h2>
+        <div class="card">
+            <h2>🎬 Videoclipuri</h2>
 
-      <h3>Adaugă material direct</h3>
-      <div class="grid">
-        <input id="newTitle" placeholder="Titlu">
-        <input id="newUrl" placeholder="Link YouTube nelistat">
-        <select id="newType">
-          <option value="videoclip">Videoclip</option>
-          <option value="procedura">Procedură</option>
-        </select>
-        <select id="newCategory">
-          <option value="carrefour">Carrefour</option>
-          <option value="franciza">Franciză</option>
-        </select>
-        <input class="full" id="newTags" placeholder="Tag-uri: restart, scanner, recycler">
-      </div>
-      <button onclick="addMaterial()">Adaugă material</button>
+            <p>
+                Clipuri scurte pentru training rapid și suport operațional.
+            </p>
 
-      <hr>
+            <div class="tags">
+                <div class="tag">Carrefour</div>
+                <div class="tag">Franciză</div>
+            </div>
+        </div>
 
-      <h3>Materiale în așteptare</h3>
-      <div id="pendingList"></div>
+        <div class="card">
+            <h2>📘 Proceduri</h2>
 
-      <hr>
+            <p>
+                Manuale și pași de lucru pentru echipamente NCR.
+            </p>
 
-      <h3>Setează rol user</h3>
-      <p class="small">Userul trebuie creat înainte în Firebase Authentication → Add user.</p>
-      <div class="grid">
-        <input id="roleEmail" placeholder="Email user">
-        <select id="roleSelect">
-          <option value="admin">admin</option>
-          <option value="suport">suport</option>
-          <option value="carrefour">carrefour</option>
-          <option value="franciza">franciza</option>
-        </select>
-        <select id="categorySelect">
-          <option value="all">all</option>
-          <option value="carrefour">carrefour</option>
-          <option value="franciza">franciza</option>
-        </select>
-      </div>
-      <button onclick="saveUserRole()">Salvează rol</button>
+            <div class="tags">
+                <div class="tag">Carrefour</div>
+                <div class="tag">Franciză</div>
+            </div>
+        </div>
 
-      <h3>Useri cu roluri</h3>
-      <div id="usersList"></div>
     </div>
 
-    <div class="mainGrid">
-      <div class="bigCard" onclick="setType('videoclip')">
-        <h2>🎬 Videoclipuri</h2>
-        <p>Clipuri video pentru instruire rapidă și suport operațional.</p>
-        <div class="filterRow">
-          <button class="filterBtn" onclick="setFilter(event,'videoclip','carrefour')">Carrefour</button>
-          <button class="filterBtn" onclick="setFilter(event,'videoclip','franciza')">Franciză</button>
-        </div>
-      </div>
+    <div class="materials" id="materialsContainer">
 
-      <div class="bigCard" onclick="setType('procedura')">
-        <h2>📘 Proceduri</h2>
-        <p>Materiale video sau pași de lucru pentru echipamentele NCR.</p>
-        <div class="filterRow">
-          <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
-          <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
+        <!-- VIDEO EXEMPLU -->
+
+        <div class="material">
+
+            <iframe 
+                src="https://www.youtube.com/embed/tz6cSlmsCCg"
+                allowfullscreen>
+            </iframe>
+
+            <div class="material-content">
+                <h3>Verificare acceptor bancnote</h3>
+
+                <p>
+                    Tutorial rapid pentru verificarea acceptorului de bancnote NCR.
+                </p>
+
+                <a 
+                    href="https://youtu.be/tz6cSlmsCCg"
+                    target="_blank"
+                    class="btn"
+                >
+                    Deschide videoclip
+                </a>
+            </div>
+
         </div>
-      </div>
+
+        <!-- PROCEDURA EXEMPLU -->
+
+        <div class="material">
+
+            <div class="material-content">
+
+                <h3>Manual Self Checkout</h3>
+
+                <p>
+                    Procedură completă pentru utilizarea Self Checkout NCR.
+                </p>
+
+                <a 
+                    href="https://sindilemadalina-sketch.github.io/smartid-academy/manual.htm"
+                    target="_blank"
+                    class="btn"
+                >
+                    Deschide procedura
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <h2 id="resultTitle">Materiale disponibile</h2>
-    <div class="cards" id="cards"></div>
-  </div>
-</div>
+</section>
 
-<div class="popup" id="popup">
-  <div class="popupContent">
-    <h2 id="popupTitle"></h2>
-    <div class="videoBox" id="popupVideoBox"></div>
+<footer>
+    © 2026 SmartID Academy
+</footer>
 
-    <p>
-      <button onclick="like()">👍 Like <span id="likeCount">0</span></button>
-      <button onclick="dislike()">👎 Dislike <span id="dislikeCount">0</span></button>
-    </p>
+<script>
 
-    <h3>Comentarii</h3>
-    <textarea id="commentText" placeholder="Scrie un comentariu..."></textarea>
-    <br><br>
-    <button onclick="addComment()">Trimite comentariu</button>
-    <button class="closeBtn" onclick="closePopup()">Închide</button>
-    <div id="comments"></div>
-  </div>
-</div>
+const searchInput = document.getElementById("searchInput");
+const materials = document.querySelectorAll(".material");
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc, setDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+searchInput.addEventListener("keyup", function(){
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
-  authDomain: "smart-id-assist.firebaseapp.com",
-  projectId: "smart-id-assist",
-  storageBucket: "smart-id-assist.firebasestorage.app",
-  messagingSenderId: "812376610238",
-  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
-};
+    const value = this.value.toLowerCase();
 
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
+    materials.forEach(material => {
 
-let currentType = "";
-let currentCategory = "";
-let currentId = null;
-let items = [];
-let currentUserRole = "";
-let currentUserCategory = "";
-let currentUserEmail = "";
+        const text = material.innerText.toLowerCase();
 
-function youtubeId(url){
-  if(!url) return "";
-  if(url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
-  if(url.includes("watch?v=")) return url.split("watch?v=")[1].split("&")[0];
-  if(url.includes("/embed/")) return url.split("/embed/")[1].split("?")[0];
-  return "";
-}
+        if(text.includes(value)){
+            material.style.display = "block";
+        }else{
+            material.style.display = "none";
+        }
 
-function youtubeEmbed(url){
-  const id = youtubeId(url);
-  if(!id) return "";
- return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
-}
-
-function previewHtml(url, type){
-  const embed = youtubeEmbed(url);
-  if(embed){
-    return `<iframe src="${embed}" allowfullscreen></iframe>`;
-  }
-  return `<div class="preview">${type === "procedura" ? "📘" : "🎬"}</div>`;
-}
-
-function popupHtml(url){
-  const embed = youtubeEmbed(url);
-  if(embed){
-    return `<iframe src="${embed}" allowfullscreen></iframe>`;
-  }
-  return `<div class="empty">Link invalid sau materialul nu este YouTube.</div>`;
-}
-
-window.login = async function(){
-  try{
-    const cred = await signInWithEmailAndPassword(auth,email.value,password.value);
-    currentUserEmail = cred.user.email;
-
-    const userDoc = await getDoc(doc(db,"users",currentUserEmail));
-
-    if(!userDoc.exists()){
-      loginError.innerText = "Userul există, dar nu are rol setat în Firestore.";
-      return;
-    }
-
-    currentUserRole = userDoc.data().role;
-    currentUserCategory = userDoc.data().category;
-
-    if(currentUserRole === "admin" || currentUserRole === "suport"){
-      submitPanel.style.display = "block";
-      adminPanel.style.display = "block";
-      loadUsers();
-      loadPending();
-    }
-
-    loginPage.style.display = "none";
-    app.style.display = "block";
-    loadItems();
-
-  }catch(e){
-    loginError.innerText = "Email sau parolă greșită.";
-  }
-}
-
-window.logout = async function(){
-  await signOut(auth);
-  location.reload();
-}
-
-window.submitMaterial = async function(){
-  if(!submitTitle.value || !submitUrl.value){
-    alert("Completează titlul și linkul YouTube.");
-    return;
-  }
-
-  await addDoc(collection(db,"pending"),{
-    title:submitTitle.value,
-    type:submitType.value,
-    category:submitCategory.value,
-    tags:submitTags.value.toLowerCase(),
-    url:submitUrl.value,
-    submittedBy:currentUserEmail,
-    status:"pending"
-  });
-
-  submitTitle.value="";
-  submitTags.value="";
-  submitUrl.value="";
-  alert("Material trimis pentru aprobare.");
-}
-
-window.addMaterial = async function(){
-  if(currentUserRole !== "admin" && currentUserRole !== "suport"){
-    alert("Nu ai drepturi pentru adăugare.");
-    return;
-  }
-
-  if(!newTitle.value || !newUrl.value){
-    alert("Completează titlul și linkul YouTube.");
-    return;
-  }
-
-  await addDoc(collection(db,"videos"),{
-    title:newTitle.value,
-    type:newType.value,
-    category:newCategory.value,
-    tags:newTags.value.toLowerCase(),
-    url:newUrl.value,
-    likes:0,
-    dislikes:0
-  });
-
-  newTitle.value="";
-  newTags.value="";
-  newUrl.value="";
-  loadItems();
-  alert("Material adăugat.");
-}
-
-async function loadPending(){
-  const snap = await getDocs(collection(db,"pending"));
-  let html = "";
-
-  snap.forEach(d=>{
-    const v = d.data();
-    html += `
-      <div class="userRow">
-        <div>
-          <b>${v.title}</b><br>
-          <span class="small">${v.type} | ${v.category} | ${v.tags}</span><br>
-          <span class="small">trimis de: ${v.submittedBy || "necunoscut"}</span>
-        </div>
-        <div>
-          <button class="approveBtn" onclick="approveMaterial('${d.id}')">Aprobă</button>
-          <button class="rejectBtn" onclick="rejectMaterial('${d.id}')">Respinge</button>
-        </div>
-      </div>
-    `;
-  });
-
-  pendingList.innerHTML = html || `<div class="empty">Nu există materiale în așteptare.</div>`;
-}
-
-window.approveMaterial = async function(id){
-  const refDoc = doc(db,"pending",id);
-  const data = (await getDoc(refDoc)).data();
-
-  await addDoc(collection(db,"videos"),{
-    title:data.title,
-    type:data.type,
-    category:data.category,
-    tags:data.tags,
-    url:data.url,
-    likes:0,
-    dislikes:0
-  });
-
-  await deleteDoc(refDoc);
-  loadPending();
-  loadItems();
-}
-
-window.rejectMaterial = async function(id){
-  await deleteDoc(doc(db,"pending",id));
-  loadPending();
-}
-
-window.saveUserRole = async function(){
-  if(currentUserRole !== "admin"){
-    alert("Doar adminul poate seta roluri.");
-    return;
-  }
-
-  await setDoc(doc(db,"users",roleEmail.value),{
-    role:roleSelect.value,
-    category:categorySelect.value
-  });
-
-  roleEmail.value="";
-  loadUsers();
-  alert("Rol salvat.");
-}
-
-async function loadUsers(){
-  const snap = await getDocs(collection(db,"users"));
-  let html = "";
-
-  snap.forEach(d=>{
-    const u = d.data();
-    html += `
-      <div class="userRow">
-        <div>
-          <b>${d.id}</b><br>
-          <span class="small">rol: ${u.role} | acces: ${u.category}</span>
-        </div>
-      </div>
-    `;
-  });
-
-  usersList.innerHTML = html;
-}
-
-window.setType = function(type){
-  currentType = type;
-  currentCategory = "";
-  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
-  loadItems();
-}
-
-window.setFilter = function(event,type,category){
-  event.stopPropagation();
-  currentType = type;
-  currentCategory = category;
-  resultTitle.innerText = type === "videoclip" ? "Videoclipuri disponibile" : "Proceduri disponibile";
-  loadItems();
-}
-
-window.loadItems = async function(){
-  const searchValue = search.value.toLowerCase();
-  const snap = await getDocs(collection(db,"videos"));
-  items = [];
-  let html = "";
-
-  snap.forEach(d=>{
-    const v = d.data();
-    const tags = (v.tags || "").toLowerCase();
-
-    if(currentUserRole === "carrefour" && v.category !== "carrefour") return;
-    if(currentUserRole === "franciza" && v.category !== "franciza") return;
-    if(currentType && v.type !== currentType) return;
-    if(currentCategory && v.category !== currentCategory) return;
-    if(searchValue && !tags.includes(searchValue)) return;
-
-    items.push({
-      id:d.id,
-      title:v.title || "Fără titlu",
-      url:v.url || "",
-      tags:v.tags || "",
-      category:v.category || "general",
-      type:v.type || "videoclip",
-      likes:v.likes || 0,
-      dislikes:v.dislikes || 0
     });
-  });
 
-  items.forEach((v,index)=>{
-    const deleteButton = (currentUserRole === "admin" || currentUserRole === "suport")
-      ? `<button class="deleteBtn" onclick="deleteMaterial(event,'${v.id}')">Șterge</button>`
-      : "";
+});
 
-    html += `
-      <div class="card" onclick="openItem(${index})">
-        ${previewHtml(v.url, v.type)}
-        <div class="cardBody">
-          <span class="tag">${v.type}</span>
-          <span class="tag">${v.category}</span>
-          <h3>${v.title}</h3>
-          <p>Tag-uri: ${v.tags}</p>
-          ${deleteButton}
-        </div>
-      </div>
-    `;
-  });
-
-  cards.innerHTML = html || `<div class="empty">Nu există materiale pentru filtrul ales.</div>`;
-}
-
-window.deleteMaterial = async function(event,id){
-  event.stopPropagation();
-  if(currentUserRole !== "admin" && currentUserRole !== "suport") return;
-  await deleteDoc(doc(db,"videos",id));
-  loadItems();
-}
-
-window.openItem = async function(index){
-  const v = items[index];
-  currentId = v.id;
-  popupTitle.innerText = v.title;
-  popupVideoBox.innerHTML = popupHtml(v.url);
-  likeCount.innerText = v.likes;
-  dislikeCount.innerText = v.dislikes;
-  popup.style.display = "block";
-  loadComments();
-}
-
-window.closePopup = function(){
-  popup.style.display = "none";
-  popupVideoBox.innerHTML = "";
-}
-
-window.like = async function(){
-  await updateDoc(doc(db,"videos",currentId),{likes:increment(1)});
-  likeCount.innerText = Number(likeCount.innerText)+1;
-}
-
-window.dislike = async function(){
-  await updateDoc(doc(db,"videos",currentId),{dislikes:increment(1)});
-  dislikeCount.innerText = Number(dislikeCount.innerText)+1;
-}
-
-window.addComment = async function(){
-  if(!commentText.value.trim()) return;
-
-  await addDoc(collection(db,"comments"),{
-    videoId:currentId,
-    text:commentText.value,
-    user:currentUserEmail
-  });
-
-  commentText.value="";
-  loadComments();
-}
-
-async function loadComments(){
-  const q = query(collection(db,"comments"), where("videoId","==",currentId));
-  const snap = await getDocs(q);
-  let html = "";
-
-  snap.forEach(d=>{
-    const c = d.data();
-    html += `<div class="comment"><b>${c.user || "user"}</b><br>${c.text}</div>`;
-  });
-
-  comments.innerHTML = html;
-}
 </script>
 
 </body>
