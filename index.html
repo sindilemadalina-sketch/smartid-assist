@@ -109,11 +109,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
   <div class="hero">
     <h1>Hub SmartID</h1>
     <p>Training, proceduri și suport pentru echipamente NCR</p>
-    <div class="quickStats">
-      <div class="stat">🎬 Videoclipuri operaționale</div>
-      <div class="stat">📘 Proceduri verificate</div>
-      <div class="stat">🔐 Acces pe categorie</div>
-    </div>
+
   </div>
 
   <div class="container">
@@ -333,13 +329,17 @@ function restrictCategoryButtons(){
   const access = allowedCategory();
 
   if(access === "carrefour"){
+    videoCarrefourBtn.style.display = "none";
     videoFrancizaBtn.style.display = "none";
+    procCarrefourBtn.style.display = "none";
     procFrancizaBtn.style.display = "none";
   }
 
   if(access === "franciza"){
     videoCarrefourBtn.style.display = "none";
+    videoFrancizaBtn.style.display = "none";
     procCarrefourBtn.style.display = "none";
+    procFrancizaBtn.style.display = "none";
   }
 }
 
