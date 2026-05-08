@@ -7,58 +7,426 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#111827}
-button{border:none;cursor:pointer;font-weight:800;border-radius:14px;padding:12px 18px;background:#6d28d9;color:white}
-input,select,textarea{border:1px solid #ddd6fe;border-radius:14px;padding:13px;font-family:Roboto}
-.loginPage{height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#ede9fe,#fff 55%,#eef1f8)}
-.loginBox{width:430px;background:white;padding:42px;border-radius:32px;text-align:center;box-shadow:0 30px 90px rgba(76,29,149,.18)}
-.logoMark,.brandIcon{background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;font-weight:900;display:flex;align-items:center;justify-content:center}
-.logoMark{width:82px;height:82px;border-radius:24px;margin:0 auto 18px;font-size:32px}
-.brandIcon{width:45px;height:45px;border-radius:15px}
-.loginBox h1{font-size:42px;color:#4c1d95;margin:0}
-.loginBox input{width:100%;margin-top:12px}
-.loginBox button{width:100%;margin-top:18px}
+body{
+  margin:0;
+  font-family:Roboto,sans-serif;
+  background:#f4f6fb;
+  color:#111827;
+  overflow-x:hidden;
+}
+
+button{
+  border:none;
+  cursor:pointer;
+  font-weight:900;
+  border-radius:16px;
+  padding:14px 22px;
+  background:#6d28d9;
+  color:white;
+  transition:.25s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(109,40,217,.25);
+}
+
+input,select,textarea{
+  border:1px solid #ddd6fe;
+  border-radius:16px;
+  padding:14px;
+  font-family:Roboto;
+  outline:none;
+}
+
+.loginPage{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at top,#ede9fe,#ffffff 55%,#eef1f8);
+}
+
+.loginBox{
+  width:430px;
+  background:white;
+  padding:42px;
+  border-radius:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(76,29,149,.18);
+  animation:pop .7s ease;
+}
+
+@keyframes pop{
+  from{opacity:0;transform:scale(.92)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.logoMark,.brandIcon{
+  background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);
+  color:white;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.logoMark{
+  width:82px;
+  height:82px;
+  border-radius:24px;
+  margin:0 auto 18px;
+  font-size:32px;
+}
+
+.brandIcon{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+}
+
+.loginBox h1{
+  font-size:42px;
+  color:#4c1d95;
+  margin:0;
+}
+
+.loginBox input{
+  width:100%;
+  margin-top:12px;
+}
+
+.loginBox button{
+  width:100%;
+  margin-top:18px;
+}
+
 .app{display:none}
-.topbar{height:82px;padding:0 42px;background:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 35px rgba(0,0,0,.08);position:sticky;top:0;z-index:5}
-.brand{display:flex;gap:12px;align-items:center;font-size:25px;font-weight:900;color:#4c1d95}
-.searchArea{display:flex;gap:12px;align-items:center}
-.searchBox{width:330px;border-radius:999px}
-.logout{background:#111827}
-.hero{text-align:center;padding:60px;background:linear-gradient(135deg,#ffffff,#f5f3ff)}
-.hero h1{font-size:64px;margin:0;font-weight:900;background:linear-gradient(90deg,#4c1d95,#9333ea,#c026d3);-webkit-background-clip:text;color:transparent}
-.hero p{font-size:20px;color:#667085}
-.container{padding:35px 45px 70px}
-.panel{background:white;border-radius:28px;padding:28px;margin-bottom:30px;box-shadow:0 15px 45px rgba(0,0,0,.08);max-width:1200px;margin-left:auto;margin-right:auto}
-.panel h2{color:#4c1d95;margin-top:0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.full{grid-column:1 / -1}
-.mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-.bigCard{background:white;border-radius:34px;padding:32px;box-shadow:0 18px 55px rgba(0,0,0,.09);transition:.2s}
-.bigCard:hover{transform:translateY(-5px)}
-.bigCard h2{font-size:35px;color:#4c1d95;margin:0}
-.bigCard p{color:#667085}
-.filterRow{display:flex;gap:12px;margin-top:25px}
-.filterBtn{background:#f3e8ff;color:#5b21b6;border-radius:999px}
-.cards{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.10);cursor:pointer;transition:.2s}
-.card:hover{transform:translateY(-5px)}
-.card iframe{width:100%;height:175px;border:none;background:#111827}
-.preview{height:175px;background:linear-gradient(135deg,#111827,#4c1d95);display:flex;align-items:center;justify-content:center;color:white;font-size:48px}
-.cardBody{padding:18px}
-.tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900;margin-right:5px}
-.deleteBtn{background:#dc2626;margin-top:10px}
+
+.topbar{
+  height:84px;
+  padding:0 42px;
+  background:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 8px 35px rgba(0,0,0,.08);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  font-size:26px;
+  font-weight:900;
+  color:#4c1d95;
+}
+
+.searchArea{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.searchBox{
+  width:340px;
+  border-radius:999px;
+}
+
+.logout{
+  background:#111827;
+}
+
+.hero{
+  position:relative;
+  text-align:center;
+  padding:75px 20px;
+  background:linear-gradient(135deg,#ffffff,#f5f3ff);
+  overflow:hidden;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:380px;
+  height:380px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#c084fc,#f0abfc);
+  opacity:.18;
+  top:-150px;
+  left:-100px;
+  animation:float 7s infinite ease-in-out;
+}
+
+.hero::after{
+  content:"";
+  position:absolute;
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  opacity:.14;
+  bottom:-130px;
+  right:-80px;
+  animation:float 8s infinite ease-in-out reverse;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(25px)}
+}
+
+.hero h1{
+  position:relative;
+  font-size:72px;
+  margin:0;
+  font-weight:900;
+  background:linear-gradient(90deg,#4c1d95,#9333ea,#c026d3);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero p{
+  position:relative;
+  font-size:21px;
+  color:#667085;
+}
+
+.container{
+  padding:38px 45px 80px;
+}
+
+.panel{
+  background:white;
+  border-radius:32px;
+  padding:30px;
+  margin-bottom:34px;
+  box-shadow:0 18px 55px rgba(0,0,0,.08);
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+  animation:slideUp .6s ease;
+}
+
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(25px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.panel h2{
+  color:#4c1d95;
+  margin-top:0;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.full{
+  grid-column:1 / -1;
+}
+
+.mainGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+}
+
+.bigCard{
+  background:white;
+  border-radius:36px;
+  padding:36px;
+  box-shadow:0 22px 60px rgba(0,0,0,.09);
+  transition:.25s;
+  border:1px solid #ede9fe;
+}
+
+.bigCard:hover{
+  transform:translateY(-8px);
+  box-shadow:0 30px 75px rgba(109,40,217,.18);
+}
+
+.bigCard h2{
+  font-size:38px;
+  color:#4c1d95;
+  margin:0;
+}
+
+.bigCard p{
+  color:#667085;
+  font-size:16px;
+}
+
+.filterRow{
+  display:flex;
+  gap:16px;
+  margin-top:28px;
+  flex-wrap:wrap;
+}
+
+.filterBtn{
+  background:#f3e8ff;
+  color:#5b21b6;
+  border-radius:999px;
+  padding:17px 32px;
+  font-size:17px;
+  font-weight:900;
+  min-width:150px;
+}
+
+.filterBtn:hover{
+  background:linear-gradient(135deg,#5b21b6,#9333ea);
+  color:white;
+}
+
+.cards{
+  margin-top:34px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:26px;
+}
+
+.card{
+  background:white;
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:0 16px 45px rgba(0,0,0,.10);
+  cursor:pointer;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-8px) scale(1.01);
+}
+
+.card iframe{
+  width:100%;
+  height:180px;
+  border:none;
+  background:#111827;
+}
+
+.preview{
+  height:180px;
+  background:linear-gradient(135deg,#111827,#4c1d95);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:52px;
+}
+
+.cardBody{
+  padding:20px;
+}
+
+.tag{
+  display:inline-block;
+  background:#f3e8ff;
+  color:#6d28d9;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin-right:5px;
+}
+
+.deleteBtn{
+  background:#dc2626;
+  margin-top:12px;
+}
+
 .approveBtn{background:#16a34a}
 .rejectBtn{background:#dc2626}
-.popup{display:none;position:fixed;inset:0;padding:35px;background:rgba(17,24,39,.86);z-index:20;overflow:auto}
-.popupContent{max-width:950px;margin:auto;padding:30px;border-radius:34px;background:white;box-shadow:0 30px 90px rgba(0,0,0,.35)}
-.videoBox iframe{width:100%;height:520px;border-radius:22px;background:black;border:none}
-textarea{width:100%;height:90px}
-.comment{margin-top:10px;padding:13px;border-radius:16px;background:#f9fafb;border-left:5px solid #9333ea}
-.closeBtn{background:#111827}
-.empty{padding:25px;background:white;border-radius:22px;color:#667085}
-.userRow{display:flex;justify-content:space-between;align-items:center;background:#f9fafb;padding:12px;border-radius:14px;margin-top:10px}
-.small{font-size:13px;color:#667085}
-hr{border:none;border-top:1px solid #eee;margin:28px 0}
+
+.popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  padding:35px;
+  background:rgba(17,24,39,.86);
+  z-index:20;
+  overflow:auto;
+}
+
+.popupContent{
+  max-width:1050px;
+  margin:auto;
+  padding:32px;
+  border-radius:36px;
+  background:white;
+  box-shadow:0 30px 90px rgba(0,0,0,.35);
+  animation:pop .35s ease;
+}
+
+.videoBox iframe{
+  width:100%;
+  height:560px;
+  border-radius:24px;
+  background:black;
+  border:none;
+}
+
+.driveFallback{
+  padding:34px;
+  background:#f8fafc;
+  border-radius:24px;
+  text-align:center;
+}
+
+.openDoc{
+  display:inline-block;
+  margin-top:15px;
+  background:#6d28d9;
+  color:white;
+  text-decoration:none;
+  padding:15px 24px;
+  border-radius:16px;
+  font-weight:900;
+}
+
+textarea{
+  width:100%;
+  height:95px;
+}
+
+.comment{
+  margin-top:10px;
+  padding:14px;
+  border-radius:16px;
+  background:#f9fafb;
+  border-left:5px solid #9333ea;
+}
+
+.closeBtn{
+  background:#111827;
+}
+
+.userRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#f9fafb;
+  padding:14px;
+  border-radius:16px;
+  margin-top:10px;
+}
+
+.small{
+  font-size:13px;
+  color:#667085;
+}
+
+hr{
+  border:none;
+  border-top:1px solid #eee;
+  margin:28px 0;
+}
 </style>
 </head>
 
@@ -77,8 +445,13 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 </div>
 
 <div class="app" id="app">
+
   <div class="topbar">
-    <div class="brand"><div class="brandIcon">HS</div>Hub SmartID</div>
+    <div class="brand">
+      <div class="brandIcon">HS</div>
+      Hub SmartID
+    </div>
+
     <div class="searchArea">
       <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="loadItems()">
       <button class="logout" onclick="logout()">Logout</button>
@@ -87,27 +460,32 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 
   <div class="hero">
     <h1>Hub SmartID</h1>
-    <p>Ghid de utilizare echipamente NCR</p>
+    <p>Training, proceduri și suport pentru echipamente NCR</p>
   </div>
 
   <div class="container">
 
     <div class="panel" id="submitPanel" style="display:none">
       <h2>Trimite material pentru aprobare</h2>
-      <p class="small">Pentru videoclip pui link YouTube nelistat. Pentru procedură pui link Google Drive către PDF/Word.</p>
+      <p class="small">Videoclip = link YouTube nelistat. Procedură = link Google Drive către PDF/Word.</p>
+
       <div class="grid">
         <input id="submitTitle" placeholder="Titlu material">
         <input id="submitUrl" placeholder="Link YouTube sau Google Drive">
+
         <select id="submitType">
           <option value="videoclip">Videoclip</option>
           <option value="procedura">Procedură</option>
         </select>
+
         <select id="submitCategory">
           <option value="carrefour">Carrefour</option>
           <option value="franciza">Franciză</option>
         </select>
+
         <input class="full" id="submitTags" placeholder="Tag-uri: restart, scanner, recycler">
       </div>
+
       <button onclick="submitMaterial()">Trimite spre aprobare</button>
     </div>
 
@@ -118,16 +496,20 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
       <div class="grid">
         <input id="newTitle" placeholder="Titlu">
         <input id="newUrl" placeholder="Link YouTube sau Google Drive">
+
         <select id="newType">
           <option value="videoclip">Videoclip</option>
           <option value="procedura">Procedură</option>
         </select>
+
         <select id="newCategory">
           <option value="carrefour">Carrefour</option>
           <option value="franciza">Franciză</option>
         </select>
+
         <input class="full" id="newTags" placeholder="Tag-uri: restart, scanner, recycler">
       </div>
+
       <button onclick="addMaterial()">Adaugă material</button>
 
       <hr>
@@ -138,7 +520,6 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
       <hr>
 
       <h3>Setează rol user</h3>
-      <p class="small">Userul trebuie creat înainte în Firebase Authentication → Add user.</p>
       <div class="grid">
         <input id="roleEmail" placeholder="Email user">
         <select id="roleSelect">
@@ -153,6 +534,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
           <option value="franciza">franciza</option>
         </select>
       </div>
+
       <button onclick="saveUserRole()">Salvează rol</button>
 
       <h3>Useri cu roluri</h3>
@@ -171,7 +553,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
 
       <div class="bigCard" onclick="setType('procedura')">
         <h2>📘 Proceduri</h2>
-        <p>Documente PDF/Word din Google Drive, vizualizate direct în aplicație.</p>
+        <p>Documente PDF/Word din Google Drive sau proceduri interne.</p>
         <div class="filterRow">
           <button class="filterBtn" onclick="setFilter(event,'procedura','carrefour')">Carrefour</button>
           <button class="filterBtn" onclick="setFilter(event,'procedura','franciza')">Franciză</button>
@@ -180,12 +562,14 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
     </div>
 
     <div class="cards" id="cards"></div>
+
   </div>
 </div>
 
 <div class="popup" id="popup">
   <div class="popupContent">
     <h2 id="popupTitle"></h2>
+
     <div class="videoBox" id="popupVideoBox"></div>
 
     <p>
@@ -198,6 +582,7 @@ hr{border:none;border-top:1px solid #eee;margin:28px 0}
     <br><br>
     <button onclick="addComment()">Trimite comentariu</button>
     <button class="closeBtn" onclick="closePopup()">Închide</button>
+
     <div id="comments"></div>
   </div>
 </div>
@@ -220,8 +605,8 @@ const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let currentType = "";
-let currentCategory = "";
+let currentType = null;
+let currentCategory = null;
 let currentId = null;
 let items = [];
 let currentUserRole = "";
@@ -250,20 +635,15 @@ function drivePreview(url){
     return `https://drive.google.com/file/d/${id}/preview`;
   }
 
-  if(url.includes("/document/d/")){
-    const id = url.split("/document/d/")[1].split("/")[0];
-    return `https://docs.google.com/document/d/${id}/preview`;
-  }
-
-  if(url.includes("/presentation/d/")){
-    const id = url.split("/presentation/d/")[1].split("/")[0];
-    return `https://docs.google.com/presentation/d/${id}/preview`;
+  if(url.includes("id=")){
+    const id = url.split("id=")[1].split("&")[0];
+    return `https://drive.google.com/file/d/${id}/preview`;
   }
 
   return "";
 }
 
-function previewHtml(url, type){
+function previewHtml(url,type){
   if(type === "procedura"){
     return `<div class="preview">📘</div>`;
   }
@@ -281,16 +661,19 @@ function popupHtml(item){
     const preview = drivePreview(item.url);
 
     if(preview){
-      return `<iframe src="${preview}" allowfullscreen></iframe>`;
+      return `
+        <iframe src="${preview}" allowfullscreen></iframe>
+        <div class="driveFallback">
+          <p>Dacă documentul nu se încarcă, Chrome sau Drive îl poate bloca.</p>
+          <a class="openDoc" href="${item.url}" target="_blank">Deschide procedura în Google Drive</a>
+        </div>
+      `;
     }
 
     return `
-      <div class="empty">
-        Procedura nu poate fi previzualizată direct.
-        <br><br>
-        <a href="${item.url}" target="_blank">
-          <button>Deschide procedura în Drive</button>
-        </a>
+      <div class="driveFallback">
+        <p>Procedura nu poate fi previzualizată direct.</p>
+        <a class="openDoc" href="${item.url}" target="_blank">Deschide procedura</a>
       </div>
     `;
   }
@@ -300,7 +683,7 @@ function popupHtml(item){
     return `<iframe src="${embed}" allowfullscreen></iframe>`;
   }
 
-  return `<div class="empty">Link video invalid.</div>`;
+  return `<div class="driveFallback">Link video invalid.</div>`;
 }
 
 window.login = async function(){
@@ -395,6 +778,7 @@ async function loadPending(){
 
   snap.forEach(d=>{
     const v = d.data();
+
     html += `
       <div class="userRow">
         <div>
@@ -410,7 +794,7 @@ async function loadPending(){
     `;
   });
 
-  pendingList.innerHTML = html || `<div class="empty">Nu există materiale în așteptare.</div>`;
+  pendingList.innerHTML = html || `<div class="small">Nu există materiale în așteptare.</div>`;
 }
 
 window.approveMaterial = async function(id){
@@ -459,6 +843,7 @@ async function loadUsers(){
 
   snap.forEach(d=>{
     const u = d.data();
+
     html += `
       <div class="userRow">
         <div>
@@ -474,7 +859,7 @@ async function loadUsers(){
 
 window.setType = function(type){
   currentType = type;
-  currentCategory = "";
+  currentCategory = null;
   loadItems();
 }
 
@@ -490,6 +875,11 @@ window.loadItems = async function(){
   const snap = await getDocs(collection(db,"videos"));
   items = [];
   let html = "";
+
+  if(!currentType){
+    cards.innerHTML = "";
+    return;
+  }
 
   snap.forEach(d=>{
     const v = d.data();
@@ -520,7 +910,7 @@ window.loadItems = async function(){
 
     html += `
       <div class="card" onclick="openItem(${index})">
-        ${previewHtml(v.url, v.type)}
+        ${previewHtml(v.url,v.type)}
         <div class="cardBody">
           <span class="tag">${v.type}</span>
           <span class="tag">${v.category}</span>
@@ -537,13 +927,16 @@ window.loadItems = async function(){
 
 window.deleteMaterial = async function(event,id){
   event.stopPropagation();
+
   if(currentUserRole !== "admin" && currentUserRole !== "suport") return;
+
   await deleteDoc(doc(db,"videos",id));
   loadItems();
 }
 
 window.openItem = async function(index){
   const v = items[index];
+
   currentId = v.id;
   popupTitle.innerText = v.title;
   popupVideoBox.innerHTML = popupHtml(v);
