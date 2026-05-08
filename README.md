@@ -1,1 +1,1 @@
-# Smartid Assist
+# Smartid
