@@ -912,12 +912,14 @@ let currentLanguage = "ro";
 
 const translations = {
 
-  ro:{
+ro:{
     hero:"Training, proceduri și suport pentru echipamente NCR",
     videos:"Videoclipuri",
     procedures:"Proceduri",
     comments:"Comentarii",
-    search:"🔎 Caută după tag..."
+    search:"🔎 Caută după tag...",
+    videosDesc:"Tutoriale și clipuri pentru suport operațional.",
+    proceduresDesc:"Proceduri și documentație tehnică."
   },
 
   en:{
@@ -925,7 +927,9 @@ const translations = {
     videos:"Videos",
     procedures:"Procedures",
     comments:"Comments",
-    search:"🔎 Search by tag..."
+    search:"🔎 Search by tag...",
+    videosDesc:"Tutorials and operational support videos.",
+    proceduresDesc:"Procedures and technical documentation."
   }
 
 };
@@ -941,8 +945,12 @@ window.changeLanguage = function(lang){
   heroSubtitle.innerText = t("hero");
 
   videosTitle.innerHTML = "🎬 " + t("videos");
+  
+  videosDesc.innerText = t("videosDesc");
 
   proceduresTitle.innerHTML = "📘 " + t("procedures");
+
+  proceduresDesc.innerText = t("proceduresDesc");
 
   commentsTitle.innerText = t("comments");
 
