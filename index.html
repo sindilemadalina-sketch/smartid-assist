@@ -2,76 +2,797 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hub SmartID</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Roboto,sans-serif;background:#f4f6fb;color:#111827}
-button{border:none;cursor:pointer;font-weight:900;border-radius:16px;padding:14px 22px;background:#6d28d9;color:white}
-input,select,textarea{border:1px solid #ddd6fe;border-radius:16px;padding:14px;font-family:Roboto;outline:none}
-.hidden{display:none!important}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-.loginPage{height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff,#f3e8ff)}
-.loginBox{width:430px;background:white;padding:42px;border-radius:34px;text-align:center;box-shadow:0 30px 90px rgba(76,29,149,.18)}
-.logo{width:86px;height:86px;border-radius:26px;margin:auto;background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
-.loginBox h1{color:#4c1d95;font-size:44px;margin:16px 0 4px}
-.loginBox input{width:100%;margin-top:12px}
-.loginBox button{width:100%;margin-top:16px}
+:root{
+  --purple:#6d28d9;
+  --purple2:#9333ea;
+  --pink:#ec4899;
+  --dark:#0f172a;
+  --text:#111827;
+  --muted:#64748b;
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --border:#e9ddff;
+  --soft:#f4ecff;
+  --green:#16a34a;
+  --red:#dc2626;
+  --blue:#2563eb;
+}
 
-.app{display:none}
-.topbar{height:84px;padding:0 42px;background:white;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 35px rgba(0,0,0,.08);position:sticky;top:0;z-index:10}
-.brand{font-size:26px;font-weight:900;color:#4c1d95;display:flex;align-items:center;gap:12px}
-.brandIcon{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#4c1d95,#9333ea,#ec4899);color:white;display:flex;align-items:center;justify-content:center}
-.actions{display:flex;gap:12px;align-items:center}
-.search{width:330px;border-radius:999px}
-.logout{background:#111827}
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left,rgba(147,51,234,.16),transparent 28%),
+    radial-gradient(circle at top right,rgba(236,72,153,.10),transparent 26%),
+    linear-gradient(135deg,#ffffff,#f6f7fb 45%,#f3ecff);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
-.hero{padding:46px 30px;text-align:center;background:radial-gradient(circle at top left,#ede9fe,transparent 30%),linear-gradient(135deg,#fff,#f5f3ff)}
-.hero h1{font-size:58px;margin:0;background:linear-gradient(90deg,#4c1d95,#9333ea,#ec4899);-webkit-background-clip:text;color:transparent}
-.hero p{color:#667085;font-size:18px}
+button,input,select,textarea{
+  font-family:inherit;
+}
 
-.main{padding:30px 42px 70px}
-.homeGrid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
-.bigCard{background:white;border-radius:34px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.08);cursor:pointer;transition:.2s}
-.bigCard:hover{transform:translateY(-6px)}
-.bigCard h2{font-size:38px;color:#4c1d95;margin:0}
-.bigCard p{color:#667085}
+button{
+  border:none;
+  cursor:pointer;
+  font-weight:800;
+  transition:.22s ease;
+}
 
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
-.card{background:white;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.1);cursor:pointer}
-.preview{height:180px;background:linear-gradient(135deg,#111827,#4c1d95);display:flex;align-items:center;justify-content:center;color:white;font-size:54px}
-.card iframe{width:100%;height:180px;border:0}
-.cardBody{padding:20px}
-.tag{display:inline-block;background:#f3e8ff;color:#6d28d9;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:900;margin:6px 5px 0 0}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.dark{background:#111827}.danger{background:#dc2626}.green{background:#16a34a}
+button:hover{
+  transform:translateY(-1px);
+}
 
-.panel{background:white;border-radius:30px;padding:28px;margin-bottom:28px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.full{grid-column:1/-1}
-.statGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
-.stat{background:linear-gradient(135deg,#f5f3ff,#fff);border:1px solid #ede9fe;border-radius:24px;padding:22px}
-.stat h3{margin:0;color:#4c1d95;font-size:28px}
-.stat p{margin:6px 0 0;color:#667085}
-.tableRow{background:#f9fafb;padding:14px;border-radius:14px;margin-top:10px}
+.hidden{
+  display:none!important;
+}
 
-.back{background:#111827;margin-bottom:22px}
-.pagination{display:flex;justify-content:center;gap:18px;align-items:center;margin-top:30px}
+/* LOGIN */
 
-.popup{display:none;position:fixed;inset:0;background:rgba(17,24,39,.88);z-index:99;padding:35px;overflow:auto}
-.popupContent{position:relative;max-width:1050px;margin:auto;background:white;border-radius:34px;padding:32px}
-.x{position:absolute;right:22px;top:22px;width:42px;height:42px;border-radius:50%;background:#111827;font-size:22px;padding:0}
-.viewer iframe{width:100%;height:560px;border:0;border-radius:22px;background:black}
-.driveBox{text-align:center;background:#f8fafc;border-radius:22px;padding:32px}
-textarea{width:100%;height:100px}
-.comment{background:#f9fafb;border-left:5px solid #9333ea;padding:14px;border-radius:14px;margin-top:10px}
+.loginPage{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:30px;
+}
 
-.storeModal{display:none;position:fixed;inset:0;background:rgba(17,24,39,.88);z-index:100;align-items:center;justify-content:center}
-.storeBox{background:white;border-radius:30px;padding:34px;width:420px;text-align:center}
-.storeBox input{width:100%;margin-top:14px}
+.loginBox{
+  width:440px;
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:34px;
+  padding:42px;
+  box-shadow:0 35px 90px rgba(76,29,149,.16);
+  text-align:center;
+}
 
-@media(max-width:850px){.homeGrid,.grid{grid-template-columns:1fr}.topbar{height:auto;flex-direction:column;padding:18px}.actions{width:100%;flex-wrap:wrap}.search{width:100%}.hero h1{font-size:44px}}
+.logoBig{
+  width:86px;
+  height:86px;
+  margin:0 auto 18px;
+  border-radius:27px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:34px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--purple),var(--purple2),var(--pink));
+  box-shadow:0 18px 40px rgba(109,40,217,.25);
+}
+
+.loginBox h1{
+  font-size:44px;
+  color:#4c1d95;
+  letter-spacing:-1px;
+}
+
+.loginBox p{
+  color:var(--muted);
+  margin-top:8px;
+  margin-bottom:18px;
+}
+
+.loginBox input{
+  width:100%;
+  padding:16px 18px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  margin-top:12px;
+  outline:none;
+  font-size:15px;
+  background:white;
+}
+
+.primaryBtn{
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:white;
+  padding:15px 22px;
+  border-radius:18px;
+  box-shadow:0 14px 32px rgba(109,40,217,.24);
+}
+
+.loginBtn{
+  width:100%;
+  margin-top:18px;
+}
+
+/* STORE MODAL */
+
+.storeModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.78);
+  z-index:200;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.storeBox{
+  width:430px;
+  background:white;
+  border-radius:30px;
+  padding:34px;
+  box-shadow:0 30px 90px rgba(0,0,0,.28);
+}
+
+.storeBox h2{
+  color:#4c1d95;
+  font-size:28px;
+}
+
+.storeBox p{
+  color:var(--muted);
+  margin:8px 0 18px;
+}
+
+.storeBox input{
+  width:100%;
+  padding:15px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  margin-bottom:14px;
+}
+
+/* APP LAYOUT */
+
+.app{
+  display:none;
+  min-height:100vh;
+}
+
+.topbar{
+  height:82px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 34px;
+  box-shadow:0 10px 30px rgba(15,23,42,.06);
+  position:sticky;
+  top:0;
+  z-index:60;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:26px;
+  font-weight:900;
+  color:#341270;
+}
+
+.logoMini{
+  width:48px;
+  height:48px;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2),var(--pink));
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+
+.topControls{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.searchBox{
+  width:340px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:14px 18px;
+  outline:none;
+  background:white;
+}
+
+.langSelect{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:13px 15px;
+  background:white;
+  font-weight:800;
+}
+
+.logoutBtn{
+  background:var(--dark);
+  color:white;
+  padding:14px 21px;
+  border-radius:18px;
+}
+
+/* RIGHT MENU */
+
+.layout{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:28px;
+  padding:28px 34px 60px;
+}
+
+.mainArea{
+  min-width:0;
+}
+
+.sideMenu{
+  position:sticky;
+  top:106px;
+  height:calc(100vh - 130px);
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(233,221,255,.9);
+  border-radius:30px;
+  padding:22px;
+  box-shadow:0 20px 60px rgba(15,23,42,.08);
+}
+
+.sideMenu h3{
+  color:#4c1d95;
+  font-size:18px;
+  margin-bottom:14px;
+}
+
+.menuBtn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  color:var(--text);
+  padding:15px 16px;
+  border-radius:18px;
+  margin-bottom:10px;
+  text-align:left;
+  border:1px solid #eef0f6;
+}
+
+.menuBtn:hover,
+.menuBtn.active{
+  background:linear-gradient(135deg,#f4ecff,#ffffff);
+  color:#4c1d95;
+  border-color:var(--border);
+}
+
+.menuBtn span{
+  font-size:20px;
+}
+
+/* HERO */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at top left,rgba(147,51,234,.16),transparent 26%),
+    radial-gradient(circle at top right,rgba(236,72,153,.12),transparent 24%),
+    linear-gradient(135deg,#fff,#f8f5ff);
+  border:1px solid rgba(233,221,255,.85);
+  border-radius:34px;
+  padding:42px 34px;
+  box-shadow:0 18px 50px rgba(15,23,42,.06);
+  margin-bottom:28px;
+  text-align:center;
+}
+
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(120deg,rgba(109,40,217,.08) 1px,transparent 1px),
+    linear-gradient(60deg,rgba(236,72,153,.07) 1px,transparent 1px);
+  background-size:80px 80px;
+  opacity:.35;
+}
+
+.heroContent{
+  position:relative;
+  z-index:2;
+}
+
+.heroKicker{
+  font-weight:800;
+  color:#4c1d95;
+  margin-bottom:8px;
+}
+
+.hero h1{
+  font-size:58px;
+  letter-spacing:-1.8px;
+  line-height:1;
+  background:linear-gradient(90deg,#0f172a,var(--purple2),var(--pink));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:18px;
+  margin-top:14px;
+}
+
+.heroLine{
+  width:88px;
+  height:5px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--purple),var(--pink));
+  margin:22px auto 0;
+}
+
+/* HOME CARDS */
+
+.homeGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-bottom:28px;
+}
+
+.homeCard{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(233,221,255,.9);
+  border-radius:30px;
+  padding:28px;
+  min-height:170px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.07);
+  cursor:pointer;
+  transition:.22s ease;
+}
+
+.homeCard:hover{
+  transform:translateY(-5px);
+  box-shadow:0 25px 70px rgba(109,40,217,.14);
+}
+
+.homeIcon{
+  width:92px;
+  height:92px;
+  border-radius:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  background:linear-gradient(135deg,#f4ecff,#ffffff);
+  color:#4c1d95;
+  border:1px solid var(--border);
+  flex:0 0 auto;
+}
+
+.homeCardText{
+  flex:1;
+}
+
+.homeCard h2{
+  font-size:32px;
+  color:#17132f;
+}
+
+.homeCard p{
+  color:var(--muted);
+  margin-top:8px;
+}
+
+.arrowCircle{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  color:var(--purple);
+  background:white;
+}
+
+/* PANELS */
+
+.pageHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.backBtn{
+  background:var(--dark);
+  color:white;
+  padding:13px 18px;
+  border-radius:16px;
+}
+
+.pageTitle{
+  font-size:32px;
+  color:#22134d;
+}
+
+.panel{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(233,221,255,.9);
+  border-radius:30px;
+  padding:26px;
+  box-shadow:0 18px 50px rgba(15,23,42,.07);
+  margin-bottom:24px;
+}
+
+.panelTitle{
+  color:#4c1d95;
+  font-size:24px;
+  margin-bottom:16px;
+}
+
+/* MATERIAL CARDS */
+
+.cardsGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:22px;
+}
+
+.materialCard{
+  background:white;
+  border-radius:26px;
+  overflow:hidden;
+  border:1px solid #edf0f7;
+  box-shadow:0 14px 36px rgba(15,23,42,.08);
+  cursor:pointer;
+  transition:.22s ease;
+}
+
+.materialCard:hover{
+  transform:translateY(-5px);
+  box-shadow:0 22px 60px rgba(109,40,217,.13);
+}
+
+.thumb{
+  height:170px;
+  background:linear-gradient(135deg,#17132f,#4c1d95);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:48px;
+  position:relative;
+}
+
+.thumb iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+.materialBody{
+  padding:18px;
+}
+
+.materialBody h3{
+  font-size:19px;
+  color:#111827;
+}
+
+.materialMeta{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:7px;
+}
+
+.tags{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.tag{
+  background:#f4ecff;
+  color:#5b21b6;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.cardActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.smallBtn{
+  padding:10px 13px;
+  border-radius:13px;
+  font-size:13px;
+}
+
+.editBtn{
+  background:#111827;
+  color:white;
+}
+
+.deleteBtn{
+  background:#dc2626;
+  color:white;
+}
+
+/* DETAIL PAGE */
+
+.detailShell{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 340px;
+  gap:24px;
+}
+
+.viewerPanel{
+  background:white;
+  border:1px solid rgba(233,221,255,.9);
+  border-radius:30px;
+  padding:20px;
+  box-shadow:0 18px 50px rgba(15,23,42,.07);
+}
+
+.viewerFrame{
+  width:100%;
+  height:68vh;
+  border:0;
+  border-radius:20px;
+  background:#0f172a;
+}
+
+.viewerFallback{
+  min-height:420px;
+  background:#f8fafc;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+
+.infoPanel{
+  background:white;
+  border:1px solid rgba(233,221,255,.9);
+  border-radius:30px;
+  padding:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.07);
+}
+
+.questionBox{
+  margin-top:18px;
+  padding:18px;
+  border-radius:20px;
+  background:#f8fafc;
+}
+
+.feedbackRow{
+  display:flex;
+  gap:18px;
+  align-items:center;
+  margin-top:12px;
+}
+
+.tapBtn{
+  background:transparent;
+  color:#111827;
+  padding:6px;
+  border-radius:10px;
+  font-size:30px;
+  box-shadow:none!important;
+}
+
+.tapBtn:hover{
+  transform:scale(1.08);
+}
+
+.shareRow{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+
+.shareBtn{
+  background:#f4ecff;
+  color:#4c1d95;
+  padding:12px 14px;
+  border-radius:14px;
+}
+
+.commentBox{
+  margin-top:18px;
+}
+
+.commentBox textarea{
+  width:100%;
+  min-height:95px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  resize:vertical;
+}
+
+.commentItem{
+  background:#f8fafc;
+  border-left:4px solid var(--purple2);
+  border-radius:14px;
+  padding:12px;
+  margin-top:10px;
+}
+
+/* DASHBOARD */
+
+.dashboardGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.tile{
+  background:linear-gradient(135deg,#ffffff,#f7f2ff);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:0 14px 34px rgba(15,23,42,.06);
+}
+
+.tile h3{
+  font-size:30px;
+  color:#4c1d95;
+}
+
+.tile p{
+  color:var(--muted);
+  margin-top:5px;
+}
+
+.managementGrid{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:22px;
+}
+
+.formGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.formGrid input,
+.formGrid select{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--border);
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.listRow{
+  background:#f8fafc;
+  border-radius:16px;
+  padding:14px;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.spacedActions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px){
+  .layout{
+    grid-template-columns:1fr;
+  }
+
+  .sideMenu{
+    position:relative;
+    top:0;
+    height:auto;
+    order:-1;
+  }
+
+  .dashboardGrid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .detailShell{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:760px){
+  .topbar{
+    height:auto;
+    flex-direction:column;
+    align-items:flex-start;
+    padding:18px;
+    gap:16px;
+  }
+
+  .topControls{
+    width:100%;
+    flex-wrap:wrap;
+  }
+
+  .searchBox{
+    width:100%;
+  }
+
+  .layout{
+    padding:18px;
+  }
+
+  .homeGrid,
+  .managementGrid,
+  .formGrid{
+    grid-template-columns:1fr;
+  }
+
+  .hero h1{
+    font-size:42px;
+  }
+
+  .dashboardGrid{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 
@@ -79,146 +800,430 @@ textarea{width:100%;height:100px}
 
 <div class="loginPage" id="loginPage">
   <div class="loginBox">
-    <div class="logo">HS</div>
+    <div class="logoBig">HS</div>
     <h1>Hub SmartID</h1>
     <p>Training, proceduri și suport NCR</p>
+
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Parolă">
-    <button onclick="login()">Autentificare</button>
-    <p id="loginError" style="color:red;margin-top:10px"></p>
+
+    <button class="primaryBtn loginBtn" onclick="login()">Autentificare</button>
+    <p id="loginError" style="color:red;margin-top:12px;"></p>
   </div>
 </div>
 
 <div class="storeModal" id="storeModal">
   <div class="storeBox">
     <h2>Cod magazin / locație</h2>
-    <p>Ex: CJ001, Băneasa, Orhideea</p>
-    <input id="storeCode" placeholder="Introdu cod magazin">
-    <button onclick="saveStore()">Continuă</button>
+    <p>Completează magazinul ca să putem urmări utilizarea materialelor.</p>
+    <input id="storeCode" placeholder="Ex: CJ001, Băneasa, Orhideea">
+    <button class="primaryBtn" onclick="saveStore()">Continuă</button>
   </div>
 </div>
 
 <div class="app" id="app">
+
   <div class="topbar">
-    <div class="brand"><div class="brandIcon">HS</div>Hub SmartID</div>
-    <div class="actions">
-      <input class="search" id="search" placeholder="🔎 Caută după tag..." oninput="loadMaterials()">
-      <select onchange="changeLang(this.value)">
+    <div class="brand">
+      <div class="logoMini">HS</div>
+      Hub SmartID
+    </div>
+
+    <div class="topControls">
+      <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="searchChanged()">
+
+      <select class="langSelect" id="langSelect" onchange="changeLang(this.value)">
         <option value="ro">RO</option>
         <option value="en">EN</option>
       </select>
-      <button class="logout" onclick="logout()">Logout</button>
+
+      <button class="logoutBtn" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <div class="hero">
-    <h1 id="heroTitle">Hub SmartID</h1>
-    <p id="heroText">Training, proceduri și suport pentru echipamente NCR</p>
+  <div class="layout">
+
+    <main class="mainArea">
+
+      <section class="hero" id="hero">
+        <div class="heroContent">
+          <div class="heroKicker" id="heroKicker">Bun venit în</div>
+          <h1>Hub SmartID</h1>
+          <p id="heroText">Training, proceduri și suport pentru echipamente NCR</p>
+          <div class="heroLine"></div>
+        </div>
+      </section>
+
+      <section id="homePage">
+        <div class="homeGrid">
+          <div class="homeCard" onclick="openListPage('videoclip')">
+            <div class="homeIcon">🎬</div>
+            <div class="homeCardText">
+              <h2 id="videosTitle">Videoclipuri</h2>
+              <p id="videosDesc">Tutoriale și clipuri pentru suport operațional.</p>
+            </div>
+            <div class="arrowCircle">›</div>
+          </div>
+
+          <div class="homeCard" onclick="openListPage('procedura')">
+            <div class="homeIcon">📘</div>
+            <div class="homeCardText">
+              <h2 id="proceduresTitle">Proceduri</h2>
+              <p id="proceduresDesc">Proceduri și documentație tehnică.</p>
+            </div>
+            <div class="arrowCircle">›</div>
+          </div>
+        </div>
+
+        <section class="panel" id="recentPanel">
+          <div class="pageHeader">
+            <h2 class="pageTitle" id="recentTitle">Materiale recente</h2>
+            <button class="primaryBtn" onclick="openListPage('videoclip')">Vezi toate</button>
+          </div>
+          <div class="cardsGrid" id="recentCards"></div>
+        </section>
+      </section>
+            <!-- LIST PAGE -->
+      <section id="listPage" class="hidden">
+
+        <div class="pageHeader">
+          <button class="backBtn" onclick="goHome()">← Înapoi</button>
+          <h2 class="pageTitle" id="listTitle">Materiale</h2>
+        </div>
+
+        <div class="panel">
+          <div class="cardsGrid" id="materialsGrid"></div>
+
+          <div class="spacedActions" style="justify-content:center;">
+            <button onclick="prevPage()">←</button>
+            <span id="pageInfo"></span>
+            <button onclick="nextPage()">→</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- DETAIL PAGE -->
+      <section id="detailPage" class="hidden">
+
+        <div class="pageHeader">
+          <button class="backBtn" onclick="goBackToList()">← Înapoi</button>
+          <h2 class="pageTitle" id="detailTitle">Detalii</h2>
+        </div>
+
+        <div class="detailShell">
+
+          <!-- VIDEO / PROCEDURA -->
+          <div class="viewerPanel">
+            <iframe id="viewerFrame" class="viewerFrame"></iframe>
+
+            <div id="viewerFallback" class="viewerFallback hidden">
+              <p>Nu se poate încărca direct.</p>
+              <br>
+              <a id="openExternal" target="_blank">
+                <button class="primaryBtn">Deschide</button>
+              </a>
+            </div>
+          </div>
+
+          <!-- INFO -->
+          <div class="infoPanel">
+
+            <h3 id="detailName"></h3>
+
+            <p id="detailMeta" class="materialMeta"></p>
+
+            <!-- ÎNTREBARE -->
+            <div class="questionBox">
+              <b>Te-a ajutat informația?</b>
+
+              <div class="feedbackRow">
+                <button class="tapBtn" onclick="feedback('up')">👍</button>
+                <button class="tapBtn" onclick="feedback('down')">👎</button>
+              </div>
+            </div>
+
+            <!-- SHARE -->
+            <div class="shareRow">
+              <button class="shareBtn" onclick="shareWhatsApp()">WhatsApp</button>
+              <button class="shareBtn" onclick="shareEmail()">Email</button>
+            </div>
+
+            <!-- COMMENTS -->
+            <div class="commentBox">
+              <textarea id="commentText" placeholder="Scrie comentariu..."></textarea>
+              <br><br>
+              <button class="primaryBtn" onclick="addComment()">Trimite</button>
+              <div id="commentsList"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboardPage" class="hidden">
+
+        <div class="pageHeader">
+          <h2 class="pageTitle">Dashboard</h2>
+        </div>
+
+        <div class="dashboardGrid">
+          <div class="tile"><h3 id="statLogins">0</h3><p>Sesiuni</p></div>
+          <div class="tile"><h3 id="statUsers">0</h3><p>Utilizatori</p></div>
+          <div class="tile"><h3 id="statViews">0</h3><p>Vizualizări</p></div>
+          <div class="tile"><h3 id="statMaterials">0</h3><p>Materiale</p></div>
+        </div>
+
+        <div class="managementGrid">
+
+          <!-- ADD MATERIAL -->
+          <div class="panel">
+            <h3 class="panelTitle">Adaugă material</h3>
+
+            <div class="formGrid">
+              <input id="newTitle" placeholder="Titlu">
+              <input id="newUrl" placeholder="Link">
+
+              <select id="newType">
+                <option value="videoclip">Videoclip</option>
+                <option value="procedura">Procedură</option>
+              </select>
+
+              <select id="newCategory">
+                <option value="carrefour">Carrefour</option>
+                <option value="franciza">Franciză</option>
+              </select>
+
+              <input id="newTags" class="full" placeholder="Tag-uri">
+            </div>
+
+            <div class="spacedActions">
+              <button class="primaryBtn" onclick="addMaterial()">Adaugă</button>
+            </div>
+          </div>
+
+          <!-- USERS -->
+          <div class="panel">
+            <h3 class="panelTitle">Useri</h3>
+
+            <div class="formGrid">
+              <input id="roleEmail" placeholder="Email">
+              <select id="roleSelect">
+                <option value="admin">admin</option>
+                <option value="suport">suport</option>
+                <option value="carrefour">carrefour</option>
+                <option value="franciza">franciza</option>
+              </select>
+            </div>
+
+            <div class="spacedActions">
+              <button onclick="saveRole()">Salvează</button>
+            </div>
+
+            <div id="usersList"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- RIGHT MENU -->
+    <aside class="sideMenu">
+
+      <h3>Meniu</h3>
+
+      <button class="menuBtn active" onclick="goHome()" id="btnHome">
+        <span>🏠</span> Home
+      </button>
+
+      <button class="menuBtn" onclick="openListPage('videoclip')" id="btnVideo">
+        <span>🎬</span> Videoclipuri
+      </button>
+
+      <button class="menuBtn" onclick="openListPage('procedura')" id="btnProc">
+        <span>📘</span> Proceduri
+      </button>
+
+      <button class="menuBtn hidden" onclick="openDashboard()" id="btnDash">
+        <span>📊</span> Dashboard
+      </button>
+
+    </aside>
+
   </div>
 
-  <div class="main">
-
-    <div id="adminPanel" class="hidden">
-      <div class="panel">
-        <h2>Dashboard Admin</h2>
-        <div class="statGrid">
-          <div class="stat"><h3 id="loginCount">0</h3><p>Login-uri totale</p></div>
-          <div class="stat"><h3 id="storeCount">0</h3><p>Magazine active</p></div>
-          <div class="stat"><h3 id="viewCount">0</h3><p>Vizualizări materiale</p></div>
-          <div class="stat"><h3 id="materialCount">0</h3><p>Materiale publicate</p></div>
-        </div>
-
-        <h3 style="margin-top:24px">Ultimele accesări</h3>
-        <div id="lastLogins"></div>
-
-        <h3 style="margin-top:24px">Top materiale accesate</h3>
-        <div id="topViews"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Adaugă material</h2>
-        <div class="grid">
-          <input id="newTitle" placeholder="Titlu">
-          <input id="newUrl" placeholder="Link YouTube / Google Drive">
-          <select id="newType">
-            <option value="videoclip">Videoclip</option>
-            <option value="procedura">Procedură</option>
-          </select>
-          <select id="newCategory">
-            <option value="carrefour">Carrefour</option>
-            <option value="franciza">Franciză</option>
-          </select>
-          <input id="newTags" class="full" placeholder="Tag-uri: restart, scanner, recycler">
-        </div>
-        <button onclick="addMaterial()">Adaugă material</button>
-      </div>
-
-      <div class="panel">
-        <h2>Setează rol user</h2>
-        <div class="grid">
-          <input id="roleEmail" placeholder="Email user">
-          <select id="roleSelect">
-            <option value="admin">admin</option>
-            <option value="suport">suport</option>
-            <option value="carrefour">carrefour</option>
-            <option value="franciza">franciza</option>
-          </select>
-        </div>
-        <button onclick="saveRole()">Salvează rol</button>
-        <div id="usersList"></div>
-      </div>
-    </div>
-
-    <div id="homePage">
-      <div class="homeGrid">
-        <div class="bigCard" onclick="openPage('videoclip')">
-          <h2 id="videosTitle">🎬 Videoclipuri</h2>
-          <p id="videosDesc">Clipuri video pentru instruire rapidă și suport operațional.</p>
-        </div>
-
-        <div class="bigCard" onclick="openPage('procedura')">
-          <h2 id="proceduresTitle">📘 Proceduri</h2>
-          <p id="proceduresDesc">Proceduri și documentație tehnică.</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="materialsPage" class="hidden">
-      <button class="back" onclick="goHome()">← Înapoi</button>
-      <div class="cards" id="cards"></div>
-      <div class="pagination">
-        <button onclick="prevPage()">←</button>
-        <span id="pageInfo"></span>
-        <button onclick="nextPage()">→</button>
-      </div>
-    </div>
-
-  </div>
 </div>
 
-<div class="popup" id="popup">
-  <div class="popupContent">
-    <button class="x" onclick="closePopup()">×</button>
-    <h2 id="popupTitle"></h2>
-    <div class="viewer" id="viewer"></div>
+<script>
+let currentPage = "home";
+let currentType = "";
+let page = 1;
+let pageSize = 12;
+let allMaterials = [];
+let filtered = [];
+let currentMaterial = null;
 
-    <div class="row">
-      <button class="green" id="likeBtn" onclick="vote('like')">👍 Like <span id="likeCount">0</span></button>
-      <button class="danger" id="dislikeBtn" onclick="vote('dislike')">👎 Dislike <span id="dislikeCount">0</span></button>
-    </div>
+/* NAVIGATION */
 
-    <h3 style="margin-top:22px">Comentarii</h3>
-    <textarea id="commentText" placeholder="Scrie comentariu..."></textarea>
-    <br><br>
-    <button onclick="addComment()">Trimite comentariu</button>
-    <div id="comments"></div>
-  </div>
-</div>
+function setActive(btn){
+  document.querySelectorAll(".menuBtn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+}
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc, setDoc, doc, increment, query, where } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+function goHome(){
+  stopVideo();
+  currentPage="home";
+  homePage.classList.remove("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+  setActive(btnHome);
+}
+
+function openListPage(type){
+  stopVideo();
+  currentType = type;
+  currentPage="list";
+  page=1;
+
+  homePage.classList.add("hidden");
+  listPage.classList.remove("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+
+  listTitle.innerText = type==="videoclip" ? "Videoclipuri" : "Proceduri";
+
+  loadMaterials();
+  setActive(type==="videoclip"?btnVideo:btnProc);
+}
+
+function openDashboard(){
+  stopVideo();
+  currentPage="dashboard";
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.remove("hidden");
+  setActive(btnDash);
+}
+
+function goBackToList(){
+  openListPage(currentType);
+}
+
+/* SEARCH */
+
+function searchChanged(){
+  loadMaterials();
+}
+
+/* MATERIAL LIST */
+
+function loadMaterials(){
+  const s = search.value.toLowerCase();
+
+  filtered = allMaterials.filter(m=>{
+    if(m.type !== currentType) return false;
+    if(s && !(m.tags||"").includes(s)) return false;
+    return true;
+  });
+
+  renderMaterials();
+}
+
+function renderMaterials(){
+  let html="";
+  const start=(page-1)*pageSize;
+  const list=filtered.slice(start,start+pageSize);
+
+  list.forEach(m=>{
+    const thumb = m.type==="videoclip"
+      ? `<iframe src="${m.embed}"></iframe>`
+      : `<div class="thumb">📘</div>`;
+
+    html+=`
+      <div class="materialCard" onclick="openDetail('${m.id}')">
+        <div class="thumb">${thumb}</div>
+        <div class="materialBody">
+          <h3>${m.title}</h3>
+          <div class="materialMeta">${m.category}</div>
+          <div class="tags">
+            ${(m.tags||"").split(",").map(t=>`<span class="tag">${t}</span>`).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  materialsGrid.innerHTML=html;
+  pageInfo.innerText=`${page} / ${Math.max(1,Math.ceil(filtered.length/pageSize))}`;
+}
+
+function nextPage(){
+  if(page < Math.ceil(filtered.length/pageSize)){page++;renderMaterials();}
+}
+function prevPage(){
+  if(page>1){page--;renderMaterials();}
+}
+
+/* DETAIL */
+
+function openDetail(id){
+  const m = allMaterials.find(x=>x.id===id);
+  currentMaterial = m;
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.remove("hidden");
+
+  detailTitle.innerText = m.title;
+  detailName.innerText = m.title;
+  detailMeta.innerText = m.category;
+
+  viewerFallback.classList.add("hidden");
+  viewerFrame.classList.remove("hidden");
+
+  if(m.type==="videoclip"){
+    viewerFrame.src = m.embed;
+  }else{
+    viewerFrame.src = m.drive;
+  }
+}
+
+function stopVideo(){
+  if(viewerFrame) viewerFrame.src="";
+}
+
+/* SHARE */
+
+function shareWhatsApp(){
+  const url = currentMaterial.url;
+  window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
+}
+
+function shareEmail(){
+  const url = currentMaterial.url;
+  window.location.href=`mailto:?subject=Material&body=${url}`;
+}
+  /* FIREBASE + BUSINESS LOGIC */
+
+let appFirebase;
+let auth;
+let db;
+
+let currentUserEmail = "";
+let currentUserRole = "";
+let currentStore = "";
+let currentSessionId = "";
+
+let firebaseReady = false;
+
+let fns = {};
 
 const firebaseConfig = {
   apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
@@ -229,48 +1234,64 @@ const firebaseConfig = {
   appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
 };
 
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
+async function initFirebase(){
+  if(firebaseReady) return;
 
-let currentUserEmail = "";
-let currentUserRole = "";
-let currentStore = "";
-let currentType = "";
-let currentMaterial = null;
-let materials = [];
-let page = 1;
-let pageSize = 12;
-let lang = "ro";
+  const appMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js");
+  const authMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+  const dbMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
 
-const tr = {
-  ro:{hero:"Training, proceduri și suport pentru echipamente NCR",videos:"Videoclipuri",procedures:"Proceduri",videosDesc:"Clipuri video pentru instruire rapidă și suport operațional.",proceduresDesc:"Proceduri și documentație tehnică.",search:"🔎 Caută după tag..."},
-  en:{hero:"Training, procedures and NCR support materials",videos:"Videos",procedures:"Procedures",videosDesc:"Operational training and support videos.",proceduresDesc:"Procedures and technical documentation.",search:"🔎 Search by tag..."}
-};
+  appFirebase = appMod.initializeApp(firebaseConfig);
+  auth = authMod.getAuth(appFirebase);
+  db = dbMod.getFirestore(appFirebase);
 
-window.changeLang = function(v){
-  lang = v;
-  heroText.innerText = tr[lang].hero;
-  videosTitle.innerText = "🎬 " + tr[lang].videos;
-  proceduresTitle.innerText = "📘 " + tr[lang].procedures;
-  videosDesc.innerText = tr[lang].videosDesc;
-  proceduresDesc.innerText = tr[lang].proceduresDesc;
-  search.placeholder = tr[lang].search;
-}
+  fns = {
+    signInWithEmailAndPassword: authMod.signInWithEmailAndPassword,
+    signOut: authMod.signOut,
 
-function allowedCategory(){
-  if(currentUserRole === "admin" || currentUserRole === "suport") return "all";
-  return currentUserRole;
+    collection: dbMod.collection,
+    getDocs: dbMod.getDocs,
+    addDoc: dbMod.addDoc,
+    updateDoc: dbMod.updateDoc,
+    deleteDoc: dbMod.deleteDoc,
+    getDoc: dbMod.getDoc,
+    setDoc: dbMod.setDoc,
+    doc: dbMod.doc,
+    increment: dbMod.increment,
+    query: dbMod.query,
+    where: dbMod.where
+  };
+
+  firebaseReady = true;
 }
 
 function safeEmail(email){
   return email.replaceAll(".","_").replaceAll("@","_");
 }
 
+function allowedCategory(){
+  if(currentUserRole === "admin" || currentUserRole === "suport"){
+    return "all";
+  }
+
+  return currentUserRole;
+}
+
 function youtubeId(url){
   if(!url) return "";
-  if(url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
-  if(url.includes("watch?v=")) return url.split("watch?v=")[1].split("&")[0];
+
+  if(url.includes("youtu.be/")){
+    return url.split("youtu.be/")[1].split("?")[0];
+  }
+
+  if(url.includes("watch?v=")){
+    return url.split("watch?v=")[1].split("&")[0];
+  }
+
+  if(url.includes("/embed/")){
+    return url.split("/embed/")[1].split("?")[0];
+  }
+
   return "";
 }
 
@@ -281,32 +1302,54 @@ function youtubeEmbed(url){
 
 function drivePreview(url){
   if(!url || !url.includes("drive.google.com")) return "";
+
   if(url.includes("/file/d/")){
     const id = url.split("/file/d/")[1].split("/")[0];
     return `https://drive.google.com/file/d/${id}/preview`;
   }
+
   if(url.includes("id=")){
     const id = url.split("id=")[1].split("&")[0];
     return `https://drive.google.com/file/d/${id}/preview`;
   }
+
   return "";
 }
 
+/* LOGIN */
+
 window.login = async function(){
+  await initFirebase();
+
   try{
-    const cred = await signInWithEmailAndPassword(auth,email.value,password.value);
+    const cred = await fns.signInWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value
+    );
+
     currentUserEmail = cred.user.email;
 
-    const userDoc = await getDoc(doc(db,"users",currentUserEmail));
+    const userDoc = await fns.getDoc(
+      fns.doc(db,"users",currentUserEmail)
+    );
+
     if(!userDoc.exists()){
-      loginError.innerText = "Userul nu are rol setat.";
+      loginError.innerText = "Userul nu are rol setat în Firestore.";
       return;
     }
 
     currentUserRole = userDoc.data().role;
 
     loginPage.style.display = "none";
-    storeModal.style.display = "flex";
+
+    if(currentUserRole === "admin" || currentUserRole === "suport"){
+      currentStore = "ADMIN";
+      startSession();
+      openApp();
+    }else{
+      storeModal.style.display = "flex";
+    }
 
   }catch(e){
     loginError.innerText = "Email sau parolă greșită.";
@@ -321,291 +1364,589 @@ window.saveStore = async function(){
 
   currentStore = storeCode.value.trim();
 
-  await addDoc(collection(db,"logins"),{
-    email:currentUserEmail,
-    role:currentUserRole,
-    store:currentStore,
-    time:new Date().toISOString()
-  });
-
   storeModal.style.display = "none";
+
+  await startSession();
+
+  openApp();
+}
+
+async function startSession(){
+  currentSessionId =
+    Date.now() + "_" + safeEmail(currentUserEmail);
+
+  await fns.setDoc(
+    fns.doc(db,"sessions",currentSessionId),
+    {
+      email:currentUserEmail,
+      role:currentUserRole,
+      store:currentStore,
+      startTime:new Date().toISOString(),
+      userAgent:navigator.userAgent
+    }
+  );
+}
+
+async function openApp(){
   app.style.display = "block";
 
   if(currentUserRole === "admin" || currentUserRole === "suport"){
-    adminPanel.classList.remove("hidden");
-    loadDashboard();
-    loadUsers();
+    btnDash.classList.remove("hidden");
+  }
+
+  await loadAllMaterials();
+  renderRecent();
+
+  if(currentUserRole === "admin" || currentUserRole === "suport"){
+    await loadDashboard();
+    await loadUsers();
   }
 }
 
 window.logout = async function(){
-  await signOut(auth);
+  await initFirebase();
+  stopVideo();
+
+  if(currentSessionId){
+    await fns.updateDoc(
+      fns.doc(db,"sessions",currentSessionId),
+      {
+        endTime:new Date().toISOString()
+      }
+    );
+  }
+
+  await fns.signOut(auth);
   location.reload();
 }
 
-window.openPage = function(type){
-  currentType = type;
-  page = 1;
-  homePage.classList.add("hidden");
-  materialsPage.classList.remove("hidden");
-  loadMaterials();
-}
+/* LOAD MATERIALS */
 
-window.goHome = function(){
-  materialsPage.classList.add("hidden");
-  homePage.classList.remove("hidden");
-}
+async function loadAllMaterials(){
+  await initFirebase();
 
-window.loadMaterials = async function(){
-  const snap = await getDocs(collection(db,"videos"));
-  const searchValue = search.value.toLowerCase();
+  const snap = await fns.getDocs(
+    fns.collection(db,"videos")
+  );
+
   const access = allowedCategory();
 
-  materials = [];
+  allMaterials = [];
 
   snap.forEach(d=>{
     const v = d.data();
-    const tags = (v.tags || "").toLowerCase();
 
-    if(v.type !== currentType) return;
     if(access !== "all" && v.category !== access) return;
-    if(searchValue && !tags.includes(searchValue)) return;
 
-    materials.push({id:d.id,...v});
+    allMaterials.push({
+      id:d.id,
+      title:v.title || "Fără titlu",
+      url:v.url || "",
+      type:v.type || "videoclip",
+      category:v.category || "general",
+      tags:v.tags || "",
+      views:v.views || 0,
+      tapUp:v.tapUp || 0,
+      tapDown:v.tapDown || 0,
+      embed:youtubeEmbed(v.url || ""),
+      drive:drivePreview(v.url || "")
+    });
   });
-
-  renderCards();
 }
 
-function renderCards(){
+function renderRecent(){
+  const list = allMaterials.slice(0,4);
+
   let html = "";
-  const start = (page-1)*pageSize;
-  const list = materials.slice(start,start+pageSize);
 
   list.forEach(m=>{
-    const preview = m.type === "procedura"
-      ? `<div class="preview">📘</div>`
-      : `<iframe src="${youtubeEmbed(m.url)}"></iframe>`;
-
-    const adminBtns = (currentUserRole === "admin" || currentUserRole === "suport")
-      ? `<div class="row"><button class="dark" onclick="editMaterial(event,'${m.id}')">Editează</button><button class="danger" onclick="deleteMaterial(event,'${m.id}')">Șterge</button></div>`
-      : "";
+    const thumb =
+      m.type === "videoclip" && m.embed
+        ? `<iframe src="${m.embed}"></iframe>`
+        : `<div class="thumb">${m.type === "procedura" ? "📘" : "🎬"}</div>`;
 
     html += `
-      <div class="card" onclick="openMaterial('${m.id}')">
-        ${preview}
-        <div class="cardBody">
+      <div class="materialCard" onclick="openDetail('${m.id}')">
+        ${thumb}
+        <div class="materialBody">
           <h3>${m.title}</h3>
-          <span class="tag">${m.category}</span>
-          <span class="tag">${m.type}</span>
-          <p>Tag-uri: ${m.tags || ""}</p>
-          ${adminBtns}
+          <div class="materialMeta">${m.category} • ${m.type}</div>
+          <div class="tags">
+            ${(m.tags || "")
+              .split(",")
+              .filter(Boolean)
+              .map(tag=>`<span class="tag">${tag.trim()}</span>`)
+              .join("")}
+          </div>
         </div>
-      </div>`;
+      </div>
+    `;
   });
 
-  cards.innerHTML = html;
-  pageInfo.innerText = `Pagina ${page} / ${Math.max(1,Math.ceil(materials.length/pageSize))}`;
+  if(document.getElementById("recentCards")){
+    recentCards.innerHTML = html;
+  }
 }
 
-window.nextPage = function(){
-  if(page < Math.ceil(materials.length/pageSize)){ page++; renderCards(); }
-}
+/* OVERRIDE LOAD MATERIALS FROM PART 2 */
 
-window.prevPage = function(){
-  if(page > 1){ page--; renderCards(); }
-}
+window.loadMaterials = async function(){
+  await loadAllMaterials();
 
-window.openMaterial = async function(id){
-  const ref = doc(db,"videos",id);
-  const data = (await getDoc(ref)).data();
-  currentMaterial = id;
+  const s = search.value.toLowerCase();
 
-  await addDoc(collection(db,"views"),{
-    materialId:id,
-    title:data.title,
-    type:data.type,
-    category:data.category,
-    email:currentUserEmail,
-    store:currentStore,
-    role:currentUserRole,
-    time:new Date().toISOString()
+  filtered = allMaterials.filter(m=>{
+    if(m.type !== currentType) return false;
+    if(s && !(m.tags || "").toLowerCase().includes(s)) return false;
+    return true;
   });
 
-  await updateDoc(ref,{views:increment(1)});
+  renderMaterials();
+}
 
-  popupTitle.innerText = data.title;
-  likeCount.innerText = data.likes || 0;
-  dislikeCount.innerText = data.dislikes || 0;
+window.searchChanged = function(){
+  if(currentPage === "list"){
+    loadMaterials();
+  }
+}
 
-  if(data.type === "procedura"){
-    const preview = drivePreview(data.url);
-    viewer.innerHTML = preview
-      ? `<iframe src="${preview}"></iframe><div class="driveBox"><a href="${data.url}" target="_blank"><button>Deschide procedura</button></a></div>`
-      : `<div class="driveBox"><a href="${data.url}" target="_blank"><button>Deschide procedura</button></a></div>`;
+/* DETAIL PAGE */
+
+window.openDetail = async function(id){
+  await initFirebase();
+
+  const m = allMaterials.find(x=>x.id===id);
+
+  if(!m) return;
+
+  currentMaterial = m;
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+  detailPage.classList.remove("hidden");
+
+  detailTitle.innerText = m.title;
+  detailName.innerText = m.title;
+  detailMeta.innerText =
+    `${m.category} • ${m.type} • ${m.views || 0} vizualizări`;
+
+  viewerFallback.classList.add("hidden");
+  viewerFrame.classList.remove("hidden");
+
+  if(m.type === "videoclip"){
+    viewerFrame.src = m.embed;
   }else{
-    viewer.innerHTML = `<iframe src="${youtubeEmbed(data.url)}" allowfullscreen></iframe>`;
+    if(m.drive){
+      viewerFrame.src = m.drive;
+    }else{
+      viewerFrame.classList.add("hidden");
+      viewerFallback.classList.remove("hidden");
+      openExternal.href = m.url;
+    }
   }
 
-  const voteDoc = await getDoc(doc(db,"votes",id+"_"+safeEmail(currentUserEmail)));
-  likeBtn.disabled = voteDoc.exists();
-  dislikeBtn.disabled = voteDoc.exists();
+  await trackView(m);
 
-  popup.style.display = "block";
-  loadComments();
+  await loadComments();
 }
 
-window.closePopup = function(){
-  popup.style.display = "none";
-  viewer.innerHTML = "";
+async function trackView(m){
+  await fns.addDoc(
+    fns.collection(db,"views"),
+    {
+      materialId:m.id,
+      title:m.title,
+      type:m.type,
+      category:m.category,
+      email:currentUserEmail,
+      role:currentUserRole,
+      store:currentStore,
+      sessionId:currentSessionId,
+      time:new Date().toISOString()
+    }
+  );
+
+  await fns.updateDoc(
+    fns.doc(db,"videos",m.id),
+    {
+      views:fns.increment(1)
+    }
+  );
 }
 
-window.vote = async function(type){
-  const voteId = currentMaterial+"_"+safeEmail(currentUserEmail);
-  const voteRef = doc(db,"votes",voteId);
-  const voteDoc = await getDoc(voteRef);
+/* FEEDBACK TAP UP / TAP DOWN */
+
+window.feedback = async function(type){
+  if(!currentMaterial) return;
+
+  const voteId =
+    currentMaterial.id + "_" + safeEmail(currentUserEmail);
+
+  const voteRef =
+    fns.doc(db,"feedback",voteId);
+
+  const voteDoc =
+    await fns.getDoc(voteRef);
 
   if(voteDoc.exists()){
-    alert("Ai votat deja.");
+    alert("Ai răspuns deja pentru acest material.");
     return;
   }
 
-  await setDoc(voteRef,{materialId:currentMaterial,user:currentUserEmail,vote:type});
+  await fns.setDoc(
+    voteRef,
+    {
+      materialId:currentMaterial.id,
+      user:currentUserEmail,
+      store:currentStore,
+      feedback:type,
+      time:new Date().toISOString()
+    }
+  );
 
-  if(type === "like"){
-    await updateDoc(doc(db,"videos",currentMaterial),{likes:increment(1)});
-    likeCount.innerText = Number(likeCount.innerText)+1;
-  }else{
-    await updateDoc(doc(db,"videos",currentMaterial),{dislikes:increment(1)});
-    dislikeCount.innerText = Number(dislikeCount.innerText)+1;
-  }
+  const field = type === "up" ? "tapUp" : "tapDown";
 
-  likeBtn.disabled = true;
-  dislikeBtn.disabled = true;
+  await fns.updateDoc(
+    fns.doc(db,"videos",currentMaterial.id),
+    {
+      [field]:fns.increment(1)
+    }
+  );
+
+  alert("Mulțumim pentru feedback.");
 }
 
-window.addComment = async function(){
-  if(!commentText.value.trim()) return;
+/* COMMENTS */
 
-  await addDoc(collection(db,"comments"),{
-    videoId:currentMaterial,
-    text:commentText.value,
-    user:currentUserEmail,
-    store:currentStore
-  });
+window.addComment = async function(){
+  if(!commentText.value.trim() || !currentMaterial) return;
+
+  await fns.addDoc(
+    fns.collection(db,"comments"),
+    {
+      videoId:currentMaterial.id,
+      text:commentText.value,
+      user:currentUserEmail,
+      store:currentStore,
+      time:new Date().toISOString()
+    }
+  );
 
   commentText.value = "";
   loadComments();
 }
 
 async function loadComments(){
-  const q = query(collection(db,"comments"),where("videoId","==",currentMaterial));
-  const snap = await getDocs(q);
+  const q = fns.query(
+    fns.collection(db,"comments"),
+    fns.where("videoId","==",currentMaterial.id)
+  );
+
+  const snap = await fns.getDocs(q);
+
   let html = "";
+
   snap.forEach(d=>{
     const c = d.data();
-    html += `<div class="comment"><b>${c.user}</b> <small>${c.store || ""}</small><br>${c.text}</div>`;
+
+    html += `
+      <div class="commentItem">
+        <b>${c.user}</b>
+        <small>${c.store || ""}</small>
+        <br>
+        ${c.text}
+      </div>
+    `;
   });
-  comments.innerHTML = html;
+
+  commentsList.innerHTML = html;
 }
 
+/* SHARE */
+
+window.shareWhatsApp = function(){
+  if(!currentMaterial) return;
+
+  const text =
+    `${currentMaterial.title} - ${currentMaterial.url}`;
+
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(text)}`,
+    "_blank"
+  );
+}
+
+window.shareEmail = function(){
+  if(!currentMaterial) return;
+
+  const subject =
+    encodeURIComponent(currentMaterial.title);
+
+  const body =
+    encodeURIComponent(currentMaterial.url);
+
+  window.location.href =
+    `mailto:?subject=${subject}&body=${body}`;
+}
+
+/* ADMIN MATERIAL MANAGEMENT */
+
 window.addMaterial = async function(){
-  await addDoc(collection(db,"videos"),{
-    title:newTitle.value,
-    url:newUrl.value,
-    type:newType.value,
-    category:newCategory.value,
-    tags:newTags.value.toLowerCase(),
-    likes:0,
-    dislikes:0,
-    views:0
-  });
+  await initFirebase();
+
+  if(!newTitle.value || !newUrl.value){
+    alert("Completează titlul și linkul.");
+    return;
+  }
+
+  await fns.addDoc(
+    fns.collection(db,"videos"),
+    {
+      title:newTitle.value,
+      url:newUrl.value,
+      type:newType.value,
+      category:newCategory.value,
+      tags:newTags.value.toLowerCase(),
+      views:0,
+      tapUp:0,
+      tapDown:0
+    }
+  );
 
   newTitle.value="";
   newUrl.value="";
   newTags.value="";
+
+  await loadAllMaterials();
+  renderRecent();
+  await loadDashboard();
+
   alert("Material adăugat.");
-  loadDashboard();
 }
 
 window.editMaterial = async function(event,id){
   event.stopPropagation();
-  const ref = doc(db,"videos",id);
-  const data = (await getDoc(ref)).data();
 
-  const title = prompt("Titlu:",data.title);
+  const ref = fns.doc(db,"videos",id);
+  const data = (await fns.getDoc(ref)).data();
+
+  const title = prompt("Titlu:",data.title || "");
   if(title === null) return;
 
-  const url = prompt("Link:",data.url);
+  const url = prompt("Link:",data.url || "");
   if(url === null) return;
 
   const tags = prompt("Tag-uri:",data.tags || "");
   if(tags === null) return;
 
-  await updateDoc(ref,{title,url,tags:tags.toLowerCase()});
-  loadMaterials();
+  const type = prompt("Tip: videoclip / procedura",data.type || "videoclip");
+  if(type === null) return;
+
+  const category = prompt("Categorie: carrefour / franciza",data.category || "carrefour");
+  if(category === null) return;
+
+  await fns.updateDoc(ref,{
+    title,
+    url,
+    tags:tags.toLowerCase(),
+    type,
+    category
+  });
+
+  await loadMaterials();
+  await loadDashboard();
+
+  alert("Material modificat.");
 }
 
 window.deleteMaterial = async function(event,id){
   event.stopPropagation();
-  if(!confirm("Ștergi materialul?")) return;
-  await deleteDoc(doc(db,"videos",id));
-  loadMaterials();
+
+  if(!confirm("Sigur ștergi materialul?")) return;
+
+  await fns.deleteDoc(
+    fns.doc(db,"videos",id)
+  );
+
+  await loadMaterials();
+  await loadDashboard();
 }
 
-window.saveRole = async function(){
-  await setDoc(doc(db,"users",roleEmail.value),{role:roleSelect.value});
-  loadUsers();
-}
+/* DASHBOARD */
 
-async function loadUsers(){
-  const snap = await getDocs(collection(db,"users"));
-  let html = "";
-  snap.forEach(d=>{
-    html += `<div class="tableRow"><b>${d.id}</b><br>${d.data().role}</div>`;
-  });
-  usersList.innerHTML = html;
+window.openDashboard = async function(){
+  stopVideo();
+  currentPage="dashboard";
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.remove("hidden");
+
+  setActive(btnDash);
+
+  await loadDashboard();
 }
 
 async function loadDashboard(){
-  const loginSnap = await getDocs(collection(db,"logins"));
-  const viewSnap = await getDocs(collection(db,"views"));
-  const materialSnap = await getDocs(collection(db,"videos"));
+  const sessionsSnap = await fns.getDocs(
+    fns.collection(db,"sessions")
+  );
 
+  const viewsSnap = await fns.getDocs(
+    fns.collection(db,"views")
+  );
+
+  const videosSnap = await fns.getDocs(
+    fns.collection(db,"videos")
+  );
+
+  const users = new Set();
   const stores = new Set();
-  let loginHtml = "";
-  let viewMap = {};
+  const viewMap = {};
 
-  loginSnap.forEach(d=>{
-    const l = d.data();
-    stores.add(l.store);
+  sessionsSnap.forEach(d=>{
+    const s = d.data();
+    users.add(s.email);
+    stores.add(s.store);
   });
 
-  const lastLoginsArr = [];
-  loginSnap.forEach(d=>lastLoginsArr.push(d.data()));
-  lastLoginsArr.sort((a,b)=>b.time.localeCompare(a.time));
-
-  lastLoginsArr.slice(0,5).forEach(l=>{
-    loginHtml += `<div class="tableRow"><b>${l.store}</b><br>${l.email} — ${l.role}<br><small>${l.time}</small></div>`;
-  });
-
-  viewSnap.forEach(d=>{
+  viewsSnap.forEach(d=>{
     const v = d.data();
     viewMap[v.title] = (viewMap[v.title] || 0) + 1;
   });
 
-  let topHtml = "";
-  Object.entries(viewMap).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([title,count])=>{
-    topHtml += `<div class="tableRow"><b>${title}</b><br>${count} vizualizări</div>`;
+  if(document.getElementById("dashSessions")){
+    dashSessions.innerText = sessionsSnap.size;
+  }
+
+  if(document.getElementById("dashUsers")){
+    dashUsers.innerText = users.size;
+  }
+
+  if(document.getElementById("dashViews")){
+    dashViews.innerText = viewsSnap.size;
+  }
+
+  if(document.getElementById("dashMaterials")){
+    dashMaterials.innerText = videosSnap.size;
+  }
+
+  const topViewsEl =
+    document.getElementById("topViewsList");
+
+  if(topViewsEl){
+    let html="";
+
+    Object.entries(viewMap)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,8)
+      .forEach(([title,count])=>{
+        html += `
+          <div class="listRow">
+            <div>
+              <b>${title}</b><br>
+              <small>${count} vizualizări</small>
+            </div>
+          </div>
+        `;
+      });
+
+    topViewsEl.innerHTML = html || "Nu există vizualizări.";
+  }
+
+  const storesEl =
+    document.getElementById("storesList");
+
+  if(storesEl){
+    let html="";
+
+    stores.forEach(store=>{
+      html += `
+        <div class="listRow">
+          <div>
+            <b>${store}</b><br>
+            <small>magazin activ</small>
+          </div>
+        </div>
+      `;
+    });
+
+    storesEl.innerHTML = html || "Nu există magazine.";
+  }
+}
+
+/* USERS MANAGEMENT */
+
+window.saveRole = async function(){
+  if(!roleEmail.value){
+    alert("Completează emailul.");
+    return;
+  }
+
+  await fns.setDoc(
+    fns.doc(db,"users",roleEmail.value),
+    {
+      role:roleSelect.value
+    }
+  );
+
+  roleEmail.value="";
+  await loadUsers();
+
+  alert("Rol salvat.");
+}
+
+async function loadUsers(){
+  const snap = await fns.getDocs(
+    fns.collection(db,"users")
+  );
+
+  let html="";
+
+  snap.forEach(d=>{
+    html += `
+      <div class="listRow">
+        <div>
+          <b>${d.id}</b><br>
+          <small>${d.data().role}</small>
+        </div>
+      </div>
+    `;
   });
 
-  loginCount.innerText = loginSnap.size;
-  storeCount.innerText = stores.size;
-  viewCount.innerText = viewSnap.size;
-  materialCount.innerText = materialSnap.size;
-  lastLogins.innerHTML = loginHtml || "Nu există accesări.";
-  topViews.innerHTML = topHtml || "Nu există vizualizări.";
+  if(document.getElementById("usersList")){
+    usersList.innerHTML = html;
+  }
 }
+
+/* LANGUAGE */
+
+window.changeLang = function(value){
+  const en = value === "en";
+
+  heroKicker.innerText = en ? "Welcome to" : "Bun venit în";
+  heroText.innerText = en
+    ? "Training, procedures and support for NCR equipment"
+    : "Training, proceduri și suport pentru echipamente NCR";
+
+  videosTitle.innerText = en ? "Videos" : "Videoclipuri";
+  videosDesc.innerText = en
+    ? "Tutorials and videos for operational support."
+    : "Tutoriale și clipuri pentru suport operațional.";
+
+  proceduresTitle.innerText = en ? "Procedures" : "Proceduri";
+  proceduresDesc.innerText = en
+    ? "Procedures and technical documentation."
+    : "Proceduri și documentație tehnică.";
+
+  search.placeholder = en
+    ? "🔎 Search by tag..."
+    : "🔎 Caută după tag...";
+}
+
+/* CLOSE HTML */
 </script>
 
 </body>
