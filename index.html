@@ -8,6 +8,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+  .tile{
+  position:relative;
+}
+
+.tile small{
+  display:block;
+  margin-top:10px;
+  color:#64748b;
+  line-height:1.4;
+}
+
+.tileHelp{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#f4ecff;
+  color:#6d28d9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
 *{
   box-sizing:border-box;
   margin:0;
@@ -964,69 +989,114 @@ button:hover{
       </section>
 
       <!-- DASHBOARD -->
-      <section id="dashboardPage" class="hidden">
+     <section id="dashboardPage" class="hidden">
 
-        <div class="pageHeader">
-          <h2 class="pageTitle">Dashboard</h2>
-        </div>
+  <div class="pageHeader">
+    <h2 class="pageTitle">Dashboard</h2>
+  </div>
 
-        <div class="dashboardGrid">
-          <div class="tile"><h3 id="statLogins">0</h3><p>Sesiuni</p></div>
-          <div class="tile"><h3 id="statUsers">0</h3><p>Utilizatori</p></div>
-          <div class="tile"><h3 id="statViews">0</h3><p>Vizualizări</p></div>
-          <div class="tile"><h3 id="statMaterials">0</h3><p>Materiale</p></div>
-        </div>
+  <div class="dashboardGrid">
 
-        <div class="managementGrid">
+    <div class="tile">
+      <div class="tileHelp">?</div>
+      <h3 id="dashSessions">0</h3>
+      <p>Total loginuri</p>
+      <small>Câte sesiuni au fost deschise în aplicație.</small>
+    </div>
 
-          <!-- ADD MATERIAL -->
-          <div class="panel">
-            <h3 class="panelTitle">Adaugă material</h3>
+    <div class="tile">
+      <div class="tileHelp">?</div>
+      <h3 id="dashUsers">0</h3>
+      <p>Useri care au intrat</p>
+      <small>Câte conturi diferite au folosit aplicația.</small>
+    </div>
 
-            <div class="formGrid">
-              <input id="newTitle" placeholder="Titlu">
-              <input id="newUrl" placeholder="Link">
+    <div class="tile">
+      <div class="tileHelp">?</div>
+      <h3 id="dashViews">0</h3>
+      <p>Vizualizări materiale</p>
+      <small>De câte ori s-au deschis videoclipuri sau proceduri.</small>
+    </div>
 
-              <select id="newType">
-                <option value="videoclip">Videoclip</option>
-                <option value="procedura">Procedură</option>
-              </select>
+    <div class="tile">
+      <div class="tileHelp">?</div>
+      <h3 id="dashMaterials">0</h3>
+      <p>Materiale publicate</p>
+      <small>Total videoclipuri și proceduri existente în platformă.</small>
+    </div>
 
-              <select id="newCategory">
-                <option value="carrefour">Carrefour</option>
-                <option value="franciza">Franciză</option>
-              </select>
+  </div>
 
-              <input id="newTags" class="full" placeholder="Tag-uri">
-            </div>
+  <div class="managementGrid">
 
-            <div class="spacedActions">
-              <button class="primaryBtn" onclick="addMaterial()">Adaugă</button>
-            </div>
-          </div>
+    <div class="panel">
+      <h3 class="panelTitle">Cine s-a logat</h3>
+      <p class="materialMeta">Lista ultimelor sesiuni: user, rol, magazin și oră.</p>
+      <div id="sessionsList"></div>
+    </div>
 
-          <!-- USERS -->
-          <div class="panel">
-            <h3 class="panelTitle">Useri</h3>
+    <div class="panel">
+      <h3 class="panelTitle">Ce materiale au fost văzute</h3>
+      <p class="materialMeta">Arată cine a deschis videoclipuri/proceduri și din ce magazin.</p>
+      <div id="viewsList"></div>
+    </div>
 
-            <div class="formGrid">
-              <input id="roleEmail" placeholder="Email">
-              <select id="roleSelect">
-                <option value="admin">admin</option>
-                <option value="suport">suport</option>
-                <option value="carrefour">carrefour</option>
-                <option value="franciza">franciza</option>
-              </select>
-            </div>
+  </div>
 
-            <div class="spacedActions">
-              <button onclick="saveRole()">Salvează</button>
-            </div>
+  <div class="panel">
+    <h3 class="panelTitle">Top materiale accesate</h3>
+    <p class="materialMeta">Cele mai vizualizate videoclipuri și proceduri.</p>
+    <div id="topViewsList"></div>
+  </div>
 
-            <div id="usersList"></div>
-          </div>
+  <div class="managementGrid">
 
-        </div>
+    <div class="panel">
+      <h3 class="panelTitle">Adaugă material</h3>
+
+      <div class="formGrid">
+        <input id="newTitle" placeholder="Titlu">
+        <input id="newUrl" placeholder="Link YouTube / Google Drive">
+
+        <select id="newType">
+          <option value="videoclip">Videoclip</option>
+          <option value="procedura">Procedură</option>
+        </select>
+
+        <select id="newCategory">
+          <option value="carrefour">Carrefour</option>
+          <option value="franciza">Franciză</option>
+        </select>
+
+        <input id="newTags" class="full" placeholder="Tag-uri">
+      </div>
+
+      <div class="spacedActions">
+        <button class="primaryBtn" onclick="addMaterial()">Adaugă material</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="panelTitle">Management useri</h3>
+
+      <div class="formGrid">
+        <input id="roleEmail" placeholder="Email">
+        <select id="roleSelect">
+          <option value="admin">admin</option>
+          <option value="suport">suport</option>
+          <option value="carrefour">carrefour</option>
+          <option value="franciza">franciza</option>
+        </select>
+      </div>
+
+      <div class="spacedActions">
+        <button onclick="saveRole()">Salvează rol</button>
+      </div>
+
+      <div id="usersList"></div>
+    </div>
+
+  </div>
 
       </section>
 
@@ -1355,18 +1425,61 @@ window.login = async function(){
     loginError.innerText = "Email sau parolă greșită.";
   }
 }
+const carrefourStores = {
+  "3051":"Barlad",
+  "3052":"Ploiesti 2",
+  "3050":"Sfantu Gheorghe",
+  "27":"Colosseum",
+  "40":"Piatra Neamt",
+  "26":"Drobeta",
+  "3053":"Alba Iulia",
+  "3054":"Craiova",
+  "3055":"Arad",
+  "42":"Roman",
+  "163":"Targu Jiu",
+  "10":"Iasi Felicia",
+  "3056":"Pitesti",
+  "1":"Chiajna",
+  "33":"Galati",
+  "41":"Rm. Valcea / Braila",
+  "12":"Suceava",
+  "3061":"City Park",
+  "3058":"Bratianu",
+  "3059":"Alexandriei",
+  "3066":"Pantelimon",
+  "3064":"Cluj 2",
+  "3060":"Bacau",
+  "3057":"Ploiesti Afi",
+  "3065":"Lujerului",
+  "3062":"Drobeta 2",
+  "18":"Oradea Lotus",
+  "46":"Zalau",
+  "19":"Buzau"
+};
 
+function resolveStore(code){
+  const cleanCode = code.trim();
+  return {
+    storeId: cleanCode,
+    storeName: carrefourStores[cleanCode] || "Magazin necunoscut",
+    storeType: "Carrefour"
+  };
+}
 window.saveStore = async function(){
   if(!storeCode.value.trim()){
     alert("Introdu codul magazinului.");
     return;
   }
 
-  currentStore = storeCode.value.trim();
+  const storeData = resolveStore(storeCode.value);
+
+currentStore = storeData.storeName;
 
   storeModal.style.display = "none";
 
-  await startSession();
+  await storeId:storeCode.value.trim(),
+storeName:currentStore,
+storeType:"Carrefour",
 
   openApp();
 }
@@ -1790,6 +1903,121 @@ window.openDashboard = async function(){
 }
 
 async function loadDashboard(){
+
+  const sessionsSnap = await fns.getDocs(
+    fns.collection(db,"sessions")
+  );
+
+  const viewsSnap = await fns.getDocs(
+    fns.collection(db,"views")
+  );
+
+  const videosSnap = await fns.getDocs(
+    fns.collection(db,"videos")
+  );
+
+  const users = new Set();
+  const viewMap = {};
+  const sessions = [];
+  const views = [];
+
+  sessionsSnap.forEach(d=>{
+    const s = d.data();
+
+    users.add(s.email);
+
+    sessions.push({
+      email:s.email || "",
+      role:s.role || "",
+      storeId:s.storeId || "",
+      storeName:s.storeName || s.store || "",
+      storeType:s.storeType || "",
+      startTime:s.startTime || ""
+    });
+  });
+
+  viewsSnap.forEach(d=>{
+    const v = d.data();
+
+    views.push({
+      title:v.title || "",
+      type:v.type || "",
+      email:v.email || "",
+      store:v.storeName || v.store || "",
+      time:v.time || ""
+    });
+
+    viewMap[v.title] = (viewMap[v.title] || 0) + 1;
+  });
+
+  dashSessions.innerText = sessionsSnap.size;
+  dashUsers.innerText = users.size;
+  dashViews.innerText = viewsSnap.size;
+  dashMaterials.innerText = videosSnap.size;
+
+  sessions.sort((a,b)=>(b.startTime || "").localeCompare(a.startTime || ""));
+  views.sort((a,b)=>(b.time || "").localeCompare(a.time || ""));
+
+  let sessionsHtml = "";
+
+  sessions.slice(0,12).forEach(s=>{
+    sessionsHtml += `
+      <div class="listRow">
+        <div>
+          <b>${s.email}</b><br>
+          <small>
+            Rol: ${s.role}
+            ${s.storeName ? " | Magazin: " + s.storeName : ""}
+            ${s.storeId ? " | ID: " + s.storeId : ""}
+          </small><br>
+          <small>${s.startTime}</small>
+        </div>
+      </div>
+    `;
+  });
+
+  sessionsList.innerHTML =
+    sessionsHtml || `<div class="listRow">Nu există loginuri încă.</div>`;
+
+  let viewsHtml = "";
+
+  views.slice(0,12).forEach(v=>{
+    viewsHtml += `
+      <div class="listRow">
+        <div>
+          <b>${v.title}</b><br>
+          <small>
+            Tip: ${v.type} | User: ${v.email}
+            ${v.store ? " | Magazin: " + v.store : ""}
+          </small><br>
+          <small>${v.time}</small>
+        </div>
+      </div>
+    `;
+  });
+
+  viewsList.innerHTML =
+    viewsHtml || `<div class="listRow">Nu există vizualizări încă.</div>`;
+
+  let topHtml = "";
+
+  Object.entries(viewMap)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,10)
+    .forEach(([title,count])=>{
+      topHtml += `
+        <div class="listRow">
+          <div>
+            <b>${title}</b><br>
+            <small>${count} vizualizări</small>
+          </div>
+        </div>
+      `;
+    });
+
+  topViewsList.innerHTML =
+    topHtml || `<div class="listRow">Nu există materiale accesate încă.</div>`;
+}
   const sessionsSnap = await fns.getDocs(
     fns.collection(db,"sessions")
   );
