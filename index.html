@@ -2179,3 +2179,899 @@ window.changeLang = function(value){
 
 </body>
 </html>
+      <!-- LIST PAGE -->
+      <section id="listPage" class="hidden">
+
+        <div class="pageHeader">
+          <button class="backBtn" onclick="goHome()">← Înapoi</button>
+          <h2 class="pageTitle" id="listTitle">Materiale</h2>
+        </div>
+
+        <div class="panel">
+          <div class="cardsGrid" id="materialsGrid"></div>
+
+          <div class="spacedActions" style="justify-content:center;">
+            <button onclick="prevPage()">←</button>
+            <span id="pageInfo"></span>
+            <button onclick="nextPage()">→</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- DETAIL PAGE -->
+      <section id="detailPage" class="hidden">
+
+        <div class="pageHeader">
+          <button class="backBtn" onclick="goBackToList()">← Înapoi</button>
+          <h2 class="pageTitle" id="detailTitle">Detalii</h2>
+        </div>
+
+        <div class="detailShell">
+
+          <!-- VIEWER -->
+          <div class="viewerPanel">
+            <iframe id="viewerFrame" class="viewerFrame"></iframe>
+
+            <div id="viewerFallback" class="viewerFallback hidden">
+              <p>Nu se poate încărca direct.</p>
+              <br>
+              <a id="openExternal" target="_blank">
+                <button class="primaryBtn">Deschide</button>
+              </a>
+            </div>
+          </div>
+
+          <!-- INFO -->
+          <div class="infoPanel">
+
+            <h3 id="detailName"></h3>
+            <p id="detailMeta" class="materialMeta"></p>
+
+            <div class="questionBox">
+              <b>Te-a ajutat informația?</b>
+
+              <div class="feedbackRow">
+                <button class="tapBtn" onclick="feedback('up')">👍</button>
+                <button class="tapBtn" onclick="feedback('down')">👎</button>
+              </div>
+            </div>
+
+            <div class="shareRow">
+              <button class="shareBtn" onclick="shareWhatsApp()">WhatsApp</button>
+              <button class="shareBtn" onclick="shareEmail()">Email</button>
+            </div>
+
+            <div class="commentBox">
+              <textarea id="commentText" placeholder="Scrie comentariu..."></textarea>
+              <br><br>
+              <button class="primaryBtn" onclick="addComment()">Trimite</button>
+              <div id="commentsList"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboardPage" class="hidden">
+
+        <div class="pageHeader">
+          <h2 class="pageTitle">Dashboard</h2>
+        </div>
+
+        <div class="dashboardGrid">
+
+          <div class="tile">
+            <div class="tileHelp">?</div>
+            <h3 id="dashSessions">0</h3>
+            <p>Total loginuri</p>
+            <small>Câte sesiuni au fost deschise în aplicație.</small>
+          </div>
+
+          <div class="tile">
+            <div class="tileHelp">?</div>
+            <h3 id="dashUsers">0</h3>
+            <p>Useri</p>
+            <small>Câte conturi au intrat în platformă.</small>
+          </div>
+
+          <div class="tile">
+            <div class="tileHelp">?</div>
+            <h3 id="dashViews">0</h3>
+            <p>Vizualizări</p>
+            <small>De câte ori au fost deschise materiale.</small>
+          </div>
+
+          <div class="tile">
+            <div class="tileHelp">?</div>
+            <h3 id="dashMaterials">0</h3>
+            <p>Materiale</p>
+            <small>Total videoclipuri și proceduri.</small>
+          </div>
+
+        </div>
+
+        <div class="managementGrid">
+
+          <div class="panel">
+            <h3 class="panelTitle">Cine s-a logat</h3>
+            <div id="sessionsList"></div>
+          </div>
+
+          <div class="panel">
+            <h3 class="panelTitle">Ce materiale s-au văzut</h3>
+            <div id="viewsList"></div>
+          </div>
+
+        </div>
+
+        <div class="panel">
+          <h3 class="panelTitle">Top materiale</h3>
+          <div id="topViewsList"></div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</div>
+
+<script>
+let currentPage = "home";
+let currentType = "";
+let page = 1;
+let pageSize = 12;
+let allMaterials = [];
+let filtered = [];
+let currentMaterial = null;
+
+/* MENU */
+
+function hideMenu(){
+  sideMenu.classList.add("collapsed");
+  openMenuBtn.classList.remove("hidden");
+}
+
+function showMenu(){
+  sideMenu.classList.remove("collapsed");
+  openMenuBtn.classList.add("hidden");
+}
+
+function goHomeAndHideMenu(){
+  goHome();
+  hideMenu();
+}
+
+function openListAndHideMenu(type){
+  openListPage(type);
+  hideMenu();
+}
+
+function openDashboardAndHideMenu(){
+  openDashboard();
+  hideMenu();
+}
+
+/* NAV */
+
+function setActive(btn){
+  document.querySelectorAll(".menuBtn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+}
+
+function goHome(){
+  stopVideo();
+  currentPage="home";
+  homePage.classList.remove("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+  setActive(btnHome);
+}
+
+function openListPage(type){
+  stopVideo();
+  currentType = type;
+  currentPage="list";
+  page=1;
+
+  homePage.classList.add("hidden");
+  listPage.classList.remove("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+
+  listTitle.innerText = type==="videoclip" ? "Videoclipuri" : "Proceduri";
+
+  loadMaterials();
+  setActive(type==="videoclip"?btnVideo:btnProc);
+}
+
+function goBackToList(){
+  openListPage(currentType);
+}
+
+/* SEARCH */
+
+function searchChanged(){
+  if(currentPage==="list"){
+    loadMaterials();
+  }
+}
+
+/* MATERIALS */
+
+function loadMaterials(){
+  const s = search.value.toLowerCase();
+
+  filtered = allMaterials.filter(m=>{
+    if(m.type !== currentType) return false;
+    if(s && !(m.tags||"").toLowerCase().includes(s)) return false;
+    return true;
+  });
+
+  renderMaterials();
+}
+
+function renderMaterials(){
+  let html="";
+  const start=(page-1)*pageSize;
+  const list=filtered.slice(start,start+pageSize);
+
+  list.forEach(m=>{
+    const thumb = m.type==="videoclip"
+      ? `<iframe src="${m.embed}"></iframe>`
+      : `<div class="thumb">📘</div>`;
+
+    html+=`
+      <div class="materialCard" onclick="openDetail('${m.id}')">
+        <div class="thumb">${thumb}</div>
+        <div class="materialBody">
+          <h3>${m.title}</h3>
+          <div class="materialMeta">${m.category}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  materialsGrid.innerHTML=html;
+  pageInfo.innerText=`${page} / ${Math.max(1,Math.ceil(filtered.length/pageSize))}`;
+}
+
+function nextPage(){ if(page < Math.ceil(filtered.length/pageSize)){page++;renderMaterials();} }
+function prevPage(){ if(page>1){page--;renderMaterials();} }
+
+/* DETAIL */
+
+function openDetail(id){
+  const m = allMaterials.find(x=>x.id===id);
+  currentMaterial = m;
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.remove("hidden");
+
+  detailTitle.innerText = m.title;
+  detailName.innerText = m.title;
+  detailMeta.innerText = m.category;
+
+  viewerFrame.src = m.type==="videoclip" ? m.embed : m.drive;
+}
+
+function stopVideo(){
+  if(viewerFrame) viewerFrame.src="";
+}
+
+/* SHARE */
+
+function shareWhatsApp(){
+  window.open(`https://wa.me/?text=${encodeURIComponent(currentMaterial.url)}`);
+}
+
+function shareEmail(){
+  window.location.href=`mailto:?subject=Material&body=${currentMaterial.url}`;
+}
+  /* FIREBASE */
+
+let appFirebase;
+let auth;
+let db;
+let firebaseReady=false;
+let fns={};
+
+let currentUserEmail="";
+let currentUserRole="";
+let currentStore="";
+let currentSessionId="";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
+  authDomain: "smart-id-assist.firebaseapp.com",
+  projectId: "smart-id-assist",
+  storageBucket: "smart-id-assist.firebasestorage.app",
+  messagingSenderId: "812376610238",
+  appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef"
+};
+
+const carrefourStores = {
+  "3051":"Barlad",
+  "3052":"Ploiesti 2",
+  "3050":"Sfantu Gheorghe",
+  "27":"Colosseum",
+  "40":"Piatra Neamt",
+  "26":"Drobeta",
+  "3053":"Alba Iulia",
+  "3054":"Craiova",
+  "3055":"Arad",
+  "42":"Roman",
+  "163":"Targu Jiu",
+  "10":"Iasi Felicia",
+  "3056":"Pitesti",
+  "1":"Chiajna",
+  "33":"Galati",
+  "41":"Rm. Valcea / Braila",
+  "12":"Suceava",
+  "3061":"City Park",
+  "3058":"Bratianu",
+  "3059":"Alexandriei",
+  "3066":"Pantelimon",
+  "3064":"Cluj 2",
+  "3060":"Bacau",
+  "3057":"Ploiesti Afi",
+  "3065":"Lujerului",
+  "3062":"Drobeta 2",
+  "18":"Oradea Lotus",
+  "46":"Zalau",
+  "19":"Buzau"
+};
+
+function resolveStore(code){
+  const clean = code.trim();
+  return {
+    storeId:clean,
+    storeName:carrefourStores[clean] || "Magazin necunoscut",
+    storeType:"Carrefour"
+  };
+}
+
+async function initFirebase(){
+  if(firebaseReady) return;
+
+  const appMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js");
+  const authMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+  const dbMod = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
+
+  appFirebase = appMod.initializeApp(firebaseConfig);
+  auth = authMod.getAuth(appFirebase);
+  db = dbMod.getFirestore(appFirebase);
+
+  fns = {
+    signInWithEmailAndPassword: authMod.signInWithEmailAndPassword,
+    signOut: authMod.signOut,
+    collection: dbMod.collection,
+    getDocs: dbMod.getDocs,
+    addDoc: dbMod.addDoc,
+    updateDoc: dbMod.updateDoc,
+    deleteDoc: dbMod.deleteDoc,
+    getDoc: dbMod.getDoc,
+    setDoc: dbMod.setDoc,
+    doc: dbMod.doc,
+    increment: dbMod.increment,
+    query: dbMod.query,
+    where: dbMod.where
+  };
+
+  firebaseReady=true;
+}
+
+function safeEmail(email){
+  return email.replaceAll(".","_").replaceAll("@","_");
+}
+
+function allowedCategory(){
+  if(currentUserRole==="admin" || currentUserRole==="suport") return "all";
+  return currentUserRole;
+}
+
+function youtubeId(url){
+  if(!url) return "";
+  if(url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
+  if(url.includes("watch?v=")) return url.split("watch?v=")[1].split("&")[0];
+  if(url.includes("/embed/")) return url.split("/embed/")[1].split("?")[0];
+  return "";
+}
+
+function youtubeEmbed(url){
+  const id = youtubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1` : "";
+}
+
+function drivePreview(url){
+  if(!url || !url.includes("drive.google.com")) return "";
+
+  if(url.includes("/file/d/")){
+    const id = url.split("/file/d/")[1].split("/")[0];
+    return `https://drive.google.com/file/d/${id}/preview`;
+  }
+
+  if(url.includes("id=")){
+    const id = url.split("id=")[1].split("&")[0];
+    return `https://drive.google.com/file/d/${id}/preview`;
+  }
+
+  return "";
+}
+
+/* LOGIN */
+
+window.login = async function(){
+  await initFirebase();
+
+  try{
+    const cred = await fns.signInWithEmailAndPassword(auth,email.value,password.value);
+    currentUserEmail = cred.user.email;
+
+    const userDoc = await fns.getDoc(fns.doc(db,"users",currentUserEmail));
+
+    if(!userDoc.exists()){
+      loginError.innerText = "Userul nu are rol setat în Firestore.";
+      return;
+    }
+
+    currentUserRole = userDoc.data().role;
+
+    loginPage.style.display="none";
+
+    if(currentUserRole==="admin" || currentUserRole==="suport"){
+      currentStore="ADMIN";
+      await startSession({
+        storeId:"ADMIN",
+        storeName:"Admin / Suport",
+        storeType:"Internal"
+      });
+      openApp();
+    }else{
+      storeModal.style.display="flex";
+    }
+
+  }catch(e){
+    loginError.innerText="Email sau parolă greșită.";
+  }
+}
+
+window.saveStore = async function(){
+  if(!storeCode.value.trim()){
+    alert("Introdu codul magazinului.");
+    return;
+  }
+
+  const storeData = resolveStore(storeCode.value);
+  currentStore = storeData.storeName;
+
+  storeModal.style.display="none";
+
+  await startSession(storeData);
+  openApp();
+}
+
+async function startSession(storeData){
+  currentSessionId = Date.now()+"_"+safeEmail(currentUserEmail);
+
+  await fns.setDoc(
+    fns.doc(db,"sessions",currentSessionId),
+    {
+      email:currentUserEmail,
+      role:currentUserRole,
+      storeId:storeData.storeId,
+      storeName:storeData.storeName,
+      storeType:storeData.storeType,
+      startTime:new Date().toISOString(),
+      userAgent:navigator.userAgent
+    }
+  );
+}
+
+async function openApp(){
+  app.style.display="block";
+
+  if(currentUserRole==="admin" || currentUserRole==="suport"){
+    btnDash.classList.remove("hidden");
+  }
+
+  await loadAllMaterials();
+  renderRecent();
+
+  if(currentUserRole==="admin" || currentUserRole==="suport"){
+    await loadDashboard();
+  }
+}
+
+window.logout = async function(){
+  await initFirebase();
+  stopVideo();
+
+  if(currentSessionId){
+    await fns.updateDoc(
+      fns.doc(db,"sessions",currentSessionId),
+      {endTime:new Date().toISOString()}
+    );
+  }
+
+  await fns.signOut(auth);
+  location.reload();
+}
+
+/* MATERIALS */
+
+async function loadAllMaterials(){
+  await initFirebase();
+
+  const snap = await fns.getDocs(fns.collection(db,"videos"));
+  const access = allowedCategory();
+
+  allMaterials=[];
+
+  snap.forEach(d=>{
+    const v=d.data();
+
+    if(access!=="all" && v.category!==access) return;
+
+    allMaterials.push({
+      id:d.id,
+      title:v.title || "Fără titlu",
+      url:v.url || "",
+      type:v.type || "videoclip",
+      category:v.category || "general",
+      tags:v.tags || "",
+      views:v.views || 0,
+      tapUp:v.tapUp || 0,
+      tapDown:v.tapDown || 0,
+      embed:youtubeEmbed(v.url || ""),
+      drive:drivePreview(v.url || "")
+    });
+  });
+}
+
+function renderRecent(){
+  const list=allMaterials.slice(0,4);
+  let html="";
+
+  list.forEach(m=>{
+    const thumb =
+      m.type==="videoclip" && m.embed
+      ? `<iframe src="${m.embed}"></iframe>`
+      : `<div class="thumb">${m.type==="procedura" ? "📘" : "🎬"}</div>`;
+
+    html+=`
+      <div class="materialCard" onclick="openDetail('${m.id}')">
+        ${thumb}
+        <div class="materialBody">
+          <h3>${m.title}</h3>
+          <div class="materialMeta">${m.category} • ${m.type}</div>
+          <div class="tags">
+            ${(m.tags||"").split(",").filter(Boolean).map(t=>`<span class="tag">${t.trim()}</span>`).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  recentCards.innerHTML = html;
+}
+
+window.loadMaterials = async function(){
+  await loadAllMaterials();
+
+  const s = search.value.toLowerCase();
+
+  filtered = allMaterials.filter(m=>{
+    if(m.type!==currentType) return false;
+    if(s && !(m.tags||"").toLowerCase().includes(s)) return false;
+    return true;
+  });
+
+  renderMaterials();
+}
+
+window.searchChanged = function(){
+  if(currentPage==="list") loadMaterials();
+}
+
+/* DETAIL */
+
+window.openDetail = async function(id){
+  await initFirebase();
+
+  const m = allMaterials.find(x=>x.id===id);
+  if(!m) return;
+
+  currentMaterial=m;
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  dashboardPage.classList.add("hidden");
+  detailPage.classList.remove("hidden");
+
+  detailTitle.innerText=m.title;
+  detailName.innerText=m.title;
+  detailMeta.innerText=`${m.category} • ${m.type} • ${m.views || 0} vizualizări`;
+
+  viewerFallback.classList.add("hidden");
+  viewerFrame.classList.remove("hidden");
+
+  if(m.type==="videoclip"){
+    viewerFrame.src=m.embed;
+  }else{
+    if(m.drive){
+      viewerFrame.src=m.drive;
+    }else{
+      viewerFrame.classList.add("hidden");
+      viewerFallback.classList.remove("hidden");
+      openExternal.href=m.url;
+    }
+  }
+
+  await trackView(m);
+  await loadComments();
+}
+
+async function trackView(m){
+  await fns.addDoc(
+    fns.collection(db,"views"),
+    {
+      materialId:m.id,
+      title:m.title,
+      type:m.type,
+      category:m.category,
+      email:currentUserEmail,
+      role:currentUserRole,
+      store:currentStore,
+      sessionId:currentSessionId,
+      time:new Date().toISOString()
+    }
+  );
+
+  await fns.updateDoc(
+    fns.doc(db,"videos",m.id),
+    {views:fns.increment(1)}
+  );
+}
+
+/* FEEDBACK */
+
+window.feedback = async function(type){
+  if(!currentMaterial) return;
+
+  const voteId=currentMaterial.id+"_"+safeEmail(currentUserEmail);
+  const voteRef=fns.doc(db,"feedback",voteId);
+  const voteDoc=await fns.getDoc(voteRef);
+
+  if(voteDoc.exists()){
+    alert("Ai răspuns deja pentru acest material.");
+    return;
+  }
+
+  await fns.setDoc(voteRef,{
+    materialId:currentMaterial.id,
+    user:currentUserEmail,
+    store:currentStore,
+    feedback:type,
+    time:new Date().toISOString()
+  });
+
+  const field = type==="up" ? "tapUp" : "tapDown";
+
+  await fns.updateDoc(
+    fns.doc(db,"videos",currentMaterial.id),
+    {[field]:fns.increment(1)}
+  );
+
+  alert("Mulțumim pentru feedback.");
+}
+
+/* COMMENTS */
+
+window.addComment = async function(){
+  if(!commentText.value.trim() || !currentMaterial) return;
+
+  await fns.addDoc(
+    fns.collection(db,"comments"),
+    {
+      videoId:currentMaterial.id,
+      text:commentText.value,
+      user:currentUserEmail,
+      store:currentStore,
+      time:new Date().toISOString()
+    }
+  );
+
+  commentText.value="";
+  loadComments();
+}
+
+async function loadComments(){
+  const q=fns.query(
+    fns.collection(db,"comments"),
+    fns.where("videoId","==",currentMaterial.id)
+  );
+
+  const snap=await fns.getDocs(q);
+  let html="";
+
+  snap.forEach(d=>{
+    const c=d.data();
+    html+=`
+      <div class="commentItem">
+        <b>${c.user}</b> <small>${c.store || ""}</small><br>
+        ${c.text}
+      </div>
+    `;
+  });
+
+  commentsList.innerHTML=html;
+}
+
+/* SHARE */
+
+window.shareWhatsApp = function(){
+  if(!currentMaterial) return;
+
+  const text = `${currentMaterial.title} - ${currentMaterial.url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,"_blank");
+}
+
+window.shareEmail = function(){
+  if(!currentMaterial) return;
+
+  const subject=encodeURIComponent(currentMaterial.title);
+  const body=encodeURIComponent(currentMaterial.url);
+  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+}
+
+/* DASHBOARD */
+
+window.openDashboard = async function(){
+  stopVideo();
+  currentPage="dashboard";
+
+  homePage.classList.add("hidden");
+  listPage.classList.add("hidden");
+  detailPage.classList.add("hidden");
+  dashboardPage.classList.remove("hidden");
+
+  setActive(btnDash);
+
+  await loadDashboard();
+}
+
+async function loadDashboard(){
+  const sessionsSnap = await fns.getDocs(fns.collection(db,"sessions"));
+  const viewsSnap = await fns.getDocs(fns.collection(db,"views"));
+  const videosSnap = await fns.getDocs(fns.collection(db,"videos"));
+
+  const users=new Set();
+  const sessions=[];
+  const views=[];
+  const viewMap={};
+
+  sessionsSnap.forEach(d=>{
+    const s=d.data();
+    users.add(s.email);
+
+    sessions.push({
+      email:s.email || "",
+      role:s.role || "",
+      storeId:s.storeId || "",
+      storeName:s.storeName || s.store || "",
+      storeType:s.storeType || "",
+      startTime:s.startTime || ""
+    });
+  });
+
+  viewsSnap.forEach(d=>{
+    const v=d.data();
+
+    views.push({
+      title:v.title || "",
+      type:v.type || "",
+      email:v.email || "",
+      store:v.storeName || v.store || "",
+      time:v.time || ""
+    });
+
+    viewMap[v.title]=(viewMap[v.title] || 0)+1;
+  });
+
+  dashSessions.innerText=sessionsSnap.size;
+  dashUsers.innerText=users.size;
+  dashViews.innerText=viewsSnap.size;
+  dashMaterials.innerText=videosSnap.size;
+
+  sessions.sort((a,b)=>(b.startTime||"").localeCompare(a.startTime||""));
+  views.sort((a,b)=>(b.time||"").localeCompare(a.time||""));
+
+  let sessionsHtml="";
+  sessions.slice(0,12).forEach(s=>{
+    sessionsHtml+=`
+      <div class="listRow">
+        <div>
+          <b>${s.email}</b><br>
+          <small>
+            Rol: ${s.role}
+            ${s.storeName ? " | Magazin: " + s.storeName : ""}
+            ${s.storeId ? " | ID: " + s.storeId : ""}
+          </small><br>
+          <small>${s.startTime}</small>
+        </div>
+      </div>
+    `;
+  });
+
+  sessionsList.innerHTML=sessionsHtml || `<div class="listRow">Nu există loginuri încă.</div>`;
+
+  let viewsHtml="";
+  views.slice(0,12).forEach(v=>{
+    viewsHtml+=`
+      <div class="listRow">
+        <div>
+          <b>${v.title}</b><br>
+          <small>
+            Tip: ${v.type} | User: ${v.email}
+            ${v.store ? " | Magazin: " + v.store : ""}
+          </small><br>
+          <small>${v.time}</small>
+        </div>
+      </div>
+    `;
+  });
+
+  viewsList.innerHTML=viewsHtml || `<div class="listRow">Nu există vizualizări încă.</div>`;
+
+  let topHtml="";
+  Object.entries(viewMap)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,10)
+    .forEach(([title,count])=>{
+      topHtml+=`
+        <div class="listRow">
+          <div>
+            <b>${title}</b><br>
+            <small>${count} vizualizări</small>
+          </div>
+        </div>
+      `;
+    });
+
+  topViewsList.innerHTML=topHtml || `<div class="listRow">Nu există materiale accesate încă.</div>`;
+}
+
+/* LANGUAGE */
+
+window.changeLang = function(value){
+  const en=value==="en";
+
+  heroKicker.innerText=en ? "Welcome to" : "Bun venit în";
+  heroText.innerText=en
+    ? "Training, procedures and support for NCR equipment"
+    : "Training, proceduri și suport pentru echipamente NCR";
+
+  videosTitle.innerText=en ? "Videos" : "Videoclipuri";
+  videosDesc.innerText=en
+    ? "Tutorials and videos for operational support."
+    : "Tutoriale și clipuri pentru suport operațional.";
+
+  proceduresTitle.innerText=en ? "Procedures" : "Proceduri";
+  proceduresDesc.innerText=en
+    ? "Procedures and technical documentation."
+    : "Proceduri și documentație tehnică.";
+
+  search.placeholder=en ? "🔎 Search by tag..." : "🔎 Caută după tag...";
+}
+</script>
+
+</body>
+</html>
