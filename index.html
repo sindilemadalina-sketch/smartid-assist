@@ -61,7 +61,9 @@ input,select,textarea{border:1px solid var(--line);border-radius:14px;padding:13
 .appShell{display:grid;grid-template-columns:1fr 286px;min-height:calc(100vh - 76px)}
 .content{grid-column:1;grid-row:1}
 .sidebar{grid-column:2;grid-row:1}
-.sidebar{background:linear-gradient(180deg,#090b13,#15111f);color:white;padding:26px 18px;position:sticky;top:76px;height:calc(100vh - 76px);overflow:auto;box-shadow:18px 0 45px rgba(15,23,42,.12)}
+.sidebar{background:linear-gradient(180deg,#090b13,#15111f);color:white;padding:26px 18px;position:sticky;top:76px;height:calc(100vh - 76px);overflow:auto;box-shadow:18px 0 45px rgba(15,23,42,.12);transition:.25s ease}
+.sidebar.menuClosed{display:none}
+.appShell.menuClosed{grid-template-columns:1fr}
 .sidebarTitle{font-size:20px;font-weight:800;margin-bottom:22px;color:#e9d5ff}.sideMeta{font-size:13px;color:#b9a8d8;margin-bottom:24px;line-height:1.5}.sideBtn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:transparent;color:#c9c0d8;padding:14px 12px;border-radius:14px;margin-bottom:7px;font-weight:700}.sideBtn:hover,.sideBtn.active{background:rgba(147,51,234,.22);color:white}.sideIcon{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:0 0 auto}
 .content{padding:28px;min-width:0}.screenTitle{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}.screenTitle h1{font-size:34px;letter-spacing:-.7px;color:#16113a}.screenTitle p{color:var(--muted);margin-top:4px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
@@ -74,6 +76,11 @@ input,select,textarea{border:1px solid var(--line);border-radius:14px;padding:13
 
 /* DASHBOARD */
 .dashboardGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-bottom:24px}.tile{background:white;border:1px solid rgba(232,220,255,.9);border-radius:22px;padding:22px;box-shadow:0 16px 45px rgba(15,23,42,.07);position:relative;cursor:pointer;min-height:138px}.tile:hover{box-shadow:0 24px 65px rgba(109,40,217,.14)}.tileIcon{position:absolute;right:16px;top:16px;width:54px;height:54px;border-radius:16px;background:#f0e6ff;color:#6d28d9;display:grid;place-items:center;font-size:24px}.tile h3{font-size:34px;color:#4c1d95}.tile p{color:#394150;font-weight:700;margin-top:5px}.tile small{display:block;color:var(--muted);margin-top:8px;line-height:1.4}.tileInfo{position:absolute;top:12px;right:12px;background:#0f172a;color:white;padding:10px 12px;border-radius:12px;font-size:12px;max-width:230px;opacity:0;transform:translateY(-8px);transition:.2s;z-index:5;pointer-events:none}.tile.active .tileInfo{opacity:1;transform:translateY(0)}
+.orbitHero{height:150px;border-radius:28px;margin-bottom:24px;position:relative;overflow:hidden;background:radial-gradient(circle at 30% 30%,rgba(147,51,234,.25),transparent 28%),linear-gradient(135deg,#fff,#f5edff);box-shadow:0 16px 45px rgba(15,23,42,.07);border:1px solid rgba(232,220,255,.9)}
+.orbitSphere{position:absolute;width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#6d28d9,#9333ea,#ec4899);box-shadow:0 0 45px rgba(147,51,234,.45);top:36px;left:40px;animation:orbitMove 7s ease-in-out infinite}
+.orbitSphere:after{content:"";position:absolute;inset:14px;border-radius:50%;background:rgba(255,255,255,.28)}
+.orbitText{position:absolute;right:34px;top:42px;display:flex;flex-direction:column;gap:6px;text-align:right;color:#35106f}.orbitText b{font-size:24px}.orbitText span{color:var(--muted)}
+@keyframes orbitMove{0%,100%{transform:translateX(0) translateY(0)}50%{transform:translateX(42vw) translateY(8px)}}
 .panel{background:white;border:1px solid rgba(232,220,255,.9);border-radius:22px;padding:22px;box-shadow:0 16px 45px rgba(15,23,42,.07);margin-bottom:22px}.panel h2{font-size:22px;color:#17132f}.panelHint{color:var(--muted);font-size:13px;margin-top:5px}.panelGrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.full{grid-column:1/-1}.listRow{background:#f8fafc;border-radius:14px;padding:13px 14px;margin-top:10px;border:1px solid #eef0f7}.listRow b{color:#111827}.listRow small{color:var(--muted);line-height:1.5}
 
 /* FULLSCREEN VIEWER */
@@ -110,6 +117,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:14px;padding:13
   <div class="topbar">
     <div class="brand"><div class="logoMini">HS</div>SmartID Hub</div>
     <div class="topControls">
+      <button class="darkBtn" onclick="toggleMenu()" id="menuToggleBtn">☰ Meniu</button>
       <input class="searchBox" id="search" placeholder="🔎 Caută după tag..." oninput="searchChanged()">
       <select id="langSelect" onchange="changeLang(this.value)"><option value="ro">RO</option><option value="en">EN</option></select>
       <button class="logoutBtn" onclick="logout()">Logout</button>
@@ -129,13 +137,16 @@ input,select,textarea{border:1px solid var(--line);border-radius:14px;padding:13
       <section id="listPage" class="hidden">
         <div class="screenTitle">
           <div><h1 id="listTitle">Videoclipuri</h1><p id="listSubtitle">Materiale disponibile pentru instruire.</p></div>
-          <div class="toolbar"><button class="softBtn" onclick="toggleViewMode()" id="viewModeBtn">Grid/List</button></div>
         </div>
         <div class="materialGrid" id="materialsGrid"></div>
       </section>
 
       <section id="dashboardPage" class="hidden">
         <div class="screenTitle"><div><h1>Dashboard</h1><p>Privire rapidă asupra utilizării platformei.</p></div></div>
+        <div class="orbitHero">
+          <div class="orbitSphere"></div>
+          <div class="orbitText"><b>SmartID Hub live</b><span>Monitorizare training, proceduri și utilizare în timp real.</span></div>
+        </div>
         <div class="dashboardGrid">
           <div class="tile" onclick="toggleTileInfo(this)"><div class="tileInfo">Câte sesiuni de login au fost deschise în aplicație.</div><div class="tileIcon">↗</div><h3 id="dashSessions">0</h3><p>Total loginuri</p><small>Sesiuni deschise în platformă.</small></div>
           <div class="tile" onclick="toggleTileInfo(this)"><div class="tileInfo">Câte conturi diferite au intrat în platformă.</div><div class="tileIcon">👤</div><h3 id="dashUsers">0</h3><p>Useri</p><small>Utilizatori unici autentificați.</small></div>
@@ -189,7 +200,7 @@ import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, getDoc
 
 const firebaseConfig={apiKey:"AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",authDomain:"smart-id-assist.firebaseapp.com",projectId:"smart-id-assist",storageBucket:"smart-id-assist.firebasestorage.app",messagingSenderId:"812376610238",appId:"1:812376610238:web:aaa03b4bd1c7bfd22c55ef"};
 const appFirebase=initializeApp(firebaseConfig),auth=getAuth(appFirebase),db=getFirestore(appFirebase);
-let currentUserEmail="",currentUserRole="",currentStore="",currentSessionId="",currentType="",allMaterials=[],currentMaterial=null,gridMode=true;
+let currentUserEmail="",currentUserRole="",currentStore="",currentSessionId="",currentType="",allMaterials=[],currentMaterial=null;
 const stores={"3051":"Barlad","3052":"Ploiesti 2","3050":"Sfantu Gheorghe","27":"Colosseum","40":"Piatra Neamt","26":"Drobeta","3053":"Alba Iulia","3054":"Craiova","3055":"Arad","42":"Roman","163":"Targu Jiu","10":"Iasi Felicia","3056":"Pitesti","1":"Chiajna","33":"Galati","41":"Rm. Valcea / Braila","12":"Suceava","3061":"City Park","3058":"Bratianu","3059":"Alexandriei","3066":"Pantelimon","3064":"Cluj 2","3060":"Bacau","3057":"Ploiesti Afi","3065":"Lujerului","3062":"Drobeta 2","18":"Oradea Lotus","46":"Zalau","19":"Buzau"};
 function safeEmail(e){return e.replaceAll(".","_").replaceAll("@","_")}
 function allowedCategory(){return currentUserRole==="admin"||currentUserRole==="suport"?"all":currentUserRole}
@@ -207,7 +218,7 @@ async function loadAll(){let snap=await getDocs(collection(db,"videos"));let acc
 window.openListPage=async(t)=>{currentType=t;dashboardPage.classList.add("hidden");listPage.classList.remove("hidden");setActive(t==="videoclip"?navVideos:navProcedures);listTitle.innerText=t==="videoclip"?"Videoclipuri":"Proceduri";listSubtitle.innerText=t==="videoclip"?"Clipuri video pentru instruire rapidă și suport operațional.":"Proceduri și documentație tehnică vizualizate direct în aplicație.";await loadAll();renderList()}
 function renderList(){let s=search.value.toLowerCase(),html="";let list=allMaterials.filter(m=>m.type===currentType&&(!s||(m.tags||"").toLowerCase().includes(s)||(m.title||"").toLowerCase().includes(s)));if(!list.length){materialsGrid.innerHTML=`<div class="emptyState">Nu există materiale pentru această secțiune.</div>`;return}list.forEach(m=>{let thumb=m.type==="videoclip"&&m.embed?`<iframe src="${m.embed}"></iframe>`:`<div class="docIcon"></div>`;let adminBtns=(currentUserRole==="admin"||currentUserRole==="suport")?`<div class="cardActions"><button class="smallBtn darkBtn" onclick="editMaterial(event,'${m.id}')">Editează</button><button class="smallBtn dangerBtn" onclick="deleteMaterial(event,'${m.id}')">Șterge</button></div>`:"";html+=`<div class="materialCard" onclick="openMaterial('${m.id}')"><div class="thumb">${thumb}</div><div class="cardBody"><h3>${m.title}</h3><div class="meta">${m.category} • ${m.type} • ${m.views||0} vizualizări</div><div class="tags">${(m.tags||"").split(",").filter(Boolean).map(t=>`<span class="tag">${t.trim()}</span>`).join("")}</div>${adminBtns}</div></div>`});materialsGrid.innerHTML=html}
 window.searchChanged=()=>{if(!listPage.classList.contains("hidden"))renderList()}
-window.toggleViewMode=()=>{gridMode=!gridMode;materialsGrid.style.gridTemplateColumns=gridMode?"repeat(auto-fill,minmax(285px,1fr))":"1fr"}
+window.toggleMenu=()=>{sidebar.classList.toggle("menuClosed");document.querySelector(".appShell").classList.toggle("menuClosed");}
 
 window.openMaterial=async(id)=>{currentMaterial=allMaterials.find(m=>m.id===id);if(!currentMaterial)return;detailTitle.innerText=currentMaterial.title;detailName.innerText=currentMaterial.title;detailMeta.innerText=`${currentMaterial.category} • ${currentMaterial.type} • ${currentMaterial.views||0} vizualizări`;let src=currentMaterial.type==="videoclip"?currentMaterial.embed:currentMaterial.drive;viewerFrame.src=src||"";if(!src){viewerWrap.innerHTML=`<div class="fallback"><h2>Materialul nu poate fi previzualizat direct.</h2><br><button class="primary" onclick="window.open('${currentMaterial.url}','_blank')">Deschide extern</button></div>`}else if(!viewerWrap.querySelector("iframe")){viewerWrap.innerHTML=`<iframe class="viewerFrame" id="viewerFrame" allowfullscreen></iframe>`;window.viewerFrame=document.getElementById("viewerFrame");viewerFrame.src=src}viewerPage.style.display="flex";document.body.style.overflow="hidden";await addDoc(collection(db,"views"),{materialId:id,title:currentMaterial.title,type:currentMaterial.type,email:currentUserEmail,store:currentStore,time:new Date().toISOString()});await updateDoc(doc(db,"videos",id),{views:increment(1)});loadComments()}
 window.closeViewer=()=>{viewerFrame.src="";viewerPage.style.display="none";document.body.style.overflow="auto"}
