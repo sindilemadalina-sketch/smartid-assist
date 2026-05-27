@@ -468,12 +468,26 @@ window.login=async()=>{
 
 window.saveStore=async()=>{
   let code=storeCode.value.trim();
-  if(!code)return alert("Introdu codul magazinului.");
-  let name=stores[code]||"Magazin necunoscut";
+
+  if(!code){
+    alert("Introdu codul magazinului.");
+    return;
+  }
+
+  if(!stores[code]){
+    alert("Cod magazin inexistent. Verifică ID-ul și încearcă din nou.");
+    storeCode.value="";
+    storeCode.focus();
+    return;
+  }
+
+  let name=stores[code];
   currentStore=name;
+
   storeModal.style.display="none";
+
   await startSession(code,name);
-  openApp()
+  openApp();
 };
 
 async function startSession(id,name){
