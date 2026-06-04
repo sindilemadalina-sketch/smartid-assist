@@ -541,11 +541,10 @@ window.login=async()=>{
     }else{
       storeModal.style.display="flex"
     }
-  }catch(e){
-    loginError.innerText="Email sau parolă greșită."
-  }
-};
-
+  catch(e){
+  alert(e.code + " | " + e.message);
+  loginError.innerText = e.code;
+}
 window.saveStore=async()=>{
   let code=storeCode.value.trim();
   if(!code){alert("Introdu codul magazinului.");return;}
