@@ -528,13 +528,20 @@ window.closeMenu=()=>{sidebar.classList.remove("open");menuOverlay.classList.rem
 
 window.login=async()=>{
   try{
-    if(email.value.trim()==="admin@smartid.com" && password.value.trim()==="Admin2025!"){
+   if(email.value.trim()==="admin@smartid.com" &&
+   password.value.trim()==="Admin2025!"){
+
   currentUserEmail="admin@smartid.com";
   currentUserRole="admin";
   currentStore="ADMIN";
+
   loginPage.style.display="none";
-  await startSession("ADMIN","Admin / Suport","admin");
-  openApp();
+  app.style.display="block";
+
+  adminMenuBtn.classList.remove("hidden");
+  adminMenuBtn.style.display="inline-flex";
+
+  openDashboard();
   return;
 }
     let cred=await signInWithEmailAndPassword(auth,email.value,password.value);
