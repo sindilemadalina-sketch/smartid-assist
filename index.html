@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartID Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+  
+  <style>
+    :root{
+      --navy:#020617;--navy2:#070b2b;--indigo:#15143d;--purple:#7e22ce;
+      --magenta:#c026d3;--cyan:#22d3ee;--text:#f8fafc;--muted:#cbd5e1;
+      --line:rgba(255,255,255,.10);--danger:#dc2626;--success:#15803d;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:"Roboto",Arial,sans-serif;color:var(--text);
+      background:
+        radial-gradient(circle at 20% 10%,rgba(37,99,235,.20),transparent 30%),
+        radial-gradient(circle at 80% 20%,rgba(192,38,211,.18),transparent 32%),
+        linear-gradient(180deg,#030712 0%,#0b102d 42%,#15143d 100%);
+      min-height:100vh;
+    }
+    button,input,select,textarea{font-family:inherit}
+    button{border:0;cursor:pointer}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    input,select,textarea{
+      width:100%;padding:14px 16px;border:1px solid rgba(255,255,255,.14);
+      border-radius:5px;background:rgba(5,10,35,.78);color:var(--text);
+      outline:none;transition:.2s;
+    }
+    input::placeholder,textarea::placeholder{color:#94a3b8}
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.12)
+    }
+    textarea{min-height:96px;resize:vertical}
+    .primary,
+    .primary-button{
+      padding:13px 20px;border-radius:4px;color:#fff;font-weight:800;
+      background:linear-gradient(135deg,#7e22ce,#c026d3);
+      box-shadow:0 12px 28px rgba(192,38,211,.22);transition:.2s;
+    }
+    .primary:hover,
+    .primary-button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+    .login-page{
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:30px;position:relative;overflow:hidden;
+      background:
+        linear-gradient(rgba(2,6,23,.68),rgba(2,6,23,.88)),
+        radial-gradient(circle at 35% 30%,#0ea5e9 0%,transparent 25%),
+        radial-gradient(circle at 68% 40%,#9333ea 0%,transparent 28%),
+        radial-gradient(circle at 55% 70%,#be123c 0%,transparent 20%),#020617;
+    }
+    .login-page:before,.login-page:after{
+      content:"";position:absolute;width:560px;height:560px;
+      border-radius:46% 54% 64% 36% / 44% 34% 66% 56%;
+      opacity:.45;background:linear-gradient(135deg,#2563eb,#06b6d4,#9333ea,#e11d48);
+      animation:floatShape 14s ease-in-out infinite;
+    }
+    .login-page:before{left:-160px;top:-150px}
+    .login-page:after{right:-190px;bottom:-180px;animation-delay:-7s}
+    @keyframes floatShape{
+      0%,100%{transform:rotate(0deg) scale(1)}
+      50%{transform:rotate(14deg) scale(1.08)}
+    }
+    .login-card{
+      position:relative;z-index:2;width:min(450px,100%);padding:44px;
+      border:1px solid rgba(255,255,255,.14);border-radius:4px;
+      background:rgba(2,6,23,.82);text-align:center;
+      box-shadow:0 35px 100px rgba(0,0,0,.55);backdrop-filter:blur(18px);
+    }
+    .login-logo{
+      width:auto;height:auto;margin:0 auto 22px;background:none;box-shadow:none;
+      font-size:34px;font-weight:900;letter-spacing:-2px;text-transform:uppercase;
+    }
+    .login-logo:after{content:" ID";color:var(--cyan)}
+    .login-card h1{margin-top:4px;margin:0;font-size:34px;font-weight:700;color:#fff}
+    .login-card .subtitle{margin:10px 0 26px;color:var(--muted);font-size:16px}
+    .login-card input{margin-top:12px}
+    .login-button{width:100%;margin-top:18px;padding:15px}
+    .login-error{min-height:22px;margin:14px 0 0;color:#fca5a5;font-size:14px;font-weight:600}
+    .app{display:none;min-height:100vh}
+    .topbar{
+      position:sticky;top:0;z-index:50;min-height:72px;padding:0 34px;
+      display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+      gap:20px;background:rgba(2,6,23,.96);
+      border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:blur(18px);
+    }
+    .brand{justify-self:center;font-size:34px;font-weight:900;letter-spacing:-2px;text-transform:uppercase}
+    .brand-icon{display:none}
+    .topbar:before{
+      content:"☰";justify-self:start;font-size:34px;font-weight:300;color:#fff;
+    }
+    .topbar:after{
+      content:"LEAD THE FUTURE";justify-self:end;font-size:13px;
+      font-weight:600;letter-spacing:10px;white-space:nowrap;color:#fff;
+    }
+    .topbar-actions{
+      position:fixed;top:72px;left:0;right:0;z-index:45;padding:14px 34px;
+      display:flex;justify-content:flex-end;gap:12px;
+      background:rgba(8,13,43,.95);border-bottom:1px solid rgba(255,255,255,.06);
+      backdrop-filter:blur(14px);
+    }
+    .search-wrapper{position:relative}
+    .search-icon{
+      position:absolute;left:16px;top:50%;transform:translateY(-50%);
+      color:var(--cyan);pointer-events:none
+    }
+    .search-input{width:370px;padding-left:45px;border-radius:3px;background:rgba(2,6,23,.8)}
+    .logout-button{
+      padding:12px 20px;border-radius:3px;color:#fff;font-weight:800;background:#a20b8f;
+    }
+    .hero{
+      position:relative;min-height:470px;display:flex;align-items:center;
+      justify-content:center;overflow:hidden;padding:110px 30px 70px;text-align:center;
+      background:
+        linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.68)),
+        radial-gradient(circle at 50% 55%,rgba(14,165,233,.40),transparent 28%),
+        radial-gradient(circle at 65% 42%,rgba(190,24,93,.38),transparent 22%),
+        radial-gradient(circle at 35% 38%,rgba(59,130,246,.38),transparent 24%),#020617;
+    }
+    .hero:before,.hero:after{
+      content:"";position:absolute;width:620px;height:620px;opacity:.62;
+      background:linear-gradient(135deg,#2563eb,#0891b2,#7e22ce,#be123c,#f59e0b);
+      border-radius:35% 65% 55% 45% / 48% 30% 70% 52%;
+      animation:heroMove 18s ease-in-out infinite;
+    }
+    .hero:before{left:9%;top:-170px}
+    .hero:after{right:5%;bottom:-250px;animation-delay:-9s}
+    @keyframes heroMove{
+      0%,100%{transform:rotate(-8deg) scale(.92)}
+      50%{transform:rotate(14deg) scale(1.08)}
+    }
+    .hero h1{
+      position:relative;z-index:2;margin:0;font-size:clamp(48px,7vw,82px);
+      font-weight:800;letter-spacing:-2px;background:none;color:#fff;
+    }
+    .hero p{
+      position:relative;z-index:2;max-width:900px;margin:20px auto 0;
+      color:#e2e8f0;font-size:21px;line-height:1.65;font-weight:300;
+    }
+    .page-container{width:min(1460px,calc(100% - 70px));margin:0 auto;padding:42px 0 80px}
+    .management-panel{
+      display:none;margin-bottom:34px;padding:30px;border:1px solid var(--line);
+      border-radius:4px;background:linear-gradient(145deg,rgba(13,19,59,.97),rgba(24,20,67,.97));
+      box-shadow:0 24px 70px rgba(0,0,0,.35);
+    }
+    .management-panel h2{margin:0 0 8px;color:var(--cyan);font-size:32px;font-weight:300}
+    .management-panel h3{margin-top:30px;color:#fff;font-weight:500}
+    .helper-text{margin-top:7px;color:var(--muted);font-size:14px;font-weight:300}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:20px 0 14px}
+    .form-full{grid-column:1/-1}
+    .admin-section{margin-top:28px;padding-top:26px;border-top:1px solid var(--line)}
+    .status-message{min-height:20px;margin-top:12px;color:var(--cyan);font-weight:700}
+    .category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+    .category-card{
+      position:relative;overflow:hidden;min-height:240px;padding:32px;
+      border:1px solid rgba(255,255,255,.10);border-radius:4px;
+      background:linear-gradient(145deg,rgba(16,21,63,.97),rgba(31,25,82,.97));
+      box-shadow:0 24px 70px rgba(0,0,0,.35);transition:.25s;
+    }
+    .category-card:hover{transform:translateY(-6px);border-color:rgba(34,211,238,.42)}
+    .category-heading{display:flex;align-items:center;gap:16px}
+    .category-symbol{
+      width:62px;height:62px;display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(34,211,238,.45);color:var(--cyan);
+      font-size:29px;font-weight:900;background:rgba(34,211,238,.06);
+    }
+    .category-card h2{margin:0;color:#fff;font-size:35px;font-weight:300}
+    .category-card p{max-width:560px;color:var(--muted);line-height:1.7;font-weight:300}
+    .filter-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+    .filter-button{
+      padding:11px 20px;border-radius:3px;color:#fff;font-weight:700;
+      background:rgba(126,34,206,.65);border:1px solid rgba(255,255,255,.08);
+    }
+    .filter-button:hover,.filter-button.active{color:#001018;background:var(--cyan);border-color:var(--cyan)}
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:34px}
+    .material-card{
+      overflow:hidden;border:1px solid rgba(255,255,255,.10);border-radius:4px;
+      background:linear-gradient(145deg,rgba(12,18,54,.98),rgba(26,22,72,.98));
+      box-shadow:0 16px 42px rgba(0,0,0,.30);cursor:pointer;transition:.24s;
+    }
+    .material-card:hover{transform:translateY(-6px);border-color:rgba(34,211,238,.45)}
+    .card-preview{
+      position:relative;height:180px;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;color:var(--cyan);font-size:54px;
+      background:
+        radial-gradient(circle at 35% 35%,rgba(14,165,233,.45),transparent 30%),
+        radial-gradient(circle at 70% 55%,rgba(192,38,211,.40),transparent 35%),#020617;
+    }
+    .card-preview img{width:100%;height:100%;object-fit:cover}
+    .preview-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.18)}
+    .play-circle{
+      width:58px;height:58px;display:flex;align-items:center;justify-content:center;
+      border-radius:50%;color:#fff;font-size:23px;background:rgba(2,6,23,.82);
+      border:1px solid rgba(255,255,255,.18)
+    }
+    .card-body{padding:20px}
+    .tag{
+      display:inline-block;margin:0 5px 6px 0;padding:6px 10px;border-radius:2px;
+      color:#001018;background:var(--cyan);font-size:11px;font-weight:900;text-transform:uppercase;
+    }
+    .card-body h3{margin:10px 0 8px;font-size:21px;font-weight:500}
+    .card-body p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;font-weight:300}
+    .delete-button{margin-top:14px;padding:10px 15px;border-radius:3px;color:#fff;font-weight:800;background:var(--danger)}
+    .list-item{
+      margin-top:11px;padding:15px;display:flex;align-items:center;justify-content:space-between;
+      gap:18px;border:1px solid var(--line);border-radius:3px;background:rgba(2,6,23,.34)
+    }
+    .list-item-details{min-width:0}
+    .list-item-details strong{display:block;overflow-wrap:anywhere}
+    .list-meta{display:block;margin-top:5px;color:var(--muted);font-size:13px;line-height:1.5}
+    .list-actions{display:flex;gap:8px;flex-shrink:0}
+    .approve-button,.reject-button{padding:10px 15px;border-radius:3px;color:#fff;font-weight:800}
+    .approve-button{background:var(--success)}
+    .reject-button{background:var(--danger)}
+    .popup{
+      position:fixed;inset:0;z-index:100;display:none;overflow-y:auto;padding:30px;
+      background:rgba(2,6,23,.90);backdrop-filter:blur(10px)
+    }
+    .popup-content{
+      width:min(1020px,100%);margin:0 auto;overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);border-radius:4px;
+      background:linear-gradient(145deg,#0b102d,#171744);
+      box-shadow:0 35px 100px rgba(0,0,0,.55)
+    }
+    .popup-header{
+      padding:20px 25px;display:flex;align-items:center;gap:18px;
+      border-bottom:1px solid var(--line);background:#030720
+    }
+    .back-button{
+      display:inline-flex;align-items:center;gap:9px;padding:11px 17px;border-radius:3px;
+      color:#001018;font-weight:800;background:var(--cyan);
+      box-shadow:0 9px 22px rgba(34,211,238,.18);transition:.2s
+    }
+    .back-button:hover{transform:translateX(-4px);background:#67e8f9}
+    .back-button svg{width:20px;height:20px}
+    .popup-header h2{margin:0;color:#fff;font-size:26px;font-weight:400}
+    .popup-body{padding:28px}
+    .content-viewer iframe{
+      width:100%;height:min(68vh,660px);border:0;border-radius:3px;background:#fff
+    }
+    .youtube-player{width:100%;aspect-ratio:16/9;height:auto!important;border:0;border-radius:3px;background:#000}
+    .viewer-fallback{padding:35px;text-align:center;border:1px solid var(--line);border-radius:3px;background:rgba(2,6,23,.35)}
+    .viewer-fallback a{
+      display:inline-block;margin-top:12px;padding:12px 18px;border-radius:3px;
+      color:#001018;text-decoration:none;font-weight:800;background:var(--cyan)
+    }
+    .reaction-row{display:flex;flex-wrap:wrap;gap:11px;margin:20px 0}
+    .reaction-button{padding:11px 17px;border-radius:3px;color:#fff;font-weight:800;background:rgba(126,34,206,.65)}
+    .comment-actions{margin-top:12px}
+    .comment{
+      margin-top:11px;padding:14px;border-left:4px solid var(--cyan);
+      border-radius:2px;background:rgba(2,6,23,.35);line-height:1.5
+    }
+    .comment-user{margin-bottom:4px;color:var(--cyan);font-weight:800;overflow-wrap:anywhere}
+    .empty-list{padding:18px;color:var(--muted);border:1px solid var(--line);border-radius:3px;background:rgba(2,6,23,.25)}
+    @media(max-width:1000px){
+      .topbar{grid-template-columns:auto 1fr}
+      .brand{justify-self:end}
+      .topbar:after{display:none}
+    }
+    @media(max-width:900px){
+      .topbar-actions{padding:14px 18px;flex-wrap:wrap}
+      .search-wrapper{flex:1}
+      .search-input{width:100%}
+      .category-grid,.form-grid{grid-template-columns:1fr}
+      .form-full{grid-column:auto}
+      .page-container{width:min(100% - 30px,1460px)}
+      .hero{min-height:410px}
+    }
+  
+    .login-logo .smart,.brand .smart{color:#fff}
+    .login-logo .id,.brand .accent{color:var(--cyan)}
+    .language-toggle{padding:12px 16px;border-radius:3px;color:#001018;font-weight:900;background:var(--cyan);transition:.2s}
+    .language-toggle:hover{background:#67e8f9}
+
+  
+    .login-mark,.brand-mark{display:none!important}
+    .smartid-wordmark{
+      display:inline-flex;
+      align-items:baseline;
+      justify-content:center;
+      gap:7px;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:-2px;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .smartid-wordmark strong{
+      color:var(--cyan);
+      font-weight:900;
+    }    .header-wordmark{
+      font-size:34px;
+      justify-self:center;
+    }
+    .brand{
+      justify-content:center;
+    }
+
+  
+    #loginButton{
+      width:100%;
+      min-height:54px;
+      margin-top:20px;
+      border-radius:10px;
+      color:#ffffff;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.2px;
+      background:linear-gradient(135deg,#7e22ce 0%,#c026d3 100%);
+      box-shadow:0 14px 34px rgba(192,38,211,.32);
+      transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+    }
+    #loginButton:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 42px rgba(192,38,211,.42);
+      filter:brightness(1.08);
+    }
+    #loginButton:active{transform:translateY(0)}
+    #loginButton:disabled{opacity:.68}
+
+  </style>
+
+</head>
+
+<body>
+
+  <main class="login-page" id="loginPage">
+    <section class="login-card">
+      <!-- Application name only; no duplicate SMART ID logo here -->
+            <h1 data-i18n="appTitle">SmartID Portal</h1>
+      <p data-i18n="appDescription">Ghid de utilizare echipamente NCR</p>
+
+      <input id="email" type="email" placeholder="Email" autocomplete="username">
+      <input id="password" type="password" placeholder="Parola" autocomplete="current-password">
+
+      <button class="primary" id="loginButton" type="button" data-i18n="signIn">Autentificare</button>
+      <p class="login-error" id="loginError"></p>
+    </section>
+  </main>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="smartid-wordmark header-wordmark"><span>SMART</span><strong>ID</strong></div>
+      </div>
+
+      <div class="top-actions">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" id="searchInput" type="search" placeholder="Cauta dupa titlu, cuvant sau tag...">
+        </div>
+        <button class="language-toggle" id="languageToggle" type="button">EN</button>
+      <button class="logout" id="logoutButton" type="button" data-i18n="logout">Logout</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h1 data-i18n="appTitle">SmartID Portal</h1>
+      <p data-i18n="appDescription">Ghid de utilizare echipamente NCR</p>
+    </section>
+
+    <main class="container">
+
+      <!-- Suport only -->
+      <section class="panel" id="submissionPanel">
+        <h2 data-i18n="submitApproval">Trimite material pentru aprobare</h2>
+        <p class="helper">Utilizatorii de suport pot trimite un videoclip sau o procedura pentru aprobare. Administratorul trebuie sa aprobe materialul inainte de publicare.</p>
+
+        <div class="form-grid">
+          <input id="submitTitle" placeholder="Titlu material">
+          <select id="submitType">
+            <option value="videoclip">Videoclip</option>
+            <option value="procedura">Procedura</option>
+          </select>
+          <select id="submitCategory">
+            <option value="carrefour">Carrefour</option>
+            <option value="franciza">Franciza</option>
+          </select>
+          <input id="submitTags" placeholder="Tag-uri: restart, scanner, plata">
+          <input class="full" id="submitUrl" placeholder="Link YouTube nelistat sau link procedura">
+        </div>
+
+        <button class="primary" id="submitMaterialButton" type="button">Trimite spre aprobare</button>
+        <div class="status" id="submissionStatus"></div>
+      </section>
+
+      <!-- Admin only -->
+      <section class="panel" id="adminPanel">
+        <h2 data-i18n="administration">Administrare</h2>
+
+        <div class="admin-section">
+          <h3>Adauga material direct</h3>
+
+          <div class="form-grid">
+            <input id="newTitle" placeholder="Titlu material">
+            <select id="newType">
+              <option value="videoclip">Videoclip</option>
+              <option value="procedura">Procedura</option>
+            </select>
+            <select id="newCategory">
+              <option value="carrefour">Carrefour</option>
+              <option value="franciza">Franciza</option>
+            </select>
+            <input id="newTags" placeholder="Tag-uri: restart, scanner, plata">
+            <input class="full" id="newUrl" placeholder="Link YouTube nelistat sau link procedura">
+          </div>
+
+          <button class="primary" id="addMaterialButton" type="button">Adauga material</button>
+          <div class="status" id="addMaterialStatus"></div>
+        </div>
+
+        <div class="admin-section">
+          <h3>Materiale in asteptare</h3>
+          <div id="pendingList"></div>
+        </div>
+
+        <div class="admin-section">
+          <h3>Roluri si acces utilizatori</h3>
+          <p class="helper">Contul trebuie creat mai intai in Firebase Authentication.</p>
+
+          <div class="form-grid">
+            <input id="roleEmail" type="email" placeholder="Email utilizator">
+            <select id="roleSelect">
+              <option value="admin">Admin</option>
+              <option value="suport">Suport</option>
+              <option value="carrefour">Utilizator Carrefour</option>
+              <option value="franciza">Franciza User</option>
+            </select>
+            <select id="categorySelect">
+              <option value="all">Tot continutul</option>
+              <option value="carrefour">Doar Carrefour</option>
+              <option value="franciza">Franciza only</option>
+            </select>
+          </div>
+
+          <button class="primary" id="saveRoleButton" type="button">Salveaza rolul</button>
+
+          <h3>Roluri inregistrate</h3>
+          <div id="usersList"></div>
+        </div>
+      </section>
+
+      <section class="category-grid">
+        <article class="category-card">
+          <div class="category-heading">
+            <div class="category-symbol">▶</div>
+            <h2>Videoclip Library</h2>
+          </div>
+          <p>Videoclipuri scurte pentru instruire si suport operational privind echipamentele NCR Self-Checkout.</p>
+          <div class="filter-row" id="videoFilters"></div>
+        </article>
+
+        <article class="category-card">
+          <div class="category-heading">
+            <div class="category-symbol">▤</div>
+            <h2>Proceduras</h2>
+          </div>
+          <p>Instructiuni ilustrate, manuale operationale si proceduri detaliate de lucru.</p>
+          <div class="filter-row" id="procedureFilters"></div>
+        </article>
+      </section>
+
+      <!-- Intentionally blank when there are no matching materials -->
+      <section class="cards-grid" id="cardsGrid"></section>
+    </main>
+  </div>
+
+  <div class="popup" id="materialPopup" aria-hidden="true">
+    <article class="popup-card">
+      <header class="popup-header">
+        <button class="back" id="backButton" type="button" title="Inapoi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M19 12H5" stroke-linecap="round"></path>
+            <path d="M11 18L5 12L11 6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span data-i18n="back">Inapoi</span>
+        </button>
+        <h2 id="popupTitle"></h2>
+      </header>
+
+      <div class="popup-body">
+        <div class="content-viewer" id="contentViewer"></div>
+
+        <div class="reaction-row">
+          <button class="reaction" id="likeButton" type="button">👍 Like <span id="likeCount">0</span></button>
+          <button class="reaction" id="dislikeButton" type="button">👎 Dislike <span id="dislikeCount">0</span></button>
+        </div>
+
+        <h3 data-i18n="comments">Comentarii</h3>
+        <textarea id="commentText" placeholder="Scrie un comentariu..."></textarea>
+
+        <div class="comment-actions">
+          <button class="primary" id="postCommentButton" type="button" data-i18n="postComment">Trimite comentariul</button>
+        </div>
+
+        <div id="commentsList"></div>
+      </div>
+    </article>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+      getDoc, setDoc, doc, increment, query, where, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDyRr9PKvwsZ7QonqFuDFjRShVR8NqN16k",
+      authDomain: "smart-id-assist.firebaseapp.com",
+      projectId: "smart-id-assist",
+      storageBucket: "smart-id-assist.firebasestorage.app",
+      messagingSenderId: "812376610238",
+      appId: "1:812376610238:web:aaa03b4bd1c7bfd22c55ef",
+      measurementId: "G-CJ5J3CHZC0"
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+
+    const el = id => document.getElementById(id);
+
+    const ui = {
+      loginPage:el("loginPage"), loginButton:el("loginButton"), loginError:el("loginError"),
+      email:el("email"), password:el("password"), app:el("app"),
+      logoutButton:el("logoutButton"), searchInput:el("searchInput"),
+      submissionPanel:el("submissionPanel"), adminPanel:el("adminPanel"),
+      submissionStatus:el("submissionStatus"), addMaterialStatus:el("addMaterialStatus"),
+      pendingList:el("pendingList"), usersList:el("usersList"),
+      videoFilters:el("videoFilters"), procedureFilters:el("procedureFilters"),
+      cardsGrid:el("cardsGrid"), popup:el("materialPopup"), backButton:el("backButton"),
+      popupTitle:el("popupTitle"), contentViewer:el("contentViewer"),
+      likeButton:el("likeButton"), dislikeButton:el("dislikeButton"),
+      likeCount:el("likeCount"), dislikeCount:el("dislikeCount"),
+      commentText:el("commentText"), postCommentButton:el("postCommentButton"),
+      commentsList:el("commentsList")
+    };
+
+    let currentUserEmail="";
+    let currentUserRole="";
+    let currentUserCategory="";
+    let selectedType="";
+    let selectedCategory="";
+    let visibleItems=[];
+    let currentItem=null;
+
+    let currentLanguage="ro";
+    const translations={
+      ro:{appTitle:"SmartID Portal",appDescription:"Ghid de utilizare echipamente NCR",signIn:"Autentificare",logout:"Logout",submitApproval:"Trimite material pentru aprobare",administration:"Administrare",videos:"Videoclipuri",procedures:"Proceduri",back:"Inapoi",comments:"Comentarii",postComment:"Trimite comentariul"},
+      en:{appTitle:"SmartID Portal",appDescription:"NCR Equipment User Guide",signIn:"Sign In",logout:"Logout",submitApproval:"Submit Material for Approval",administration:"Administration",videos:"Video Library",procedures:"Procedures",back:"Back",comments:"Comments",postComment:"Post Comment"}
+    };
+    function applyLanguage(){
+      document.documentElement.lang=currentLanguage==="ro"?"ro":"en";
+      document.querySelectorAll("[data-i18n]").forEach(node=>{const key=node.dataset.i18n;if(translations[currentLanguage][key]) node.textContent=translations[currentLanguage][key];});
+      el("languageToggle").textContent=currentLanguage==="ro"?"EN":"RO";
+    }
+    function toggleLanguage(){currentLanguage=currentLanguage==="ro"?"en":"ro";applyLanguage();}
+
+    const value=id=>el(id).value.trim();
+    const clear=id=>{el(id).value=""};
+
+    function esc(v=""){
+      return String(v)
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    function role(v=""){return String(v).trim().toLowerCase()}
+    function category(v=""){
+      const x=String(v).trim().toLowerCase();
+      return x==="franchise"?"franciza":x;
+    }
+    function type(v=""){
+      const x=String(v).trim().toLowerCase();
+      if(x==="video") return "videoclip";
+      if(x==="procedure") return "procedura";
+      return x;
+    }
+
+    const displayCategory=c=>category(c)==="franciza"?"Franciza":"Carrefour";
+    const displayType=t=>type(t)==="procedura"?"Procedura":"Videoclip";
+    const canManage=()=>currentUserRole==="admin"||currentUserRole==="suport";
+    const isAdmin=()=>currentUserRole==="admin";
+
+    function canSeeCategory(c){
+      if(canManage()||currentUserCategory==="all") return true;
+      return category(c)===currentUserCategory;
+    }
+
+    function youtubeId(raw){
+      if(!raw) return "";
+      try{
+        const u=new URL(raw);
+        if(u.hostname.includes("youtu.be")) return u.pathname.replace("/","").split("/")[0];
+        if(u.hostname.includes("youtube.com")){
+          if(u.pathname.startsWith("/embed/")) return u.pathname.split("/embed/")[1].split("/")[0];
+          if(u.pathname.startsWith("/shorts/")) return u.pathname.split("/shorts/")[1].split("/")[0];
+          return u.searchParams.get("v")||"";
+        }
+      }catch{}
+      return "";
+    }
+
+    const youtubeThumb=url=>{
+      const id=youtubeId(url);
+      return id?`https://img.youtube.com/vi/${id}/hqdefault.jpg`:"";
+    };
+
+    const youtubeEmbed=url=>{
+      const id=youtubeId(url);
+      if(!id) return "";
+      return `https://www.youtube-nocookie.com/embed/${id}?rel=0&cc_load_policy=0&playsinline=1`;
+    };
+
+    function createFilters(){
+      const cats=canManage()?["carrefour","franciza"]:[currentUserCategory];
+      ui.videoFilters.innerHTML="";
+      ui.procedureFilters.innerHTML="";
+
+      cats.forEach(c=>{
+        if(c==="all") return;
+
+        const vb=document.createElement("button");
+        vb.className="filter-btn";
+        vb.textContent=displayCategory(c);
+        vb.addEventListener("click",()=>setFilter("videoclip",c,vb));
+        ui.videoFilters.appendChild(vb);
+
+        const pb=document.createElement("button");
+        pb.className="filter-btn";
+        pb.textContent=displayCategory(c);
+        pb.addEventListener("click",()=>setFilter("procedura",c,pb));
+        ui.procedureFilters.appendChild(pb);
+      });
+    }
+
+    function setFilter(t,c,button){
+      selectedType=type(t);
+      selectedCategory=category(c);
+      document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+      button.classList.add("active");
+      loadItems();
+    }
+
+    async function login(){
+      ui.loginError.textContent="";
+      ui.loginButton.disabled=true;
+      ui.loginButton.textContent="Se autentifica...";
+
+      try{
+        const cred=await signInWithEmailAndPassword(auth,ui.email.value.trim().toLowerCase(),ui.password.value);
+        currentUserEmail=(cred.user.email||"").trim().toLowerCase();
+
+        const userDoc=await getDoc(doc(db,"users",currentUserEmail));
+        if(!userDoc.exists()){
+          await signOut(auth);
+          throw new Error("Contul tau nu are un rol atribuit.");
+        }
+
+        const data=userDoc.data();
+        currentUserRole=role(data.role);
+        currentUserCategory=category(data.category);
+
+        if(!["admin","suport","carrefour","franciza"].includes(currentUserRole)){
+          await signOut(auth);
+          throw new Error("Rolul atribuit utilizatorului nu este valid.");
+        }
+
+        /* Only support sees submission. Only admin sees administration. */
+        ui.submissionPanel.style.display=currentUserRole==="suport"?"block":"none";
+        ui.adminPanel.style.display=currentUserRole==="admin"?"block":"none";
+
+        ui.loginPage.style.display="none";
+        ui.app.style.display="block";
+
+        createFilters();
+
+        if(isAdmin()){
+          await Promise.all([loadPending(),loadUsers()]);
+        }
+
+        await loadItems();
+      }catch(error){
+        console.error("Login error:", error);
+
+        const code=error?.code||"";
+        const messages={
+          "auth/invalid-credential":"Email sau parola incorecta.",
+          "auth/invalid-login-credentials":"Email sau parola incorecta.",
+          "auth/user-not-found":"Utilizatorul nu exista in Firebase Authentication.",
+          "auth/wrong-password":"Parola este incorecta.",
+          "auth/invalid-email":"Adresa de email nu este valida.",
+          "auth/too-many-requests":"Prea multe incercari. Incearca din nou mai tarziu.",
+          "auth/network-request-failed":"Nu exista conexiune la internet sau Firebase nu poate fi accesat."
+        };
+
+        ui.loginError.textContent=messages[code]||error?.message||"Autentificarea nu a reusit.";
+      }finally{
+        ui.loginButton.disabled=false;
+        ui.loginButton.textContent="Autentificare";
+      }
+    }
+
+    async function logout(){
+      await signOut(auth);
+      location.reload();
+    }
+
+    async function submitMaterial(){
+      const title=value("submitTitle");
+      const t=type(el("submitType").value);
+      const c=category(el("submitCategory").value);
+      const tags=value("submitTags").toLowerCase();
+      const url=value("submitUrl");
+
+      ui.submissionStatus.textContent="";
+      if(!title||!url){
+        ui.submissionStatus.textContent="Completeaza titlul si linkul.";
+        return;
+      }
+
+      try{
+        await addDoc(collection(db,"pending"),{
+          title,type:t,category:c,tags,url,submittedBy:currentUserEmail,
+          status:"pending",createdAt:serverTimestamp()
+        });
+        clear("submitTitle");clear("submitTags");clear("submitUrl");
+        ui.submissionStatus.textContent="Materialul a fost trimis pentru aprobare.";
+      }catch(error){
+        console.error(error);
+        ui.submissionStatus.textContent="Materialul nu a putut fi trimis.";
+      }
+    }
+
+    async function addMaterial(){
+      if(!isAdmin()) return;
+
+      const title=value("newTitle");
+      const t=type(el("newType").value);
+      const c=category(el("newCategory").value);
+      const tags=value("newTags").toLowerCase();
+      const url=value("newUrl");
+
+      ui.addMaterialStatus.textContent="";
+      if(!title||!url){
+        ui.addMaterialStatus.textContent="Completeaza titlul si linkul.";
+        return;
+      }
+
+      try{
+        await addDoc(collection(db,"videos"),{
+          title,type:t,category:c,tags,url,likes:0,dislikes:0,
+          createdBy:currentUserEmail,createdAt:serverTimestamp()
+        });
+        clear("newTitle");clear("newTags");clear("newUrl");
+        ui.addMaterialStatus.textContent="Materialul a fost adaugat.";
+        await loadItems();
+      }catch(error){
+        console.error(error);
+        ui.addMaterialStatus.textContent="Materialul nu a putut fi adaugat.";
+      }
+    }
+
+    async function loadPending(){
+      if(!isAdmin()) return;
+      const snap=await getDocs(collection(db,"pending"));
+      ui.pendingList.innerHTML="";
+
+      if(snap.empty){
+        ui.pendingList.innerHTML='<div class="empty-list">Nu exista materiale in asteptare.</div>';
+        return;
+      }
+
+      snap.forEach(ds=>{
+        const m=ds.data();
+        const item=document.createElement("div");
+        item.className="list-item";
+        item.innerHTML=`
+          <div class="list-details">
+            <strong>${esc(m.title||"Material fara titlu")}</strong>
+            <span class="list-meta">
+              ${esc(displayType(m.type))} · ${esc(displayCategory(m.category))} · ${esc(m.tags||"Fara tag-uri")}
+              <br>Trimis de: ${esc(m.submittedBy||"Unknown")}
+            </span>
+          </div>
+          <div class="list-actions">
+            <button class="approve" type="button">Aproba</button>
+            <button class="reject" type="button">Respinge</button>
+          </div>`;
+
+        item.querySelector(".approve").addEventListener("click",()=>approveMaterial(ds.id));
+        item.querySelector(".reject").addEventListener("click",()=>rejectMaterial(ds.id));
+        ui.pendingList.appendChild(item);
+      });
+    }
+
+    async function approveMaterial(id){
+      if(!isAdmin()) return;
+      const ref=doc(db,"pending",id);
+      const pending=await getDoc(ref);
+      if(!pending.exists()) return;
+      const m=pending.data();
+
+      await addDoc(collection(db,"videos"),{
+        title:m.title||"",type:type(m.type),category:category(m.category),
+        tags:String(m.tags||"").toLowerCase(),url:m.url||"",
+        likes:0,dislikes:0,createdBy:m.submittedBy||currentUserEmail,
+        approvedBy:currentUserEmail,createdAt:serverTimestamp()
+      });
+
+      await deleteDoc(ref);
+      await Promise.all([loadPending(),loadItems()]);
+    }
+
+    async function rejectMaterial(id){
+      if(!isAdmin()) return;
+      await deleteDoc(doc(db,"pending",id));
+      await loadPending();
+    }
+
+    async function saveRole(){
+      if(!isAdmin()) return;
+      const email=value("roleEmail").toLowerCase();
+      if(!email) return;
+
+      await setDoc(doc(db,"users",email),{
+        role:role(el("roleSelect").value),
+        category:category(el("categorySelect").value),
+        updatedAt:serverTimestamp()
+      },{merge:true});
+
+      clear("roleEmail");
+      await loadUsers();
+    }
+
+    async function loadUsers(){
+      if(!isAdmin()) return;
+      const snap=await getDocs(collection(db,"users"));
+      ui.usersList.innerHTML="";
+
+      snap.forEach(ds=>{
+        const u=ds.data();
+        const item=document.createElement("div");
+        item.className="list-item";
+        item.innerHTML=`
+          <div class="list-details">
+            <strong>${esc(ds.id)}</strong>
+            <span class="list-meta">Rol: ${esc(u.role||"Neatribuit")} · Acces: ${esc(u.category||"Neatribuit")}</span>
+          </div>`;
+        ui.usersList.appendChild(item);
+      });
+    }
+
+    async function loadItems(){
+      const term=ui.searchInput.value.trim().toLowerCase();
+      const snap=await getDocs(collection(db,"videos"));
+      visibleItems=[];
+
+      snap.forEach(ds=>{
+        const d=ds.data();
+        const item={
+          id:ds.id,title:d.title||"Material fara titlu",type:type(d.type),
+          category:category(d.category),tags:String(d.tags||""),
+          url:d.url||"",likes:Number(d.likes||0),dislikes:Number(d.dislikes||0)
+        };
+
+        if(!canSeeCategory(item.category)) return;
+        if(selectedType&&item.type!==selectedType) return;
+        if(selectedCategory&&item.category!==selectedCategory) return;
+
+        const searchable=[item.title,item.tags,displayType(item.type),displayCategory(item.category)]
+          .join(" ").toLowerCase();
+
+        if(term&&!searchable.includes(term)) return;
+        visibleItems.push(item);
+      });
+
+      renderItems();
+    }
+
+    function renderItems(){
+      ui.cardsGrid.innerHTML=""; /* No empty-results message */
+
+      visibleItems.forEach((item,index)=>{
+        const card=document.createElement("article");
+        card.className="material-card";
+        const thumb=youtubeThumb(item.url);
+
+        const preview=item.type==="videoclip"&&thumb
+          ?`<div class="card-preview"><img src="${esc(thumb)}" alt=""><div class="preview-overlay"><div class="play">▶</div></div></div>`
+          :`<div class="card-preview">▤</div>`;
+
+        const deleteBtn=canManage()?'<button class="delete" type="button">Sterge</button>':"";
+
+        card.innerHTML=`
+          ${preview}
+          <div class="card-body">
+            <span class="tag">${esc(displayType(item.type))}</span>
+            <span class="tag">${esc(displayCategory(item.category))}</span>
+            <h3>${esc(item.title)}</h3>
+            <p>Tags: ${esc(item.tags||"—")}</p>
+            ${deleteBtn}
+          </div>`;
+
+        card.addEventListener("click",()=>openItem(index));
+
+        const del=card.querySelector(".delete");
+        if(del){
+          del.addEventListener("click",async e=>{
+            e.stopPropagation();
+            if(confirm("Sterge this material?")){
+              await deleteDoc(doc(db,"videos",item.id));
+              await loadItems();
+            }
+          });
+        }
+
+        ui.cardsGrid.appendChild(card);
+      });
+    }
+
+    function openItem(index){
+      const item=visibleItems[index];
+      if(!item) return;
+      currentItem=item;
+
+      ui.popupTitle.textContent=item.title;
+      ui.likeCount.textContent=String(item.likes);
+      ui.dislikeCount.textContent=String(item.dislikes);
+
+      if(item.type==="videoclip"){
+        const embed=youtubeEmbed(item.url);
+        ui.contentViewer.innerHTML=embed
+          ?`<iframe class="youtube" src="${esc(embed)}" title="${esc(item.title)}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>`
+          :`<div class="fallback"><p>Linkul videoclipului nu poate fi afisat.</p><a href="${esc(item.url)}" target="_blank" rel="noopener">Deschide videoclipulclip</a></div>`;
+      }else{
+        ui.contentViewer.innerHTML=`
+          <iframe src="${esc(item.url)}" title="${esc(item.title)}"></iframe>
+          <div class="fallback">
+            <a href="${esc(item.url)}" target="_blank" rel="noopener">Open Procedura in a New Tab</a>
+          </div>`;
+      }
+
+      ui.popup.style.display="block";
+      ui.popup.setAttribute("aria-hidden","false");
+      document.body.style.overflow="hidden";
+      loadComentarii();
+    }
+
+    function closeItem(){
+      currentItem=null;
+      ui.popup.style.display="none";
+      ui.popup.setAttribute("aria-hidden","true");
+      ui.contentViewer.innerHTML="";
+      ui.commentsList.innerHTML="";
+      ui.commentText.value="";
+      document.body.style.overflow="";
+    }
+
+    async function likeItem(){
+      if(!currentItem) return;
+      await updateDoc(doc(db,"videos",currentItem.id),{likes:increment(1)});
+      currentItem.likes++;
+      ui.likeCount.textContent=String(currentItem.likes);
+    }
+
+    async function dislikeItem(){
+      if(!currentItem) return;
+      await updateDoc(doc(db,"videos",currentItem.id),{dislikes:increment(1)});
+      currentItem.dislikes++;
+      ui.dislikeCount.textContent=String(currentItem.dislikes);
+    }
+
+    async function postComment(){
+      if(!currentItem) return;
+      const text=ui.commentText.value.trim();
+      if(!text) return;
+
+      await addDoc(collection(db,"comments"),{
+        videoId:currentItem.id,text,user:currentUserEmail,createdAt:serverTimestamp()
+      });
+
+      ui.commentText.value="";
+      await loadComentarii();
+    }
+
+    async function loadComentarii(){
+      if(!currentItem) return;
+      const q=query(collection(db,"comments"),where("videoId","==",currentItem.id));
+      const snap=await getDocs(q);
+      ui.commentsList.innerHTML="";
+
+      snap.forEach(ds=>{
+        const c=ds.data();
+        const box=document.createElement("div");
+        box.className="comment";
+        box.innerHTML=`<div class="comment-user">${esc(c.user||"User")}</div><div>${esc(c.text||"")}</div>`;
+        ui.commentsList.appendChild(box);
+      });
+    }
+
+    applyLanguage();
+
+    ui.loginButton.addEventListener("click",login);
+    ui.password.addEventListener("keydown",e=>{if(e.key==="Enter") login()});
+    el("languageToggle").addEventListener("click",toggleLanguage);
+    ui.logoutButton.addEventListener("click",logout);
+    ui.searchInput.addEventListener("input",loadItems);
+    el("submitMaterialButton").addEventListener("click",submitMaterial);
+    el("addMaterialButton").addEventListener("click",addMaterial);
+    el("saveRoleButton").addEventListener("click",saveRole);
+    ui.backButton.addEventListener("click",closeItem);
+    ui.likeButton.addEventListener("click",likeItem);
+    ui.dislikeButton.addEventListener("click",dislikeItem);
+    ui.postCommentButton.addEventListener("click",postComment);
+
+    ui.popup.addEventListener("click",e=>{if(e.target===ui.popup) closeItem()});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ui.popup.style.display==="block") closeItem()});
+  </script>
+</body>
+</html>
