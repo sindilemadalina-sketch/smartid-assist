@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartID Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginPage" class="login-page">
+    <section class="login-card">
+      <h1>SmartID Portal</h1>
+      <p>Ghid de utilizare echipamente NCR</p>
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Parolă">
+      <button id="loginBtn" class="primary">Autentificare</button>
+      <div id="loginError" class="error"></div>
+    </section>
+  </main>
+
+  <div id="storeModal" class="modal">
+    <section class="modal-card">
+      <h2>Selectare magazin</h2>
+      <p>Introdu ID-ul magazinului pentru a continua.</p>
+      <input id="storeCode" placeholder="ID magazin">
+      <button id="storeContinueBtn" class="primary">Continuă</button>
+      <div id="storeError" class="error"></div>
+    </section>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="brand-row">
+        <button id="menuBtn" class="menu-btn hidden">☰</button>
+        <div class="brand">SmartID Portal</div>
+      </div>
+      <div class="top-actions">
+        <input id="searchInput" class="search" placeholder="Caută după titlu sau tag...">
+        <button id="logoutBtn" class="logout">Logout</button>
+      </div>
+    </header>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+      <button id="closeMenuBtn" class="close-menu">×</button>
+      <h2>Meniu</h2>
+      <button class="side-btn" data-page="dashboardPage">Dashboard</button>
+      <button class="side-btn" data-page="videosPage">Videoclipuri</button>
+      <button class="side-btn" data-page="proceduresPage">Proceduri</button>
+      <button class="side-btn" data-page="storesPage">Administrare magazine</button>
+    </aside>
+
+    <main class="content">
+      <section id="dashboardPage" class="page hidden">
+        <div class="hero">
+          <div class="sphere s1"></div><div class="sphere s2"></div><div class="sphere s3"></div>
+          <div class="hero-text">
+            <h1>Dashboard SmartID Portal</h1>
+            <p>Statistici privind utilizarea platformei SmartID Portal.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card" data-tip="Numărul total de autentificări înregistrate.">
+            <strong id="statLogins">0</strong><span>Autentificări</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul magazinelor care au accesat platforma.">
+            <strong id="statStores">0</strong><span>Magazine active</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul total de vizualizări ale videoclipurilor.">
+            <strong id="statVideos">0</strong><span>Vizualizări video</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul total de vizualizări ale procedurilor.">
+            <strong id="statProcedures">0</strong><span>Vizualizări proceduri</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="userHomePage" class="page hidden">
+        <div class="user-grid">
+          <article class="user-card" data-page="videosPage">
+            <div class="icon">▶</div><h2>Videoclipuri</h2><p>Clipuri pentru instruire și suport operațional.</p>
+          </article>
+          <article class="user-card" data-page="proceduresPage">
+            <div class="icon">▣</div><h2>Proceduri</h2><p>Documentație și pași operaționali.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="videosPage" class="page hidden">
+        <div class="page-head"><h1>Videoclipuri</h1><button class="back-btn">Înapoi</button></div>
+        <div id="videosGrid" class="materials-grid"></div>
+      </section>
+
+      <section id="proceduresPage" class="page hidden">
+        <div class="page-head"><h1>Proceduri</h1><button class="back-btn">Înapoi</button></div>
+        <div id="proceduresGrid" class="materials-grid"></div>
+      </section>
+
+      <section id="storesPage" class="page hidden">
+        <div class="page-head"><h1>Administrare magazine</h1></div>
+        <section class="panel">
+          <div class="form-grid">
+            <input id="newStoreId" placeholder="ID magazin">
+            <input id="newStoreName" placeholder="Nume magazin">
+            <select id="newStoreType">
+              <option value="carrefour">Carrefour</option>
+              <option value="franciza">Franciză</option>
+            </select>
+            <select id="newStoreActive">
+              <option value="true">Activ</option>
+              <option value="false">Inactiv</option>
+            </select>
+          </div>
+          <button id="saveStoreBtn" class="primary">Adaugă / actualizează</button>
+          <div id="saveStoreStatus" class="status"></div>
+        </section>
+        <section class="panel">
+          <h2>Magazine existente</h2>
+          <div id="storesList"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
