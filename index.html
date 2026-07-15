@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartID Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginPage" class="login-page">
+    <section class="login-card">
+      <h1>SmartID Portal</h1>
+      <p>Ghid de utilizare echipamente NCR</p>
+      <input id="email" type="email" placeholder="Email" autocomplete="username">
+      <input id="password" type="password" placeholder="Parolă" autocomplete="current-password">
+      <button id="loginBtn" class="primary wide">Autentificare</button>
+      <div id="loginError" class="error"></div>
+    </section>
+  </main>
+
+  <div id="storeModal" class="modal">
+    <section class="modal-card">
+      <h2>Selectare magazin</h2>
+      <p>Introdu ID-ul magazinului pentru a continua.</p>
+      <input id="storeCode" placeholder="ID magazin">
+      <button id="storeContinueBtn" class="primary wide">Continuă</button>
+      <div id="storeError" class="error dark-error"></div>
+    </section>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="topbar">
+      <div class="brand-row">
+        <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
+        <strong class="brand">SmartID Portal</strong>
+      </div>
+      <div class="top-actions">
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="searchInput" class="search" placeholder="Caută după titlu, descriere sau tag...">
+        </div>
+        <button id="logoutBtn" class="logout">Logout</button>
+      </div>
+    </header>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+      <button id="closeMenuBtn" class="close-menu">×</button>
+      <h2>Meniu</h2>
+      <p class="sidebar-subtitle">Administrare SmartID Portal</p>
+      <button class="side-btn" data-page="dashboardPage">📊 Dashboard</button>
+      <button class="side-btn" data-page="equipmentPage">🧩 Materiale</button>
+      <button class="side-btn" data-page="addMaterialPage">＋ Adaugă material</button>
+      <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
+    </aside>
+
+    <main class="content">
+      <section id="dashboardPage" class="page hidden">
+        <div class="stats-grid">
+          <article class="stat-card" data-tip="Numărul total de autentificări înregistrate în platformă.">
+            <strong id="statLogins">0</strong><span>Autentificări</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul magazinelor care au accesat platforma cel puțin o dată.">
+            <strong id="statStores">0</strong><span>Magazine active</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul total de accesări ale videoclipurilor.">
+            <strong id="statVideos">0</strong><span>Vizualizări videoclipuri</span>
+          </article>
+          <article class="stat-card" data-tip="Numărul total de accesări ale procedurilor.">
+            <strong id="statProcedures">0</strong><span>Vizualizări proceduri</span>
+          </article>
+        </div>
+
+        <div class="dashboard-lower">
+          <section class="panel">
+            <h2>Ultimele autentificări</h2>
+            <div id="recentLogins"></div>
+          </section>
+          <section class="panel">
+            <h2>Ultimele materiale adăugate</h2>
+            <div id="recentMaterials"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="equipmentPage" class="page hidden">
+        <div class="page-head">
+          <div>
+            <h1 id="equipmentPageTitle">Echipamente</h1>
+            <p id="storeWelcome" class="subtitle"></p>
+          </div>
+        </div>
+        <div id="equipmentGrid" class="equipment-grid"></div>
+      </section>
+
+      <section id="materialTypePage" class="page hidden">
+        <div class="page-head">
+          <div>
+            <h1 id="selectedEquipmentTitle">Echipament</h1>
+            <p class="subtitle">Alege tipul materialului.</p>
+          </div>
+          <button class="back-btn" data-back="equipmentPage">Înapoi</button>
+        </div>
+        <div class="type-grid">
+          <article class="type-card" data-material-type="videoclip">
+            <span>▶</span><h2>Videoclipuri</h2>
+          </article>
+          <article class="type-card" data-material-type="procedura">
+            <span>▣</span><h2>Proceduri</h2>
+          </article>
+        </div>
+      </section>
+
+      <section id="materialsPage" class="page hidden">
+        <div class="page-head">
+          <div>
+            <h1 id="materialsTitle">Materiale</h1>
+            <p id="materialsSubtitle" class="subtitle"></p>
+          </div>
+          <button class="back-btn" data-back="materialTypePage">Înapoi</button>
+        </div>
+        <div id="materialsGrid" class="materials-grid"></div>
+      </section>
+
+      <section id="addMaterialPage" class="page hidden">
+        <div class="page-head">
+          <div><h1>Adaugă material</h1><p class="subtitle">Asociază materialul cu unul sau mai multe echipamente.</p></div>
+        </div>
+        <section class="panel">
+          <div class="form-grid">
+            <input id="materialTitle" placeholder="Titlu material">
+            <select id="materialType">
+              <option value="videoclip">Videoclip</option>
+              <option value="procedura">Procedură</option>
+            </select>
+            <input id="materialUrl" class="full" placeholder="Link YouTube nelistat sau link procedură HTML">
+            <textarea id="materialDescription" class="full" placeholder="Descriere scurtă"></textarea>
+            <input id="materialTags" class="full" placeholder="Tag-uri: restart, acceptor, configurare">
+          </div>
+
+          <div class="section-label">Categorie material</div>
+          <div class="choice-row">
+            <label><input type="checkbox" name="materialCategory" value="carrefour" checked> Carrefour</label>
+            <label><input type="checkbox" name="materialCategory" value="franciza"> Franciză</label>
+          </div>
+
+          <div class="equipment-select-block">
+            <h3>Echipamente Carrefour</h3>
+            <div id="carrefourEquipmentChoices" class="checkbox-grid"></div>
+          </div>
+          <div class="equipment-select-block">
+            <h3>Echipamente Franciză</h3>
+            <div id="francizaEquipmentChoices" class="checkbox-grid"></div>
+          </div>
+
+          <button id="saveMaterialBtn" class="primary">Adaugă material</button>
+          <div id="materialStatus" class="status"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Materiale existente</h2>
+          <div id="adminMaterialsList"></div>
+        </section>
+      </section>
+
+      <section id="storesPage" class="page hidden">
+        <div class="page-head"><div><h1>Administrare magazine</h1><p class="subtitle">Adaugă, caută și filtrează magazinele.</p></div></div>
+        <section class="panel">
+          <div class="form-grid">
+            <input id="newStoreId" placeholder="ID magazin">
+            <input id="newStoreName" placeholder="Nume magazin">
+            <select id="newStoreCategory">
+              <option value="carrefour">Carrefour</option>
+              <option value="franciza">Franciză</option>
+            </select>
+            <select id="newStoreFormat">
+              <option value="hiper">Hiper</option>
+              <option value="super">Super</option>
+              <option value="express">Express</option>
+            </select>
+            <select id="newStoreActive">
+              <option value="true">Activ</option>
+              <option value="false">Inactiv</option>
+            </select>
+          </div>
+          <button id="saveStoreBtn" class="primary">Adaugă / actualizează magazin</button>
+          <div id="saveStoreStatus" class="status"></div>
+        </section>
+
+        <section class="panel">
+          <div class="store-toolbar">
+            <input id="storeSearch" placeholder="Caută după ID sau nume...">
+            <select id="storeFilter">
+              <option value="all">Toate</option>
+              <option value="carrefour">Carrefour</option>
+              <option value="franciza">Franciză</option>
+              <option value="hiper">Hiper</option>
+              <option value="super">Super</option>
+              <option value="express">Express</option>
+            </select>
+          </div>
+          <div id="storesList"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="viewer" class="viewer">
+    <header class="viewer-head">
+      <strong id="viewerTitle"></strong>
+      <button id="closeViewerBtn" class="logout">Înapoi</button>
+    </header>
+    <div class="viewer-body">
+      <iframe id="viewerFrame" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
