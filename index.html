@@ -26,7 +26,10 @@
       <h2>Selectare magazin</h2>
       <p>Introdu ID-ul magazinului pentru a continua.</p>
       <input id="storeCode" placeholder="ID magazin">
-      <button id="storeContinueBtn" class="primary wide">Continuă</button>
+      <div class="store-modal-actions">
+        <button id="storeContinueBtn" class="primary">Continuă</button>
+        <button id="storeLogoutBtn" class="store-logout">Logout</button>
+      </div>
       <div id="storeError" class="error dark-error"></div>
     </section>
   </div>
@@ -156,7 +159,10 @@
             <div id="francizaEquipmentChoices" class="checkbox-grid"></div>
           </div>
 
-          <button id="saveMaterialBtn" class="primary">Adaugă material</button>
+          <div class="material-form-actions">
+            <button id="saveMaterialBtn" class="primary">Adaugă material</button>
+            <button id="cancelEditMaterialBtn" class="secondary hidden">Renunță la editare</button>
+          </div>
           <div id="materialStatus" class="status"></div>
         </section>
 

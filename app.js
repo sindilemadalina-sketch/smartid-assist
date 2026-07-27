@@ -24,6 +24,7 @@ let selectedEquipmentLabel = "";
 let selectedMaterialType = "";
 let materials = [];
 let storesCache = [];
+let editingMaterialId = null;
 
 const normRole = value => String(value || "").trim().toLowerCase();
 const normCategory = value => {
@@ -48,7 +49,7 @@ function showPage(id) {
 
 async function ensureStores() {
   try {
-    const markerRef = doc(db, "system", "storesSeedV2");
+    const markerRef = doc(db, "system", "storesSeedV3");
     const marker = await getDoc(markerRef);
     if (marker.exists()) return;
 
@@ -348,7 +349,7 @@ async function saveMaterial() {
     return;
   }
 
-  await addDoc(collection(db, "videos"), {
+  const payload = {
     title,
     url,
     type,
@@ -356,17 +357,66 @@ async function saveMaterial() {
     equipment,
     description: el("materialDescription").value.trim(),
     tags: el("materialTags").value.trim().toLowerCase(),
-    views: 0,
-    createdAt: serverTimestamp(),
-    createdBy: currentEmail
-  });
+    updatedAt: serverTimestamp(),
+    updatedBy: currentEmail
+  };
 
+  if (editingMaterialId) {
+    await updateDoc(doc(db, "videos", editingMaterialId), payload);
+    el("materialStatus").textContent = "Modificările au fost salvate.";
+  } else {
+    await addDoc(collection(db, "videos"), {
+      ...payload,
+      views: 0,
+      createdAt: serverTimestamp(),
+      createdBy: currentEmail
+    });
+    el("materialStatus").textContent = "Materialul a fost adăugat.";
+  }
+
+  resetMaterialForm();
+  await loadMaterials();
+  await renderAdminMaterials();
+}
+
+function resetMaterialForm() {
+  editingMaterialId = null;
   ["materialTitle", "materialUrl", "materialDescription", "materialTags"].forEach(id => el(id).value = "");
   document.querySelectorAll('#addMaterialPage input[type="checkbox"]').forEach(input => input.checked = false);
   document.querySelector('input[name="materialCategory"][value="carrefour"]').checked = true;
-  el("materialStatus").textContent = "Materialul a fost adăugat.";
-  await loadMaterials();
-  await renderAdminMaterials();
+  el("materialType").value = "videoclip";
+  el("saveMaterialBtn").textContent = "Adaugă material";
+  el("cancelEditMaterialBtn").classList.add("hidden");
+}
+
+function startEditMaterial(materialId) {
+  const material = materials.find(item => item.id === materialId);
+  if (!material) return;
+
+  editingMaterialId = material.id;
+  el("materialTitle").value = material.title || "";
+  el("materialUrl").value = material.url || "";
+  el("materialType").value = material.type || "videoclip";
+  el("materialDescription").value = material.description || "";
+  el("materialTags").value = material.tags || "";
+
+  document.querySelectorAll('#addMaterialPage input[type="checkbox"]').forEach(input => input.checked = false);
+
+  (material.categories || []).forEach(category => {
+    const input = document.querySelector(`input[name="materialCategory"][value="${category}"]`);
+    if (input) input.checked = true;
+  });
+
+  (material.equipment || []).forEach(eq => {
+    document.querySelectorAll(`#addMaterialPage input[type="checkbox"][value="${eq}"]`).forEach(input => {
+      if (input.name !== "materialCategory") input.checked = true;
+    });
+  });
+
+  el("saveMaterialBtn").textContent = "Salvează modificările";
+  el("cancelEditMaterialBtn").classList.remove("hidden");
+  el("materialStatus").textContent = "Editezi materialul selectat.";
+  window.scrollTo({top:0, behavior:"smooth"});
 }
 
 async function renderAdminMaterials() {
@@ -377,19 +427,33 @@ async function renderAdminMaterials() {
     return;
   }
 
-  container.innerHTML = materials.map(material => `
-    <div class="admin-material-row">
-      <b>${escapeHtml(material.title || "Material")}</b>
-      <span class="badge">${material.type === "videoclip" ? "Videoclip" : "Procedură"}</span>
-      <div class="store-meta">${escapeHtml(material.categories.join(", "))} · ${escapeHtml(material.equipment.join(", "))}</div>
-      <div class="row-actions"><button class="danger" data-delete-material="${material.id}">Șterge</button></div>
-    </div>
-  `).join("");
+  container.innerHTML = materials.map(material => {
+    const tags = material.tags ? `<div class="material-tags">🏷 ${escapeHtml(material.tags)}</div>` : '<div class="material-tags">🏷 Fără tag-uri</div>';
+    const views = Number(material.views || 0);
+    return `
+      <div class="admin-material-row">
+        <b>${escapeHtml(material.title || "Material")}</b>
+        <span class="badge">${material.type === "videoclip" ? "Videoclip" : "Procedură"}</span>
+        <div class="store-meta">${escapeHtml((material.categories || []).join(", "))} · ${escapeHtml((material.equipment || []).join(", "))}</div>
+        ${tags}
+        <div class="material-info">👁 ${views} vizualizări${material.createdBy ? ` · Adăugat de ${escapeHtml(material.createdBy)}` : ""}</div>
+        <div class="row-actions">
+          <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
+          <button class="danger" data-delete-material="${material.id}">Șterge</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-edit-material]").forEach(button => {
+    button.addEventListener("click", () => startEditMaterial(button.dataset.editMaterial));
+  });
 
   container.querySelectorAll("[data-delete-material]").forEach(button => {
     button.addEventListener("click", async () => {
       if (!confirm("Ștergi materialul?")) return;
       await deleteDoc(doc(db, "videos", button.dataset.deleteMaterial));
+      if (editingMaterialId === button.dataset.deleteMaterial) resetMaterialForm();
       await renderAdminMaterials();
     });
   });
@@ -431,27 +495,71 @@ async function loadStores() {
 function renderStores() {
   const term = el("storeSearch").value.trim().toLowerCase();
   const filter = el("storeFilter").value;
-  const list = storesCache
-    .filter(store => {
-      const category = normCategory(store.category || store.type);
-      const format = store.format || "";
-      const matchesText = !term || `${store.id} ${store.name || ""}`.toLowerCase().includes(term);
-      const matchesFilter = filter === "all" || category === filter || format === filter;
-      return matchesText && matchesFilter;
-    })
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
 
-  el("storesList").innerHTML = list.map(store => {
+  const filtered = storesCache.filter(store => {
     const category = normCategory(store.category || store.type);
-    return `
+    const format = String(store.format || "").toLowerCase();
+    const matchesText = !term || `${store.id} ${store.name || ""}`.toLowerCase().includes(term);
+    const matchesFilter = filter === "all" || category === filter || format === filter;
+    return matchesText && matchesFilter;
+  });
+
+  const carrefour = filtered.filter(s => normCategory(s.category || s.type) === "carrefour");
+  const franciza = filtered.filter(s => normCategory(s.category || s.type) === "franciza");
+
+  const renderRows = list => list
+    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"))
+    .map(store => `
       <div class="store-row">
         <b>${escapeHtml(store.name || store.id)}</b>
-        <span class="badge">${category === "franciza" ? "Franciză" : "Carrefour"}</span>
-        ${category === "carrefour" && store.format ? `<span class="badge">${escapeHtml(store.format)}</span>` : ""}
-        <div class="store-meta">ID: ${escapeHtml(store.id)} · ${store.active === false ? "Inactiv" : "Activ"}</div>
+        <div class="store-meta">
+          ID: ${escapeHtml(store.id)} ·
+          <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
+            ${store.active === false ? "Inactiv" : "Activ"}
+          </span>
+        </div>
       </div>
-    `;
-  }).join("") || '<div class="empty">Nu există magazine pentru filtrul selectat.</div>';
+    `).join("");
+
+  const group = (title, list, key) => `
+    <div class="group-block">
+      <button class="group-head" data-store-group="${key}">
+        <span>${title}</span><span>${list.length} ▾</span>
+      </button>
+      <div class="group-body" id="group-${key}">
+        ${list.length ? renderRows(list) : '<div class="store-row"><small>Nu există magazine.</small></div>'}
+      </div>
+    </div>`;
+
+  const hiper = carrefour.filter(s => String(s.format || "").toLowerCase() === "hiper");
+  const superStores = carrefour.filter(s => String(s.format || "").toLowerCase() === "super");
+  const express = carrefour.filter(s => String(s.format || "").toLowerCase() === "express");
+  const noFormat = carrefour.filter(s => !["hiper","super","express"].includes(String(s.format || "").toLowerCase()));
+
+  let output = "";
+  if (filter !== "franciza") {
+    output += '<h2 class="category-title">Carrefour</h2>';
+    output += group("Hiper", hiper, "hiper");
+    output += group("Super", superStores, "super");
+    output += group("Express", express, "express");
+    if (noFormat.length) output += group("Fără format", noFormat, "noformat");
+  }
+
+  if (filter !== "carrefour" && !["hiper","super","express"].includes(filter)) {
+    output += '<h2 class="category-title">Franciză</h2>';
+    output += group("Magazine Franciză", franciza, "franciza");
+  }
+
+  el("storesList").innerHTML = output || '<div class="empty">Nu există magazine pentru filtrul selectat.</div>';
+
+  el("storesList").querySelectorAll("[data-store-group]").forEach(button => {
+    button.addEventListener("click", () => {
+      const body = el(`group-${button.dataset.storeGroup}`);
+      body.classList.toggle("collapsed");
+      const count = body.querySelectorAll(".store-row").length;
+      button.querySelector("span:last-child").textContent = `${count} ${body.classList.contains("collapsed") ? "▸" : "▾"}`;
+    });
+  });
 }
 
 function toggleStoreFormat() {
@@ -493,9 +601,24 @@ function closeMenu() {
   el("menuOverlay").classList.remove("open");
 }
 
+
+async function cancelStoreSelection() {
+  currentStoreId = "";
+  currentStoreName = "";
+  currentStoreFormat = "";
+  el("storeCode").value = "";
+  el("storeError").textContent = "";
+  el("storeModal").classList.remove("open");
+  await signOut(auth);
+  el("loginPage").style.display = "flex";
+  el("app").classList.add("hidden");
+  el("email").focus();
+}
+
 el("loginBtn").addEventListener("click", login);
 el("password").addEventListener("keydown", event => { if (event.key === "Enter") login(); });
 el("storeContinueBtn").addEventListener("click", continueWithStore);
+el("storeLogoutBtn").addEventListener("click", cancelStoreSelection);
 el("logoutBtn").addEventListener("click", async () => { await signOut(auth); location.reload(); });
 el("menuBtn").addEventListener("click", openMenu);
 el("closeMenuBtn").addEventListener("click", closeMenu);
@@ -505,6 +628,7 @@ el("closeViewerBtn").addEventListener("click", () => {
   el("viewerFrame").src = "about:blank";
 });
 el("saveMaterialBtn").addEventListener("click", saveMaterial);
+el("cancelEditMaterialBtn").addEventListener("click", () => { resetMaterialForm(); el("materialStatus").textContent = ""; });
 el("saveStoreBtn").addEventListener("click", saveStore);
 el("newStoreCategory").addEventListener("change", toggleStoreFormat);
 el("storeSearch").addEventListener("input", renderStores);
