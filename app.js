@@ -220,6 +220,7 @@ async function continueWithStore() {
 function renderEquipment() {
   const category = currentCategory === "franciza" ? "franciza" : "carrefour";
   const items = EQUIPMENT[category] || [];
+
   el("equipmentPageTitle").textContent = category === "franciza" ? "Franciză" : "Carrefour";
   el("storeWelcome").textContent = currentStoreName
     ? `${currentStoreName}${currentStoreFormat ? ` · ${currentStoreFormat[0].toUpperCase()}${currentStoreFormat.slice(1)}` : ""}`
@@ -229,7 +230,7 @@ function renderEquipment() {
     <article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}">
       <div class="equipment-icon">${item.icon}</div>
       <h2>${escapeHtml(item.label)}</h2>
-      <p>Videoclipuri și proceduri pentru acest echipament.</p>
+      <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
     </article>
   `).join("");
 
@@ -237,8 +238,8 @@ function renderEquipment() {
     card.addEventListener("click", () => {
       selectedEquipment = card.dataset.equipment;
       selectedEquipmentLabel = card.dataset.label;
-      el("selectedEquipmentTitle").textContent = selectedEquipmentLabel;
-      showPage("materialTypePage");
+      renderSelectedMaterials();
+      showPage("materialsPage");
     });
   });
 }
@@ -736,8 +737,10 @@ document.querySelectorAll(".side-btn").forEach(button => {
 document.querySelectorAll(".type-card").forEach(card => {
   card.addEventListener("click", () => {
     selectedMaterialType = card.dataset.materialType;
-    renderSelectedMaterials();
-    showPage("materialsPage");
+    el("selectedMaterialTypeTitle").textContent =
+      selectedMaterialType === "videoclip" ? "Categorii videoclipuri" : "Categorii proceduri";
+    renderEquipment();
+    showPage("materialTypePage");
   });
 });
 
