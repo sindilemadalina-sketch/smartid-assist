@@ -478,9 +478,18 @@ async function loadDashboard() {
     `).join("") || '<div class="list-row"><small>Nu există autentificări.</small></div>';
 
     await loadMaterials();
-    el("recentMaterials").innerHTML = materials.slice(-5).reverse().map(item => `
-      <div class="list-row"><b>${escapeHtml(item.title || "Material")}</b><br><small>${item.type === "videoclip" ? "Videoclip" : "Procedură"}</small></div>
-    `).join("") || '<div class="list-row"><small>Nu există materiale.</small></div>';
+    const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
+    const procedureViews = views.filter(item => normType(item.type) === "procedura").length;
+    const totalViews = videoViews + procedureViews;
+    const videoAngle = totalViews ? (videoViews / totalViews) * 360 : 0;
+
+    el("diagramVideos").textContent = videoViews;
+    el("diagramProcedures").textContent = procedureViews;
+    el("diagramTotal").textContent = totalViews;
+
+    el("usageDiagram").style.background = totalViews
+      ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
+      : "conic-gradient(#e5e7eb 0deg 360deg)";
   } catch (error) {
     console.warn("Dashboard-ul nu a putut fi încărcat.", error);
   }

@@ -82,9 +82,21 @@
             <h2>Ultimele autentificări</h2>
             <div id="recentLogins"></div>
           </section>
-          <section class="panel">
-            <h2>Ultimele materiale adăugate</h2>
-            <div id="recentMaterials"></div>
+          <section class="panel usage-panel">
+            <h2>Distribuția vizualizărilor</h2>
+            <p class="subtitle">Videoclipuri comparativ cu proceduri.</p>
+            <div class="diagram-wrap">
+              <div id="usageDiagram" class="usage-diagram">
+                <div class="diagram-center">
+                  <strong id="diagramTotal">0</strong>
+                  <span>Total</span>
+                </div>
+              </div>
+              <div class="diagram-legend">
+                <div><span class="legend-dot video-dot"></span>Videoclipuri <b id="diagramVideos">0</b></div>
+                <div><span class="legend-dot procedure-dot"></span>Proceduri <b id="diagramProcedures">0</b></div>
+              </div>
+            </div>
           </section>
         </div>
       </section>

@@ -58,3 +58,47 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .edit-material-btn:hover{
   background:#e5d8ff;
 }
+
+.dashboard-material-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dashboard-material-row .edit-material-btn{flex:0 0 auto}
+@media(max-width:650px){.dashboard-material-row{align-items:flex-start;flex-direction:column}}
+
+.usage-panel{min-height:100%}
+.diagram-wrap{display:flex;align-items:center;justify-content:center;gap:40px;min-height:300px;padding:18px 0}
+.usage-diagram{
+  width:210px;
+  height:210px;
+  position:relative;
+  border-radius:50%;
+  background:conic-gradient(#e5e7eb 0deg 360deg);
+  box-shadow:0 16px 38px rgba(76,29,149,.16)
+}
+.usage-diagram::after{
+  content:"";
+  position:absolute;
+  inset:40px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:inset 0 0 0 1px #f0edf8
+}
+.diagram-center{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none
+}
+.diagram-center strong{font-size:34px;color:#4c1d95}
+.diagram-center span{margin-top:3px;color:#667085;font-size:13px;font-weight:700}
+.diagram-legend{display:grid;gap:18px;color:#334155}
+.diagram-legend div{display:flex;align-items:center;gap:10px;font-size:15px}
+.diagram-legend b{margin-left:auto;color:#111827}
+.legend-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.video-dot{background:#6d28d9}
+.procedure-dot{background:#c026d3}
+@media(max-width:650px){
+  .diagram-wrap{flex-direction:column;gap:24px}
+}
