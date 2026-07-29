@@ -24,6 +24,7 @@ let selectedEquipmentLabel = "";
 let selectedMaterialType = "";
 let materials = [];
 let storesCache = [];
+let currentOpenMaterial = null;
 let editingMaterialId = null;
 
 const normRole = value => String(value || "").trim().toLowerCase();
@@ -294,6 +295,7 @@ function renderSelectedMaterials() {
 }
 
 async function openViewer(material) {
+  currentOpenMaterial = material;
   el("viewerTitle").textContent = material.title || "Material";
   const yt = youtubeId(material.url || "");
   el("viewerFrame").src = material.type === "videoclip" && yt
@@ -461,21 +463,20 @@ async function renderAdminMaterials() {
 
 async function loadDashboard() {
   try {
-    const [sessionsSnap, viewsSnap] = await Promise.all([
+    const [sessionsSnap, viewsSnap, sharesSnap] = await Promise.all([
       getDocs(collection(db, "sessions")),
-      getDocs(collection(db, "materialViews"))
+      getDocs(collection(db, "materialViews")),
+      getDocs(collection(db, "shares"))
     ]);
     const sessions = sessionsSnap.docs.map(item => item.data());
     const views = viewsSnap.docs.map(item => item.data());
+    const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
 
     el("statLogins").textContent = sessions.length;
     el("statStores").textContent = new Set(sessions.map(item => item.storeId).filter(Boolean)).size;
     el("statVideos").textContent = views.filter(item => normType(item.type) === "videoclip").length;
     el("statProcedures").textContent = views.filter(item => normType(item.type) === "procedura").length;
-
-    el("recentLogins").innerHTML = sessions.slice(-5).reverse().map(item => `
-      <div class="list-row"><b>${escapeHtml(item.storeName || item.email || "Utilizator")}</b><br><small>${escapeHtml(item.email || "")}</small></div>
-    `).join("") || '<div class="list-row"><small>Nu există autentificări.</small></div>';
+    el("statShares").textContent = shares.length;
 
     await loadMaterials();
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
@@ -601,6 +602,71 @@ async function saveStore() {
   await loadStores();
 }
 
+
+async function recordShare(method) {
+  if (!currentOpenMaterial) return;
+  try {
+    await addDoc(collection(db, "shares"), {
+      materialId: currentOpenMaterial.id,
+      title: currentOpenMaterial.title || "",
+      type: currentOpenMaterial.type || "",
+      method,
+      email: currentEmail,
+      storeId: currentStoreId,
+      storeName: currentStoreName,
+      storeFormat: currentStoreFormat,
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Distribuirea nu a putut fi înregistrată.", error);
+  }
+}
+
+async function shareWhatsApp() {
+  if (!currentOpenMaterial) return;
+  await recordShare("WhatsApp");
+  const text = `${currentOpenMaterial.title || "Material"} - ${currentOpenMaterial.url || ""}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+}
+
+async function shareEmail() {
+  if (!currentOpenMaterial) return;
+  await recordShare("E-mail");
+  const subject = `SmartID Portal - ${currentOpenMaterial.title || "Material"}`;
+  const body = `${currentOpenMaterial.title || "Material"}\n\n${currentOpenMaterial.url || ""}`;
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+async function copyMaterialLink() {
+  if (!currentOpenMaterial) return;
+  await navigator.clipboard.writeText(currentOpenMaterial.url || "");
+  await recordShare("Copiere link");
+  alert("Linkul a fost copiat.");
+}
+
+async function openSharesHistory() {
+  try {
+    const snap = await getDocs(collection(db, "shares"));
+    const shares = snap.docs.map(item => ({ id: item.id, ...item.data() })).reverse();
+    el("sharesList").innerHTML = shares.length
+      ? shares.map(item => `
+          <div class="share-row">
+            <b>${escapeHtml(item.title || "Material")}</b>
+            <small>
+              Distribuit de: ${escapeHtml(item.email || "Utilizator")}
+              ${item.storeName ? ` · Magazin: ${escapeHtml(item.storeName)}` : ""}
+              ${item.storeId ? ` · ID: ${escapeHtml(item.storeId)}` : ""}
+              · Metodă: ${escapeHtml(item.method || "Necunoscută")}
+            </small>
+          </div>
+        `).join("")
+      : '<div class="empty">Nu există distribuiri înregistrate.</div>';
+    el("sharesModal").classList.add("open");
+  } catch (error) {
+    console.warn(error);
+  }
+}
+
 function openMenu() {
   el("sidebar").classList.add("open");
   el("menuOverlay").classList.add("open");
@@ -630,11 +696,17 @@ el("storeContinueBtn").addEventListener("click", continueWithStore);
 el("storeLogoutBtn").addEventListener("click", cancelStoreSelection);
 el("logoutBtn").addEventListener("click", async () => { await signOut(auth); location.reload(); });
 el("menuBtn").addEventListener("click", openMenu);
+el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
+el("shareEmailBtn").addEventListener("click", shareEmail);
+el("copyLinkBtn").addEventListener("click", copyMaterialLink);
+el("sharesCard").addEventListener("click", openSharesHistory);
+el("closeSharesModalBtn").addEventListener("click", () => el("sharesModal").classList.remove("open"));
 el("closeMenuBtn").addEventListener("click", closeMenu);
 el("menuOverlay").addEventListener("click", closeMenu);
 el("closeViewerBtn").addEventListener("click", () => {
   el("viewer").classList.remove("open");
   el("viewerFrame").src = "about:blank";
+  currentOpenMaterial = null;
 });
 el("saveMaterialBtn").addEventListener("click", saveMaterial);
 el("cancelEditMaterialBtn").addEventListener("click", () => { resetMaterialForm(); el("materialStatus").textContent = ""; });

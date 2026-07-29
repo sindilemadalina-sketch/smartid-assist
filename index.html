@@ -75,13 +75,12 @@
           <article class="stat-card" data-tip="Numărul total de accesări ale procedurilor.">
             <strong id="statProcedures">0</strong><span>Vizualizări proceduri</span>
           </article>
+          <article class="stat-card share-stat-card" id="sharesCard" data-tip="Numărul total de distribuiri ale materialelor.">
+            <strong id="statShares">0</strong><span>Distribuiri</span>
+          </article>
         </div>
 
         <div class="dashboard-lower">
-          <section class="panel">
-            <h2>Ultimele autentificări</h2>
-            <div id="recentLogins"></div>
-          </section>
           <section class="panel usage-panel">
             <h2>Distribuția vizualizărilor</h2>
             <p class="subtitle">Videoclipuri comparativ cu proceduri.</p>
@@ -233,7 +232,25 @@
     </header>
     <div class="viewer-body">
       <iframe id="viewerFrame" allowfullscreen></iframe>
+      <div class="share-bar">
+        <button id="shareWhatsAppBtn" class="share-btn">WhatsApp</button>
+        <button id="shareEmailBtn" class="share-btn">E-mail</button>
+        <button id="copyLinkBtn" class="share-btn">Copiază linkul</button>
+      </div>
     </div>
+  </div>
+
+  <div id="sharesModal" class="modal">
+    <section class="modal-card shares-modal-card">
+      <div class="shares-modal-head">
+        <div>
+          <h2>Istoric distribuiri</h2>
+          <p>Materiale distribuite și utilizatorii care le-au trimis.</p>
+        </div>
+        <button id="closeSharesModalBtn" class="back-btn">Închide</button>
+      </div>
+      <div id="sharesList" class="shares-list"></div>
+    </section>
   </div>
 
   <script type="module" src="app.js"></script>
