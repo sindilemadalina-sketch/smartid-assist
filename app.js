@@ -297,9 +297,32 @@ function renderSelectedMaterials() {
 
 async function openViewer(material) {
   currentOpenMaterial = material;
+
+  if (material.type === "procedura") {
+    try {
+      await addDoc(collection(db, "materialViews"), {
+        materialId: material.id,
+        title: material.title || "",
+        type: material.type,
+        email: currentEmail,
+        storeId: currentStoreId,
+        storeName: currentStoreName,
+        storeFormat: currentStoreFormat,
+        createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, "videos", material.id), { views: increment(1) });
+    } catch (error) {
+      console.warn("Vizualizarea nu a putut fi înregistrată.", error);
+    }
+
+    window.open(material.url || "about:blank", "_blank", "noopener,noreferrer");
+    currentOpenMaterial = null;
+    return;
+  }
+
   el("viewerTitle").textContent = material.title || "Material";
   const yt = youtubeId(material.url || "");
-  el("viewerFrame").src = material.type === "videoclip" && yt
+  el("viewerFrame").src = yt
     ? `https://www.youtube-nocookie.com/embed/${yt}?rel=0&cc_load_policy=0&playsinline=1`
     : material.url || "about:blank";
   el("viewer").classList.add("open");
