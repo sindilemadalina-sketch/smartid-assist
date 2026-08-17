@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
   updateDoc, doc, increment, serverTimestamp
@@ -145,7 +145,7 @@ async function login() {
   el("loginBtn").textContent = "Se autentifică...";
 
   try {
-    await setPersistence(auth, browserSessionPersistence);
+    await setPersistence(auth, browserLocalPersistence);
     const credential = await signInWithEmailAndPassword(
       auth,
       el("email").value.trim().toLowerCase(),
@@ -278,23 +278,53 @@ function renderSelectedMaterials() {
   const term = el("searchInput").value.trim().toLowerCase();
   const list = materials.filter(material => {
     const text = `${material.title || ""} ${material.description || ""} ${material.tags || ""}`.toLowerCase();
-    return materialAllowed(material) && material.type === selectedMaterialType && material.equipment.includes(selectedEquipment) && (!term || text.includes(term));
+    return materialAllowed(material)
+      && material.type === selectedMaterialType
+      && material.equipment.includes(selectedEquipment)
+      && (!term || text.includes(term));
   });
+
+  const sorted = [...list].sort((a, b) => {
+    const byViews = Number(b.views || 0) - Number(a.views || 0);
+    if (byViews !== 0) return byViews;
+    return String(a.title || "").localeCompare(String(b.title || ""), "ro");
+  });
+
   el("materialsTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
-  el("materialsSubtitle").textContent = selectedEquipmentLabel;
-  const makeCard = material => {
+  el("materialsSubtitle").textContent = `${selectedEquipmentLabel} · în ordinea celor mai vizionate`;
+
+  const makeCard = (material, position) => {
     const yt = youtubeId(material.url || "");
-    const preview = material.type === "videoclip" && yt ? `<div class="thumb"><img src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><div class="play">▶</div></div>` : `<div class="thumb">▣</div>`;
-    const card = document.createElement("article"); card.className="material-card";
-    card.innerHTML = `${preview}<div class="material-body"><h3>${escapeHtml(material.title || "Material")}</h3><p>${escapeHtml(material.description || "")}</p><div class="material-info">👁 ${Number(material.views||0)} vizualizări</div></div>`;
-    card.addEventListener("click",()=>openViewer(material)); return card;
+    const preview = material.type === "videoclip" && yt
+      ? `<div class="thumb"><img src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><div class="play">▶</div></div>`
+      : `<div class="thumb">▣</div>`;
+
+    const card = document.createElement("article");
+    card.className = "material-card ranked-material";
+    card.innerHTML = `
+      <div class="rank-badge">#${position}</div>
+      ${preview}
+      <div class="material-body">
+        <h3>${escapeHtml(material.title || "Material")}</h3>
+        <p>${escapeHtml(material.description || "")}</p>
+        <div class="material-info">👁 ${Number(material.views || 0)} vizualizări</div>
+      </div>`;
+    card.addEventListener("click", () => openViewer(material));
+    return card;
   };
-  const grid=el("materialsGrid"); grid.innerHTML="";
-  if(!list.length) grid.innerHTML=`<div class="empty">${escapeHtml(selectedMaterialType === "videoclip" ? `Nu există încă videoclipuri disponibile pentru ${selectedEquipmentLabel}.` : `Nu există încă proceduri disponibile pentru ${selectedEquipmentLabel}.`)}</div>`;
-  else list.forEach(m=>grid.appendChild(makeCard(m)));
-  const popular=el("popularMaterials"); popular.innerHTML="";
-  const top=[...list].sort((a,b)=>Number(b.views||0)-Number(a.views||0)).slice(0,5);
-  if(!top.length) popular.innerHTML='<div class="empty">Nu există încă suficiente vizualizări.</div>'; else top.forEach(m=>popular.appendChild(makeCard(m)));
+
+  const grid = el("materialsGrid");
+  grid.innerHTML = "";
+
+  if (!sorted.length) {
+    grid.innerHTML = `<div class="empty">${escapeHtml(
+      selectedMaterialType === "videoclip"
+        ? `Nu există încă videoclipuri disponibile pentru ${selectedEquipmentLabel}.`
+        : `Nu există încă proceduri disponibile pentru ${selectedEquipmentLabel}.`
+    )}</div>`;
+  } else {
+    sorted.forEach((material, index) => grid.appendChild(makeCard(material, index + 1)));
+  }
 }
 
 function driveSamePageUrl(raw) {
@@ -503,16 +533,38 @@ async function loadDashboard() {
       : "conic-gradient(#e5e7eb 0deg 360deg)";
 
     const byUser = {};
-    sessions.forEach(x=>{const k=x.email||"Necunoscut"; byUser[k]??={logins:0,videos:0,procedures:0}; byUser[k].logins++;});
-    materials.forEach(x=>{const k=x.createdBy||"Necunoscut"; byUser[k]??={logins:0,videos:0,procedures:0}; if(x.type==="videoclip")byUser[k].videos++; else if(x.type==="procedura")byUser[k].procedures++;});
-    el("contributorsList").innerHTML = Object.entries(byUser).sort((a,b)=>a[0].localeCompare(b[0])).map(([email,v])=>`<div class="contributor-row"><b>${escapeHtml(email)}</b><span>Accesări: ${v.logins}</span><span>Clipuri: ${v.videos}</span><span>Proceduri: ${v.procedures}</span></div>`).join("") || '<div class="empty">Nu există activitate.</div>';
+    materials.forEach(item => {
+      const email = item.createdBy || "Necunoscut";
+      byUser[email] ??= { videos: 0, procedures: 0 };
+      if (item.type === "videoclip") byUser[email].videos++;
+      if (item.type === "procedura") byUser[email].procedures++;
+    });
 
-    const activity = [];
-    sessions.forEach(x => activity.push({kind:"Accesare", email:x.email||"Necunoscut", detail:x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role||""), when:x.createdAt}));
-    materials.forEach(x => activity.push({kind:x.type==="videoclip"?"Videoclip adăugat":"Procedură adăugată", email:x.createdBy||"Necunoscut", detail:x.title||"Material", when:x.createdAt}));
-    const millis = v => v && typeof v.toMillis === "function" ? v.toMillis() : (v?.seconds ? v.seconds*1000 : 0);
-    activity.sort((a,b)=>millis(b.when)-millis(a.when));
-    el("activityHistory").innerHTML = activity.slice(0,30).map(a=>`<div class="activity-row"><b>${escapeHtml(a.email)}</b><span>${escapeHtml(a.kind)} · ${escapeHtml(a.detail||"")}</span><small>${millis(a.when)?new Date(millis(a.when)).toLocaleString("ro-RO"):""}</small></div>`).join("") || '<div class="empty">Nu există activitate.</div>';
+    const teamVideosTotal = materials.filter(item => item.type === "videoclip").length;
+    const teamProceduresTotal = materials.filter(item => item.type === "procedura").length;
+    el("teamVideosTotal").textContent = teamVideosTotal;
+    el("teamProceduresTotal").textContent = teamProceduresTotal;
+
+    const contributors = Object.entries(byUser)
+      .sort((a, b) => (b[1].videos + b[1].procedures) - (a[1].videos + a[1].procedures));
+
+    el("contributorsList").innerHTML = contributors.length
+      ? contributors.map(([email, values]) => `
+          <div class="team-member-row">
+            <div class="team-member-name">
+              <div class="team-avatar">${escapeHtml((email || "?").charAt(0).toUpperCase())}</div>
+              <div>
+                <b>${escapeHtml(email)}</b>
+                <small>${values.videos + values.procedures} materiale încărcate</small>
+              </div>
+            </div>
+            <div class="team-metrics">
+              <span class="metric-pill video-pill">▶ ${values.videos} videoclipuri</span>
+              <span class="metric-pill procedure-pill">▣ ${values.procedures} proceduri</span>
+            </div>
+          </div>
+        `).join("")
+      : '<div class="empty">Nu există încă materiale încărcate de echipă.</div>';
   } catch (error) {
     console.warn("Dashboard-ul nu a putut fi încărcat.", error);
   }

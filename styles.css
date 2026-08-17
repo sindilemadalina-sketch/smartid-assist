@@ -144,3 +144,216 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .activity-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto;gap:14px;padding:11px 0;border-bottom:1px solid #edf0f5;align-items:center}
 .activity-row:last-child{border-bottom:0}.activity-row small{color:#667085}
 @media(max-width:760px){.activity-row{grid-template-columns:1fr}}
+
+/* Dashboard - layout echipa */
+.dashboard-main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(420px,1.15fr);
+  gap:22px;
+  margin-top:24px;
+  align-items:stretch
+}
+.dashboard-main-grid .panel{
+  margin-bottom:0;
+  border:1px solid rgba(109,40,217,.08);
+  box-shadow:0 20px 55px rgba(15,23,42,.09)
+}
+.panel-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding-bottom:16px;
+  border-bottom:1px solid #f0edf6
+}
+.team-panel{
+  background:linear-gradient(180deg,#fff 0%,#fbf9ff 100%)
+}
+.team-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:20px 0
+}
+.team-summary-card{
+  padding:18px;
+  border-radius:18px;
+  background:#fff;
+  border:1px solid #ece7f8;
+  box-shadow:0 10px 28px rgba(76,29,149,.06)
+}
+.team-summary-card span{
+  display:block;
+  color:#667085;
+  font-size:13px;
+  font-weight:700
+}
+.team-summary-card strong{
+  display:block;
+  margin-top:7px;
+  color:#4c1d95;
+  font-size:30px
+}
+.contributors-list{
+  display:grid;
+  gap:10px
+}
+.team-member-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid #eceaf2;
+  transition:.18s
+}
+.team-member-row:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(15,23,42,.08)
+}
+.team-member-name{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0
+}
+.team-avatar{
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#6d28d9,#c026d3);
+  color:#fff;
+  font-weight:900
+}
+.team-member-name b{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+.team-member-name small{
+  display:block;
+  margin-top:3px;
+  color:#667085
+}
+.team-metrics{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end
+}
+.metric-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:8px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap
+}
+.video-pill{
+  background:#eee8ff;
+  color:#5b21b6
+}
+.procedure-pill{
+  background:#fce7f3;
+  color:#9d174d
+}
+@media(max-width:1050px){
+  .dashboard-main-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  .team-summary{grid-template-columns:1fr}
+  .team-member-row{align-items:flex-start;flex-direction:column}
+  .team-metrics{justify-content:flex-start}
+}
+
+/* Videoclipuri / Proceduri si liste materiale - vertical pe toate conturile */
+.type-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:14px !important;
+  max-width:900px;
+}
+.type-card{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  text-align:left !important;
+  padding:20px 24px !important;
+}
+.type-card span{
+  margin:0 !important;
+  font-size:34px !important;
+  flex:0 0 48px;
+}
+.equipment-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  max-width:1000px;
+}
+.equipment-card{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 22px !important;
+}
+.equipment-icon{
+  margin:0 !important;
+  flex:0 0 58px;
+}
+.materials-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  max-width:1100px;
+}
+.material-card{
+  width:100%;
+  display:grid;
+  grid-template-columns:180px 1fr;
+  min-height:120px;
+}
+.material-card .thumb{
+  height:100%;
+  min-height:120px;
+}
+@media(max-width:650px){
+  .material-card{grid-template-columns:1fr}
+  .material-card .thumb{height:150px}
+}
+
+/* Lista completa ordonata dupa popularitate */
+.ranked-material{position:relative}
+.rank-badge{
+  position:absolute;
+  z-index:3;
+  top:10px;
+  left:10px;
+  min-width:38px;
+  height:30px;
+  padding:0 9px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(7,17,38,.9);
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:0 6px 16px rgba(15,23,42,.18)
+}
+.carrefour-logo{
+  display:block;
+  width:82px;
+  height:auto;
+  margin-top:10px;
+  object-fit:contain
+}
