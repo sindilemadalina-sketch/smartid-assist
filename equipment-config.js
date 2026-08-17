@@ -17,7 +17,7 @@ export const EQUIPMENT = {
     },
     {
       "id": "gui",
-      "label": "Back Office (GUI)",
+      "label": "Back Office",
       "icon": "⚙️"
     }
   ],
@@ -39,7 +39,7 @@ export const EQUIPMENT = {
     },
     {
       "id": "gui",
-      "label": "Back Office (GUI)",
+      "label": "Back Office",
       "icon": "⚙️"
     }
   ]

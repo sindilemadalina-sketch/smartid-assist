@@ -119,3 +119,28 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .share-row small{display:block;margin-top:4px;color:#667085;line-height:1.45}
 @media(max-width:1150px){.stats-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.stats-grid{grid-template-columns:1fr 1fr}.share-bar{left:18px;right:18px;transform:none}.shares-modal-head{flex-direction:column}}
+
+/* Update final: liste verticale, popularitate, geolocalizare, administrare */
+.equipment-grid,.materials-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.equipment-card{display:flex;align-items:center;gap:16px;padding:16px 18px}.equipment-icon{width:52px;height:52px;margin:0;flex:0 0 auto}.equipment-card p{margin-left:auto}
+.material-card{display:grid;grid-template-columns:150px 1fr;min-height:105px}.material-card .thumb{height:105px}.material-body{display:flex;flex-direction:column;justify-content:center}
+.popular-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}.popular-section h2{margin-bottom:14px}
+.geo-recommendation{margin:10px 0;color:#334155;font-weight:700}.geo-recommendation.good{padding:12px;border-radius:12px;background:#ecfdf3;color:#166534}.geo-recommendation.warn{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412}
+.carrefour-brand{display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-weight:900;color:#17479e}.carrefour-mark{display:grid;place-items:center;width:30px;height:24px;border-radius:8px;background:linear-gradient(90deg,#e30613 0 50%,#17479e 50%);color:#fff;font-size:13px}
+.coordinate-row{display:grid;grid-template-columns:minmax(190px,1fr) 150px 150px auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf0f5}.coordinate-row input{padding:10px}.map-link{padding:10px 12px;border-radius:10px;background:#eef0f5;color:#334155;text-decoration:none;font-weight:800}.contributor-row{display:grid;grid-template-columns:1fr auto auto auto;gap:16px;padding:12px 0;border-bottom:1px solid #edf0f5}.permission-label{display:flex;align-items:center;gap:8px}.permission-label input{width:auto}
+@media(max-width:760px){.material-card{grid-template-columns:1fr}.material-card .thumb{height:145px}.equipment-card{align-items:flex-start}.equipment-card p{margin-left:0}.coordinate-row,.contributor-row{grid-template-columns:1fr}.carrefour-brand{display:flex}}
+
+/* Carrefour branding */
+.carrefour-title{display:inline-flex;align-items:center;gap:12px}
+.carrefour-title img{height:34px;width:auto;display:block}
+@media(max-width:520px){.carrefour-title img{height:28px}}
+
+
+/* Pachet final - completari solicitate */
+.admin-category-chooser{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.category-choice{padding:11px 18px;border-radius:999px;background:#eef0f5;color:#334155;border:1px solid #dde2eb}
+.category-choice.active{background:linear-gradient(135deg,#6d28d9,#c026d3);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(109,40,217,.20)}
+.coordinates-stat-card{cursor:pointer}
+.activity-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto;gap:14px;padding:11px 0;border-bottom:1px solid #edf0f5;align-items:center}
+.activity-row:last-child{border-bottom:0}.activity-row small{color:#667085}
+@media(max-width:760px){.activity-row{grid-template-columns:1fr}}

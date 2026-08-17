@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
   updateDoc, doc, increment, serverTimestamp
@@ -26,6 +26,8 @@ let materials = [];
 let storesCache = [];
 let currentOpenMaterial = null;
 let editingMaterialId = null;
+let currentCanAdd = false;
+let currentCanManage = false;
 
 const normRole = value => String(value || "").trim().toLowerCase();
 const normCategory = value => {
@@ -122,7 +124,11 @@ async function finishLogin() {
 
   el("loginPage").style.display = "none";
   el("app").classList.remove("hidden");
-  el("menuBtn").classList.toggle("hidden", currentRole !== "admin");
+  el("menuBtn").classList.remove("hidden");
+  document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
+  document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
+  document.querySelectorAll('[data-permission="users"],[data-permission="coordinates"]').forEach(x => x.classList.toggle("hidden", currentRole !== "admin"));
+  el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
 
   if (currentRole === "admin") {
     await loadDashboard();
@@ -139,6 +145,7 @@ async function login() {
   el("loginBtn").textContent = "Se autentifică...";
 
   try {
+    await setPersistence(auth, browserSessionPersistence);
     const credential = await signInWithEmailAndPassword(
       auth,
       el("email").value.trim().toLowerCase(),
@@ -151,6 +158,8 @@ async function login() {
 
     const profile = profileSnap.data();
     currentRole = normRole(profile.role);
+    currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
+    currentCanManage = profile.canManage === true || currentRole === "admin";
     currentCategory = normCategory(profile.category);
 
     if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
@@ -162,7 +171,9 @@ async function login() {
     } else {
       await ensureStores();
       el("storeModal").classList.add("open");
+      el("storeCode").value = "";
       el("storeCode").focus();
+      setTimeout(recommendStoreByLocation, 250);
     }
   } catch (error) {
     const messages = {
@@ -221,7 +232,12 @@ function renderEquipment() {
   const category = currentCategory === "franciza" ? "franciza" : "carrefour";
   const items = EQUIPMENT[category] || [];
 
-  el("equipmentPageTitle").textContent = category === "franciza" ? "Franciză" : "Carrefour";
+  if (category === "franciza") {
+    el("equipmentPageTitle").textContent = "Franciză";
+  } else {
+    el("equipmentPageTitle").innerHTML = '<span class="carrefour-title"><img src="carrefour-logo.svg" alt="Carrefour"><span>Carrefour</span></span>';
+  }
+  el("carrefourBrand").classList.toggle("hidden", category !== "carrefour");
   el("storeWelcome").textContent = currentStoreName
     ? `${currentStoreName}${currentStoreFormat ? ` · ${currentStoreFormat[0].toUpperCase()}${currentStoreFormat.slice(1)}` : ""}`
     : "";
@@ -262,86 +278,49 @@ function renderSelectedMaterials() {
   const term = el("searchInput").value.trim().toLowerCase();
   const list = materials.filter(material => {
     const text = `${material.title || ""} ${material.description || ""} ${material.tags || ""}`.toLowerCase();
-    return materialAllowed(material)
-      && material.type === selectedMaterialType
-      && material.equipment.includes(selectedEquipment)
-      && (!term || text.includes(term));
+    return materialAllowed(material) && material.type === selectedMaterialType && material.equipment.includes(selectedEquipment) && (!term || text.includes(term));
   });
-
   el("materialsTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
   el("materialsSubtitle").textContent = selectedEquipmentLabel;
-  const grid = el("materialsGrid");
-  grid.innerHTML = "";
-
-  if (!list.length) {
-    const message = selectedMaterialType === "videoclip"
-      ? `Nu există încă videoclipuri disponibile pentru ${selectedEquipmentLabel}.`
-      : `Nu există încă proceduri disponibile pentru ${selectedEquipmentLabel}.`;
-    grid.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
-    return;
-  }
-
-  list.forEach(material => {
+  const makeCard = material => {
     const yt = youtubeId(material.url || "");
-    const preview = material.type === "videoclip" && yt
-      ? `<div class="thumb"><img src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><div class="play">▶</div></div>`
-      : `<div class="thumb">▣</div>`;
-
-    const card = document.createElement("article");
-    card.className = "material-card";
-    card.innerHTML = `${preview}<div class="material-body"><h3>${escapeHtml(material.title || "Material")}</h3><p>${escapeHtml(material.description || "")}</p></div>`;
-    card.addEventListener("click", () => openViewer(material));
-    grid.appendChild(card);
-  });
+    const preview = material.type === "videoclip" && yt ? `<div class="thumb"><img src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><div class="play">▶</div></div>` : `<div class="thumb">▣</div>`;
+    const card = document.createElement("article"); card.className="material-card";
+    card.innerHTML = `${preview}<div class="material-body"><h3>${escapeHtml(material.title || "Material")}</h3><p>${escapeHtml(material.description || "")}</p><div class="material-info">👁 ${Number(material.views||0)} vizualizări</div></div>`;
+    card.addEventListener("click",()=>openViewer(material)); return card;
+  };
+  const grid=el("materialsGrid"); grid.innerHTML="";
+  if(!list.length) grid.innerHTML=`<div class="empty">${escapeHtml(selectedMaterialType === "videoclip" ? `Nu există încă videoclipuri disponibile pentru ${selectedEquipmentLabel}.` : `Nu există încă proceduri disponibile pentru ${selectedEquipmentLabel}.`)}</div>`;
+  else list.forEach(m=>grid.appendChild(makeCard(m)));
+  const popular=el("popularMaterials"); popular.innerHTML="";
+  const top=[...list].sort((a,b)=>Number(b.views||0)-Number(a.views||0)).slice(0,5);
+  if(!top.length) popular.innerHTML='<div class="empty">Nu există încă suficiente vizualizări.</div>'; else top.forEach(m=>popular.appendChild(makeCard(m)));
 }
 
+function driveSamePageUrl(raw) {
+  if (!raw) return "about:blank";
+  try {
+    const u = new URL(raw);
+    if (u.hostname.includes("drive.google.com")) {
+      const m = u.pathname.match(/\/file\/d\/([^/]+)/);
+      if (m) {
+        const download = `https://drive.google.com/uc?export=download&id=${m[1]}`;
+        return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(download)}`;
+      }
+    }
+  } catch {}
+  return raw;
+}
 async function openViewer(material) {
   currentOpenMaterial = material;
-
-  if (material.type === "procedura") {
-    try {
-      await addDoc(collection(db, "materialViews"), {
-        materialId: material.id,
-        title: material.title || "",
-        type: material.type,
-        email: currentEmail,
-        storeId: currentStoreId,
-        storeName: currentStoreName,
-        storeFormat: currentStoreFormat,
-        createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, "videos", material.id), { views: increment(1) });
-    } catch (error) {
-      console.warn("Vizualizarea nu a putut fi înregistrată.", error);
-    }
-
-    window.open(material.url || "about:blank", "_blank", "noopener,noreferrer");
-    currentOpenMaterial = null;
-    return;
-  }
-
   el("viewerTitle").textContent = material.title || "Material";
   const yt = youtubeId(material.url || "");
-  el("viewerFrame").src = yt
-    ? `https://www.youtube-nocookie.com/embed/${yt}?rel=0&cc_load_policy=0&playsinline=1`
-    : material.url || "about:blank";
+  el("viewerFrame").src = material.type === "videoclip" && yt ? `https://www.youtube-nocookie.com/embed/${yt}?rel=0&cc_load_policy=0&playsinline=1` : driveSamePageUrl(material.url || "about:blank");
   el("viewer").classList.add("open");
-
   try {
-    await addDoc(collection(db, "materialViews"), {
-      materialId: material.id,
-      title: material.title || "",
-      type: material.type,
-      email: currentEmail,
-      storeId: currentStoreId,
-      storeName: currentStoreName,
-      storeFormat: currentStoreFormat,
-      createdAt: serverTimestamp()
-    });
-    await updateDoc(doc(db, "videos", material.id), { views: increment(1) });
-  } catch (error) {
-    console.warn("Vizualizarea nu a putut fi înregistrată.", error);
-  }
+    await addDoc(collection(db,"materialViews"),{materialId:material.id,title:material.title||"",type:material.type,email:currentEmail,storeId:currentStoreId,storeName:currentStoreName,storeFormat:currentStoreFormat,createdAt:serverTimestamp()});
+    await updateDoc(doc(db,"videos",material.id),{views:increment(1)}); material.views=Number(material.views||0)+1;
+  } catch(error){console.warn("Vizualizarea nu a putut fi înregistrată.",error);}
 }
 
 function renderEquipmentChoices() {
@@ -442,6 +421,7 @@ function startEditMaterial(materialId) {
   el("saveMaterialBtn").textContent = "Salvează modificările";
   el("cancelEditMaterialBtn").classList.remove("hidden");
   el("materialStatus").textContent = "Editezi materialul selectat.";
+  showPage("addMaterialPage");
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
@@ -453,7 +433,10 @@ async function renderAdminMaterials() {
     return;
   }
 
-  container.innerHTML = materials.map(material => {
+  const manageTerm = el("manageMaterialSearch") ? el("manageMaterialSearch").value.trim().toLowerCase() : "";
+  const manageType = el("manageMaterialType") ? el("manageMaterialType").value : "all";
+  const managed = materials.filter(m => (!manageTerm || `${m.title||""} ${m.tags||""}`.toLowerCase().includes(manageTerm)) && (manageType === "all" || m.type === manageType));
+  container.innerHTML = managed.map(material => {
     const tags = material.tags ? `<div class="material-tags">🏷 ${escapeHtml(material.tags)}</div>` : '<div class="material-tags">🏷 Fără tag-uri</div>';
     const views = Number(material.views || 0);
     return `
@@ -487,20 +470,23 @@ async function renderAdminMaterials() {
 
 async function loadDashboard() {
   try {
-    const [sessionsSnap, viewsSnap, sharesSnap] = await Promise.all([
+    const [sessionsSnap, viewsSnap, sharesSnap, storesSnap] = await Promise.all([
       getDocs(collection(db, "sessions")),
       getDocs(collection(db, "materialViews")),
-      getDocs(collection(db, "shares"))
+      getDocs(collection(db, "shares")),
+      getDocs(collection(db, "stores"))
     ]);
     const sessions = sessionsSnap.docs.map(item => item.data());
     const views = viewsSnap.docs.map(item => item.data());
     const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
+    const dashboardStores = storesSnap.docs.map(item => ({ id:item.id, ...item.data() }));
 
     el("statLogins").textContent = sessions.length;
     el("statStores").textContent = new Set(sessions.map(item => item.storeId).filter(Boolean)).size;
     el("statVideos").textContent = views.filter(item => normType(item.type) === "videoclip").length;
     el("statProcedures").textContent = views.filter(item => normType(item.type) === "procedura").length;
     el("statShares").textContent = shares.length;
+    el("statCoordinates").textContent = dashboardStores.filter(x => Number.isFinite(Number(x.latitude)) && Number.isFinite(Number(x.longitude))).length;
 
     await loadMaterials();
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
@@ -515,6 +501,18 @@ async function loadDashboard() {
     el("usageDiagram").style.background = totalViews
       ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
       : "conic-gradient(#e5e7eb 0deg 360deg)";
+
+    const byUser = {};
+    sessions.forEach(x=>{const k=x.email||"Necunoscut"; byUser[k]??={logins:0,videos:0,procedures:0}; byUser[k].logins++;});
+    materials.forEach(x=>{const k=x.createdBy||"Necunoscut"; byUser[k]??={logins:0,videos:0,procedures:0}; if(x.type==="videoclip")byUser[k].videos++; else if(x.type==="procedura")byUser[k].procedures++;});
+    el("contributorsList").innerHTML = Object.entries(byUser).sort((a,b)=>a[0].localeCompare(b[0])).map(([email,v])=>`<div class="contributor-row"><b>${escapeHtml(email)}</b><span>Accesări: ${v.logins}</span><span>Clipuri: ${v.videos}</span><span>Proceduri: ${v.procedures}</span></div>`).join("") || '<div class="empty">Nu există activitate.</div>';
+
+    const activity = [];
+    sessions.forEach(x => activity.push({kind:"Accesare", email:x.email||"Necunoscut", detail:x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role||""), when:x.createdAt}));
+    materials.forEach(x => activity.push({kind:x.type==="videoclip"?"Videoclip adăugat":"Procedură adăugată", email:x.createdBy||"Necunoscut", detail:x.title||"Material", when:x.createdAt}));
+    const millis = v => v && typeof v.toMillis === "function" ? v.toMillis() : (v?.seconds ? v.seconds*1000 : 0);
+    activity.sort((a,b)=>millis(b.when)-millis(a.when));
+    el("activityHistory").innerHTML = activity.slice(0,30).map(a=>`<div class="activity-row"><b>${escapeHtml(a.email)}</b><span>${escapeHtml(a.kind)} · ${escapeHtml(a.detail||"")}</span><small>${millis(a.when)?new Date(millis(a.when)).toLocaleString("ro-RO"):""}</small></div>`).join("") || '<div class="empty">Nu există activitate.</div>';
   } catch (error) {
     console.warn("Dashboard-ul nu a putut fi încărcat.", error);
   }
@@ -627,6 +625,24 @@ async function saveStore() {
 }
 
 
+function distanceKm(a,b,c,d){const R=6371,toRad=x=>x*Math.PI/180;const dLat=toRad(c-a),dLon=toRad(d-b);const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q));}
+async function recommendStoreByLocation(){
+  const box=el("geoRecommendation"); if(!navigator.geolocation){box.textContent="Browserul nu suportă geolocalizarea.";box.className="geo-recommendation warn";return;}
+  box.textContent="Se verifică locația..."; box.className="geo-recommendation";
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{const snap=await getDocs(collection(db,"stores"));const candidates=snap.docs.map(d=>({id:d.id,...d.data()})).filter(s=>s.active!==false&&Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude))&&(currentCategory==="all"||normCategory(s.category||s.type)===currentCategory));
+      if(!candidates.length){box.textContent="Magazinele nu au încă coordonate configurate. Adminul le poate completa din Coordonate magazine.";box.className="geo-recommendation warn";return;}
+      const ranked=candidates.map(s=>({...s,distance:distanceKm(pos.coords.latitude,pos.coords.longitude,Number(s.latitude),Number(s.longitude))})).sort((a,b)=>a.distance-b.distance); const best=ranked[0];
+      box.innerHTML=`Magazin recomandat: <b>${escapeHtml(best.name||best.id)}</b> · ID ${escapeHtml(best.id)} · ${best.distance.toFixed(1)} km`;box.className="geo-recommendation good";el("storeCode").value=best.id;
+    }catch(err){box.textContent="Nu am putut calcula recomandarea.";box.className="geo-recommendation warn";}
+  },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
+}
+async function loadCoordinates(){await loadStores();renderCoordinates();}
+function renderCoordinates(){const term=el("coordinateSearch").value.trim().toLowerCase(),filter=el("coordinateFilter").value;const list=storesCache.filter(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return (!term||`${s.id} ${s.name||""}`.toLowerCase().includes(term))&&(filter==="all"||(filter==="ready"&&has)||(filter==="missing"&&!has));});el("coordinatesList").innerHTML=list.map(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return `<div class="coordinate-row"><div><b>${escapeHtml(s.name||s.id)}</b><div class="store-meta">ID ${escapeHtml(s.id)}</div></div><input data-lat="${s.id}" value="${has?escapeHtml(s.latitude):""}" placeholder="Latitudine"><input data-lng="${s.id}" value="${has?escapeHtml(s.longitude):""}" placeholder="Longitudine"><div class="row-actions"><button class="secondary" data-save-coord="${s.id}">Salvează</button>${has?`<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.latitude},${s.longitude}">Hartă</a>`:""}</div></div>`}).join("")||'<div class="empty">Niciun magazin.</div>';el("coordinatesList").querySelectorAll("[data-save-coord]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.saveCoord,lat=Number(document.querySelector(`[data-lat="${id}"]`).value),lng=Number(document.querySelector(`[data-lng="${id}"]`).value);if(!Number.isFinite(lat)||!Number.isFinite(lng)){alert("Completează coordonate valide.");return;}await setDoc(doc(db,"stores",id),{latitude:lat,longitude:lng},{merge:true});await loadCoordinates();}));}
+async function loadUsers(){const snap=await getDocs(collection(db,"users"));const list=snap.docs.map(d=>({email:d.id,...d.data()}));el("usersList").innerHTML=list.map(u=>`<div class="admin-material-row"><b>${escapeHtml(u.email)}</b><span class="badge">${escapeHtml(u.role||"")}</span><div class="material-info">Categorie: ${escapeHtml(u.category||"all")} · Adăugare: ${u.canAdd===true||["admin","suport"].includes(normRole(u.role))?"Da":"Nu"} · Gestionare: ${u.canManage===true||normRole(u.role)==="admin"?"Da":"Nu"}</div></div>`).join("")||'<div class="empty">Nu există conturi configurate.</div>';}
+async function saveUserProfile(){const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});el("userStatus").textContent="Drepturile au fost salvate. Contul trebuie să existe și în Firebase Authentication.";await loadUsers();}
+
+
 async function recordShare(method) {
   if (!currentOpenMaterial) return;
   try {
@@ -718,12 +734,13 @@ el("loginBtn").addEventListener("click", login);
 el("password").addEventListener("keydown", event => { if (event.key === "Enter") login(); });
 el("storeContinueBtn").addEventListener("click", continueWithStore);
 el("storeLogoutBtn").addEventListener("click", cancelStoreSelection);
-el("logoutBtn").addEventListener("click", async () => { await signOut(auth); location.reload(); });
+el("logoutBtn").addEventListener("click", async () => { await signOut(auth); sessionStorage.clear(); el("email").value=""; el("password").value=""; el("storeCode").value=""; location.reload(); });
 el("menuBtn").addEventListener("click", openMenu);
 el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
 el("shareEmailBtn").addEventListener("click", shareEmail);
 el("copyLinkBtn").addEventListener("click", copyMaterialLink);
 el("sharesCard").addEventListener("click", openSharesHistory);
+el("coordinatesCard").addEventListener("click", async () => { if(currentRole!=="admin") return; await loadCoordinates(); showPage("coordinatesPage"); });
 el("closeSharesModalBtn").addEventListener("click", () => el("sharesModal").classList.remove("open"));
 el("closeMenuBtn").addEventListener("click", closeMenu);
 el("menuOverlay").addEventListener("click", closeMenu);
@@ -747,13 +764,26 @@ document.querySelectorAll(".side-btn").forEach(button => {
     const page = button.dataset.page;
     if (page === "dashboardPage") await loadDashboard();
     if (page === "equipmentPage") {
-      currentCategory = "carrefour";
+      if (currentRole === "admin" && !["carrefour","franciza"].includes(currentCategory)) currentCategory = "carrefour";
       renderEquipment();
     }
-    if (page === "addMaterialPage") await renderAdminMaterials();
+    if (page === "manageMaterialsPage") await renderAdminMaterials();
+    if (page === "usersPage") await loadUsers();
+    if (page === "coordinatesPage") await loadCoordinates();
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
+  });
+});
+
+
+document.querySelectorAll("[data-admin-category]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (currentRole !== "admin") return;
+    currentCategory = button.dataset.adminCategory;
+    document.querySelectorAll("[data-admin-category]").forEach(b=>b.classList.toggle("active", b===button));
+    renderEquipment();
+    showPage("equipmentPage");
   });
 });
 
@@ -769,6 +799,22 @@ document.querySelectorAll(".type-card").forEach(card => {
 
 document.querySelectorAll("[data-back]").forEach(button => {
   button.addEventListener("click", () => showPage(button.dataset.back));
+});
+
+el("detectLocationBtn").addEventListener("click", recommendStoreByLocation);
+el("manageMaterialSearch").addEventListener("input", renderAdminMaterials);
+el("manageMaterialType").addEventListener("change", renderAdminMaterials);
+el("coordinateSearch").addEventListener("input", renderCoordinates);
+el("coordinateFilter").addEventListener("change", renderCoordinates);
+el("saveUserBtn").addEventListener("click", saveUserProfile);
+
+
+window.addEventListener("DOMContentLoaded", async () => {
+  try { await signOut(auth); } catch {}
+  sessionStorage.clear();
+  el("email").value = "";
+  el("password").value = "";
+  el("storeCode").value = "";
 });
 
 renderEquipmentChoices();

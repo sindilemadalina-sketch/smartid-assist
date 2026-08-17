@@ -14,8 +14,8 @@
     <section class="login-card">
       <h1>SmartID Portal</h1>
       <p>Ghid de utilizare echipamente NCR</p>
-      <input id="email" type="email" placeholder="Email" autocomplete="username">
-      <input id="password" type="password" placeholder="Parolă" autocomplete="current-password">
+      <input id="email" type="email" placeholder="Email" autocomplete="off">
+      <input id="password" type="password" placeholder="Parolă" autocomplete="new-password">
       <button id="loginBtn" class="primary wide">Autentificare</button>
       <div id="loginError" class="error"></div>
     </section>
@@ -24,7 +24,7 @@
   <div id="storeModal" class="modal">
     <section class="modal-card">
       <h2>Selectare magazin</h2>
-      <p>Introdu ID-ul magazinului pentru a continua.</p>
+      <p>Introdu ID-ul magazinului. Dacă permiți locația, îți recomandăm automat magazinul apropiat.</p><div id="geoRecommendation" class="geo-recommendation"></div><button id="detectLocationBtn" class="secondary wide" type="button">📍 Detectează locația și recomandă magazinul</button>
       <input id="storeCode" placeholder="ID magazin">
       <div class="store-modal-actions">
         <button id="storeContinueBtn" class="primary">Continuă</button>
@@ -56,7 +56,10 @@
       <p class="sidebar-subtitle">Administrare SmartID Portal</p>
       <button class="side-btn" data-page="dashboardPage">📊 Dashboard</button>
       <button class="side-btn" data-page="equipmentPage">🧩 Materiale</button>
-      <button class="side-btn" data-page="addMaterialPage">＋ Adaugă material</button>
+      <button class="side-btn" data-page="addMaterialPage" data-permission="add">＋ Adăugare materiale</button>
+       <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
+       <button class="side-btn" data-page="usersPage" data-permission="users">👥 Colegi și drepturi</button>
+       <button class="side-btn" data-page="coordinatesPage" data-permission="coordinates">📍 Coordonate magazine</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
     </aside>
 
@@ -78,6 +81,9 @@
           <article class="stat-card share-stat-card" id="sharesCard" data-tip="Numărul total de distribuiri ale materialelor.">
             <strong id="statShares">0</strong><span>Distribuiri</span>
           </article>
+          <article class="stat-card coordinates-stat-card" id="coordinatesCard" data-tip="Magazine cu coordonate Google configurate.">
+            <strong id="statCoordinates">0</strong><span>Coordonate Google</span>
+          </article>
         </div>
 
         <div class="dashboard-lower">
@@ -97,14 +103,19 @@
               </div>
             </div>
           </section>
-        </div>
+        </div><section class="panel"><h2>Activitate colegi</h2><p class="subtitle">Accesări și materiale încărcate de fiecare coleg.</p><div id="contributorsList"></div></section>
+        <section class="panel"><h2>Istoric activitate colegi</h2><p class="subtitle">Ultimele accesări și adăugări înregistrate.</p><div id="activityHistory"></div></section>
       </section>
 
       <section id="equipmentPage" class="page hidden">
         <div class="page-head">
           <div>
-            <h1 id="equipmentPageTitle">Materiale</h1>
+            <h1 id="equipmentPageTitle">Materiale</h1><span id="carrefourBrand" class="carrefour-brand hidden"><span class="carrefour-mark">C</span> Carrefour</span>
             <p id="storeWelcome" class="subtitle"></p>
+            <div id="adminCategoryChooser" class="admin-category-chooser hidden">
+              <button class="category-choice active" data-admin-category="carrefour">Carrefour</button>
+              <button class="category-choice" data-admin-category="franciza">Franciză</button>
+            </div>
           </div>
         </div>
         <div class="type-grid">
@@ -136,7 +147,7 @@
           </div>
           <button class="back-btn" data-back="materialTypePage">Înapoi</button>
         </div>
-        <div id="materialsGrid" class="materials-grid"></div>
+        <div id="materialsGrid" class="materials-grid"></div><section class="popular-section"><h2>Cele mai vizionate</h2><div id="popularMaterials" class="materials-grid"></div></section>
       </section>
 
       <section id="addMaterialPage" class="page hidden">
@@ -176,11 +187,23 @@
           </div>
           <div id="materialStatus" class="status"></div>
         </section>
+      </section>
 
-        <section class="panel">
-          <h2>Materiale existente</h2>
-          <div id="adminMaterialsList"></div>
-        </section>
+
+      <section id="manageMaterialsPage" class="page hidden">
+        <div class="page-head"><div><h1>Gestionare materiale</h1><p class="subtitle">Vizualizează, editează sau șterge materialele existente.</p></div></div>
+        <section class="panel"><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
+      </section>
+
+      <section id="usersPage" class="page hidden">
+        <div class="page-head"><div><h1>Colegi și drepturi</h1><p class="subtitle">Configurează drepturile conturilor deja create în Firebase Authentication.</p></div></div>
+        <section class="panel"><div class="form-grid"><input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Suport</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option><option value="admin">Admin</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+        <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
+      </section>
+
+      <section id="coordinatesPage" class="page hidden">
+        <div class="page-head"><div><h1>Coordonate magazine</h1><p class="subtitle">Coordonatele sunt folosite pentru recomandarea automată la logare.</p></div></div>
+        <section class="panel"><div class="store-toolbar"><input id="coordinateSearch" placeholder="Caută ID sau magazin..."><select id="coordinateFilter"><option value="all">Toate</option><option value="missing">Fără coordonate</option><option value="ready">Cu coordonate</option></select></div><div id="coordinatesList"></div></section>
       </section>
 
       <section id="storesPage" class="page hidden">
