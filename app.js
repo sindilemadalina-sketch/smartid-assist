@@ -29,6 +29,39 @@ let editingMaterialId = null;
 let currentCanAdd = false;
 let currentCanManage = false;
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+
+const TEAM_LOGIN_NAMES = [
+  "Nistor Ionut",
+  "Apetrei Andrei",
+  "Robert Neagu",
+  "Andreea Ianos",
+  "Dan Oros",
+  "Valentin Surugiu"
+];
+
+function getLoginDirectory() {
+  try { return JSON.parse(localStorage.getItem("smartidLoginDirectory") || "{}"); }
+  catch { return {}; }
+}
+function saveLoginDirectory(directory) {
+  localStorage.setItem("smartidLoginDirectory", JSON.stringify(directory));
+}
+function refreshQuickLoginUsers() {
+  const select = el("quickLoginUser");
+  if (!select) return;
+  const directory = getLoginDirectory();
+  [...select.options].forEach(option => {
+    const name = option.dataset.team;
+    if (name && directory[name]) option.value = directory[name];
+  });
+}
+function rememberNamedLogin(name, email) {
+  if (!name || !email) return;
+  const directory = getLoginDirectory();
+  directory[name] = email.toLowerCase();
+  saveLoginDirectory(directory);
+  refreshQuickLoginUsers();
+}
 const TEAM_DISPLAY_NAMES = [
   "Nistor Ionut",
   "Apetrei Andrei",
@@ -169,7 +202,6 @@ async function finishLogin() {
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
-  document.querySelectorAll('[data-permission="coordinates"]').forEach(x => x.classList.toggle("hidden", currentRole !== "admin"));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
 
   if (currentRole === "admin") {
@@ -195,6 +227,10 @@ async function login() {
     );
 
     currentEmail = (credential.user.email || "").toLowerCase();
+    localStorage.setItem("smartidLastLoginEmail", currentEmail);
+    const quickLogin = el("quickLoginUser");
+    const selectedOption = quickLogin?.options[quickLogin.selectedIndex];
+    if (selectedOption?.dataset?.team) rememberNamedLogin(selectedOption.dataset.team, currentEmail);
     const profileSnap = await getDoc(doc(db, "users", currentEmail));
     if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
 
@@ -617,7 +653,6 @@ async function loadDashboard() {
     el("statProcedures").textContent = views.filter(item => normType(item.type) === "procedura").length;
     el("statShares").textContent = shares.length;
     if (el("statPending")) el("statPending").textContent = materials.filter(m => m.status === "pending").length;
-    el("statCoordinates").textContent = dashboardStores.filter(x => Number.isFinite(Number(x.latitude)) && Number.isFinite(Number(x.longitude))).length;
 
     await loadMaterials();
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
@@ -851,8 +886,33 @@ async function recommendStoreByLocation(){
 }
 async function loadCoordinates(){await loadStores();renderCoordinates();}
 function renderCoordinates(){const term=el("coordinateSearch").value.trim().toLowerCase(),filter=el("coordinateFilter").value;const list=storesCache.filter(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return (!term||`${s.id} ${s.name||""}`.toLowerCase().includes(term))&&(filter==="all"||(filter==="ready"&&has)||(filter==="missing"&&!has));});el("coordinatesList").innerHTML=list.map(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return `<div class="coordinate-row"><div><b>${escapeHtml(s.name||s.id)}</b><div class="store-meta">ID ${escapeHtml(s.id)}</div></div><input data-lat="${s.id}" value="${has?escapeHtml(s.latitude):""}" placeholder="Latitudine"><input data-lng="${s.id}" value="${has?escapeHtml(s.longitude):""}" placeholder="Longitudine"><div class="row-actions"><button class="secondary" data-save-coord="${s.id}">Salvează</button>${has?`<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.latitude},${s.longitude}">Hartă</a>`:""}</div></div>`}).join("")||'<div class="empty">Niciun magazin.</div>';el("coordinatesList").querySelectorAll("[data-save-coord]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.saveCoord,lat=Number(document.querySelector(`[data-lat="${id}"]`).value),lng=Number(document.querySelector(`[data-lng="${id}"]`).value);if(!Number.isFinite(lat)||!Number.isFinite(lng)){alert("Completează coordonate valide.");return;}await setDoc(doc(db,"stores",id),{latitude:lat,longitude:lng},{merge:true});await loadCoordinates();}));}
-async function loadUsers(){const snap=await getDocs(collection(db,"users"));const list=snap.docs.map(d=>({email:d.id,...d.data()}));el("usersList").innerHTML=list.map(u=>`<div class="admin-material-row"><b>${escapeHtml(u.email)}</b><span class="badge">${escapeHtml(u.role||"")}</span><div class="material-info">Categorie: ${escapeHtml(u.category||"all")} · Adăugare: ${u.canAdd===true||["admin","suport"].includes(normRole(u.role))?"Da":"Nu"} · Gestionare: ${u.canManage===true||normRole(u.role)==="admin"?"Da":"Nu"}</div></div>`).join("")||'<div class="empty">Nu există conturi configurate.</div>';}
-async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});el("userStatus").textContent="Drepturile au fost salvate. Contul trebuie să existe și în Firebase Authentication.";await loadUsers();}
+async function loadUsers(){
+  const snap=await getDocs(collection(db,"users"));
+  const list=snap.docs.map(d=>({email:d.id,...d.data()}));
+  el("usersList").innerHTML=list.map(u=>`
+    <div class="admin-material-row user-config-row" data-user-email="${escapeHtml(u.email)}">
+      <b>${escapeHtml(u.displayName || u.email)}</b>
+      <span class="badge">${escapeHtml(u.role||"")}</span>
+      <div class="material-info">${u.displayName ? `${escapeHtml(u.email)} · ` : ""}Categorie: ${escapeHtml(u.category||"all")} · Adăugare: ${u.canAdd===true||["admin","suport"].includes(normRole(u.role))?"Da":"Nu"} · Gestionare: ${u.canManage===true||normRole(u.role)==="admin"?"Da":"Nu"}</div>
+    </div>`).join("")||'<div class="empty">Nu există conturi configurate.</div>';
+
+  el("usersList").querySelectorAll("[data-user-email]").forEach(row=>{
+    row.addEventListener("click",()=>{
+      const u=list.find(x=>x.email===row.dataset.userEmail);
+      if(!u) return;
+      el("userEmail").value=u.email;
+      if(el("userDisplayName")) el("userDisplayName").value=u.displayName||"";
+      el("userRole").value=u.role||"suport";
+      el("userCategory").value=u.category||"all";
+      el("userCanAdd").checked=u.canAdd===true;
+      el("userCanManage").checked=u.canManage===true;
+    });
+  });
+}
+async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
+if(savedName) rememberNamedLogin(savedName,email);
+el("userStatus").textContent="Drepturile au fost salvate.";
+await loadUsers();}
 
 
 async function recordShare(method) {
@@ -952,7 +1012,6 @@ el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
 el("shareEmailBtn").addEventListener("click", shareEmail);
 el("copyLinkBtn").addEventListener("click", copyMaterialLink);
 el("sharesCard").addEventListener("click", openSharesHistory);
-el("coordinatesCard").addEventListener("click", async () => { if(currentRole!=="admin") return; await loadCoordinates(); showPage("coordinatesPage"); });
 el("closeSharesModalBtn").addEventListener("click", () => el("sharesModal").classList.remove("open"));
 el("closeMenuBtn").addEventListener("click", closeMenu);
 el("menuOverlay").addEventListener("click", closeMenu);
@@ -981,7 +1040,6 @@ document.querySelectorAll(".side-btn").forEach(button => {
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
     if (page === "usersPage") await loadUsers();
-    if (page === "coordinatesPage") await loadCoordinates();
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
@@ -1039,3 +1097,33 @@ if (el("statPending")) {
   const pendingCard=el("statPending").closest(".stat-card");
   if(pendingCard) pendingCard.addEventListener("click",async()=>{showPage("manageMaterialsPage");await renderAdminMaterials();});
 }
+
+function initQuickLogin() {
+  refreshQuickLoginUsers();
+  const lastEmail = localStorage.getItem("smartidLastLoginEmail") || "";
+  if (lastEmail && el("email")) el("email").value = lastEmail;
+
+  const select = el("quickLoginUser");
+  if (!select) return;
+
+  const matching = [...select.options].find(o => o.value && o.value !== "__other__" && o.value.toLowerCase() === lastEmail.toLowerCase());
+  if (matching) select.value = matching.value;
+
+  select.addEventListener("change", () => {
+    const option = select.options[select.selectedIndex];
+    if (select.value === "__other__") {
+      el("email").value = "";
+      el("email").focus();
+      return;
+    }
+    if (select.value) {
+      el("email").value = select.value;
+      el("password").focus();
+    } else if (option?.dataset?.team) {
+      el("email").value = "";
+      el("email").placeholder = `Email ${option.dataset.team} - o singură dată`;
+      el("email").focus();
+    }
+  });
+}
+initQuickLogin();

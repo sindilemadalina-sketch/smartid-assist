@@ -14,8 +14,19 @@
     <section class="login-card">
       <h1>SmartID Portal</h1>
       <p>Ghid de utilizare echipamente NCR</p>
-      <input id="email" type="email" placeholder="Email" autocomplete="off">
-      <input id="password" type="password" placeholder="Parolă" autocomplete="new-password">
+      <select id="quickLoginUser" class="quick-login-user">
+        <option value="">Alege utilizatorul</option>
+        <option value="admin@smartid.com" data-name="Admin principal">Admin principal</option>
+        <option value="" data-team="Nistor Ionut">Nistor Ionut</option>
+        <option value="" data-team="Apetrei Andrei">Apetrei Andrei</option>
+        <option value="" data-team="Robert Neagu">Robert Neagu</option>
+        <option value="" data-team="Andreea Ianos">Andreea Ianos</option>
+        <option value="" data-team="Dan Oros">Dan Oros</option>
+        <option value="" data-team="Valentin Surugiu">Valentin Surugiu</option>
+        <option value="__other__">Alt utilizator</option>
+      </select>
+      <input id="email" type="email" placeholder="Email" autocomplete="username">
+      <input id="password" type="password" placeholder="Parolă" autocomplete="current-password">
       <button id="loginBtn" class="primary wide">Autentificare</button>
       <div id="loginError" class="error"></div>
     </section>
@@ -58,7 +69,6 @@
       <button class="side-btn" data-page="addMaterialPage" data-permission="add">＋ Adăugare materiale</button>
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
        <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
-       <button class="side-btn" data-page="coordinatesPage" data-permission="coordinates">📍 Coordonate magazine</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
     </aside>
 
@@ -207,13 +217,18 @@
 
       <section id="usersPage" class="page hidden">
         <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Doar Adminul principal acordă sau modifică drepturile utilizatorilor.</p></div></div>
-        <section class="panel"><div class="form-grid"><input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+        <section class="panel"><div class="form-grid">
+          <select id="userDisplayName">
+            <option value="">Selectează colegul</option>
+            <option value="Nistor Ionut">Nistor Ionut</option>
+            <option value="Apetrei Andrei">Apetrei Andrei</option>
+            <option value="Robert Neagu">Robert Neagu</option>
+            <option value="Andreea Ianos">Andreea Ianos</option>
+            <option value="Dan Oros">Dan Oros</option>
+            <option value="Valentin Surugiu">Valentin Surugiu</option>
+          </select>
+          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
         <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
-      </section>
-
-      <section id="coordinatesPage" class="page hidden">
-        <div class="page-head"><div><h1>Coordonate magazine</h1><p class="subtitle">Coordonatele sunt folosite pentru recomandarea automată la logare.</p></div></div>
-        <section class="panel"><div class="store-toolbar"><input id="coordinateSearch" placeholder="Caută ID sau magazin..."><select id="coordinateFilter"><option value="all">Toate</option><option value="missing">Fără coordonate</option><option value="ready">Cu coordonate</option></select></div><div id="coordinatesList"></div></section>
       </section>
 
       <section id="storesPage" class="page hidden">

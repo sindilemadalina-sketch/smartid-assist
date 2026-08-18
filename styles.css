@@ -379,3 +379,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 
 /* Utilizatori - nume coleg */
 .user-form select#userDisplayName{min-width:220px}
+
+/* Login rapid și utilizatori */
+.quick-login-user{
+  margin-top:12px;
+  background:#fff;
+}
+.user-config-row{cursor:pointer}
+.user-config-row:hover{background:#faf8ff}
+#userDisplayName{min-width:220px}
+
+/* Dashboard final: coordonatele nu sunt afișate aici */
+.stats-grid .approval-stat{cursor:pointer}
