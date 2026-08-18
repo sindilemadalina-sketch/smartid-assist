@@ -28,6 +28,46 @@ let currentOpenMaterial = null;
 let editingMaterialId = null;
 let currentCanAdd = false;
 let currentCanManage = false;
+const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+const TEAM_DISPLAY_NAMES = [
+  "Nistor Ionut",
+  "Apetrei Andrei",
+  "Robert Neagu",
+  "Andreea Ianos",
+  "Dan Oros",
+  "Valentin Surugiu"
+];
+let usersNameMap = new Map();
+
+async function loadUserNameMap() {
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    usersNameMap = new Map(snap.docs.map(d => {
+      const data=d.data();
+      return [d.id.toLowerCase(), data.displayName || d.id];
+    }));
+  } catch { usersNameMap = new Map(); }
+}
+function displayUser(email) {
+  const key=String(email||"").toLowerCase();
+  if (key === PRIMARY_ADMIN_EMAIL) return "Admin principal";
+  return usersNameMap.get(key) || email || "Necunoscut";
+}
+
+const isPrimaryAdmin = () => currentEmail.toLowerCase() === PRIMARY_ADMIN_EMAIL;
+
+async function logTeamActivity(action, material = null, extra = {}) {
+  try {
+    await addDoc(collection(db, "teamActivity"), {
+      email: currentEmail, action,
+      materialId: material?.id || extra.materialId || "",
+      title: material?.title || extra.title || "",
+      type: material?.type || extra.type || "",
+      createdAt: serverTimestamp(), ...extra
+    });
+  } catch (error) { console.warn("Activitatea echipei nu a putut fi înregistrată.", error); }
+}
+
 
 const normRole = value => String(value || "").trim().toLowerCase();
 const normCategory = value => {
@@ -97,8 +137,9 @@ async function loadMaterials() {
 }
 
 function materialAllowed(material) {
+  const status = material.status || "approved";
   if (currentRole === "admin" || currentRole === "suport") return true;
-  return material.categories.includes(currentCategory);
+  return status === "approved" && material.categories.includes(currentCategory);
 }
 
 async function recordSession() {
@@ -127,7 +168,8 @@ async function finishLogin() {
   el("menuBtn").classList.remove("hidden");
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
-  document.querySelectorAll('[data-permission="users"],[data-permission="coordinates"]').forEach(x => x.classList.toggle("hidden", currentRole !== "admin"));
+  document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
+  document.querySelectorAll('[data-permission="coordinates"]').forEach(x => x.classList.toggle("hidden", currentRole !== "admin"));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
 
   if (currentRole === "admin") {
@@ -397,16 +439,24 @@ async function saveMaterial() {
   };
 
   if (editingMaterialId) {
-    await updateDoc(doc(db, "videos", editingMaterialId), payload);
-    el("materialStatus").textContent = "Modificările au fost salvate.";
-  } else {
-    await addDoc(collection(db, "videos"), {
+    await updateDoc(doc(db, "videos", editingMaterialId), {
       ...payload,
-      views: 0,
-      createdAt: serverTimestamp(),
-      createdBy: currentEmail
+      status: isPrimaryAdmin() ? (materials.find(x=>x.id===editingMaterialId)?.status || "approved") : "pending"
     });
-    el("materialStatus").textContent = "Materialul a fost adăugat.";
+    await logTeamActivity("material_edited", null, {materialId:editingMaterialId,title,type});
+    el("materialStatus").textContent = isPrimaryAdmin() ? "Modificările au fost salvate." : "Modificările au fost retrimise spre aprobare.";
+  } else {
+    const initialStatus = isPrimaryAdmin() ? "approved" : "pending";
+    const createdRef = await addDoc(collection(db, "videos"), {
+      ...payload, status: initialStatus, views: 0,
+      createdAt: serverTimestamp(), createdBy: currentEmail,
+      approvedBy: isPrimaryAdmin() ? currentEmail : "",
+      approvedAt: isPrimaryAdmin() ? serverTimestamp() : null
+    });
+    await logTeamActivity("material_added", null, {materialId:createdRef.id,title,type,status:initialStatus});
+    el("materialStatus").textContent = isPrimaryAdmin()
+      ? "Materialul a fost adăugat și publicat."
+      : "Materialul a fost trimis spre aprobarea Adminului principal.";
   }
 
   resetMaterialForm();
@@ -476,9 +526,14 @@ async function renderAdminMaterials() {
         <div class="store-meta">${escapeHtml((material.categories || []).join(", "))} · ${escapeHtml((material.equipment || []).join(", "))}</div>
         ${tags}
         <div class="material-info">👁 ${views} vizualizări${material.createdBy ? ` · Adăugat de ${escapeHtml(material.createdBy)}` : ""}</div>
+        <div class="approval-line"><span class="status-badge status-${escapeHtml(material.status || "approved")}">${
+          (material.status || "approved") === "pending" ? "În așteptare" : (material.status || "approved") === "rejected" ? "Respins" : "Aprobat"
+        }</span></div>
         <div class="row-actions">
           <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
-          <button class="danger" data-delete-material="${material.id}">Șterge</button>
+          ${isPrimaryAdmin() && (material.status || "approved") !== "approved" ? `<button class="primary" data-approve-material="${material.id}">✓ Aprobă</button>` : ""}
+          ${isPrimaryAdmin() && (material.status || "approved") !== "rejected" ? `<button class="secondary" data-reject-material="${material.id}">Respinge</button>` : ""}
+          ${isPrimaryAdmin() ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
         </div>
       </div>
     `;
@@ -488,17 +543,62 @@ async function renderAdminMaterials() {
     button.addEventListener("click", () => startEditMaterial(button.dataset.editMaterial));
   });
 
+  container.querySelectorAll("[data-approve-material]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!isPrimaryAdmin()) return;
+      const material=materials.find(x=>x.id===button.dataset.approveMaterial);
+      await updateDoc(doc(db,"videos",button.dataset.approveMaterial),{status:"approved",approvedBy:currentEmail,approvedAt:serverTimestamp()});
+      await logTeamActivity("material_approved",material);
+      await renderAdminMaterials(); await loadDashboard();
+    });
+  });
+  container.querySelectorAll("[data-reject-material]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!isPrimaryAdmin()) return;
+      const material=materials.find(x=>x.id===button.dataset.rejectMaterial);
+      await updateDoc(doc(db,"videos",button.dataset.rejectMaterial),{status:"rejected",approvedBy:currentEmail,approvedAt:serverTimestamp()});
+      await logTeamActivity("material_rejected",material);
+      await renderAdminMaterials(); await loadDashboard();
+    });
+  });
+
   container.querySelectorAll("[data-delete-material]").forEach(button => {
     button.addEventListener("click", async () => {
       if (!confirm("Ștergi materialul?")) return;
+      const material=materials.find(x=>x.id===button.dataset.deleteMaterial);
       await deleteDoc(doc(db, "videos", button.dataset.deleteMaterial));
+      await logTeamActivity("material_deleted",material);
       if (editingMaterialId === button.dataset.deleteMaterial) resetMaterialForm();
       await renderAdminMaterials();
     });
   });
 }
 
+
+function dashboardTimestamp(value) {
+  const ms = value && typeof value.toMillis === "function" ? value.toMillis() : (value?.seconds ? value.seconds * 1000 : 0);
+  return ms ? new Date(ms).toLocaleString("ro-RO") : "—";
+}
+function openDashboardDetails(title, subtitle, rows) {
+  el("dashboardDetailsTitle").textContent = title;
+  el("dashboardDetailsSubtitle").textContent = subtitle || "";
+  el("dashboardDetailsBody").innerHTML = rows.length ? rows.map(row => `
+    <div class="dashboard-detail-row">
+      <div class="dashboard-detail-main"><b>${escapeHtml(row.title || "—")}</b><span>${escapeHtml(row.detail || "")}</span></div>
+      <small>${escapeHtml(row.when || "")}</small>
+    </div>`).join("") : '<div class="empty">Nu există încă informații.</div>';
+  el("dashboardDetailsModal").classList.add("open");
+}
+function bindDashboardStat(statId, handler) {
+  const number = el(statId);
+  const card = number?.closest(".stat-card");
+  if (!card) return;
+  card.classList.add("clickable-stat");
+  card.onclick = handler;
+}
+
 async function loadDashboard() {
+  await loadUserNameMap();
   try {
     const [sessionsSnap, viewsSnap, sharesSnap, storesSnap] = await Promise.all([
       getDocs(collection(db, "sessions")),
@@ -516,6 +616,7 @@ async function loadDashboard() {
     el("statVideos").textContent = views.filter(item => normType(item.type) === "videoclip").length;
     el("statProcedures").textContent = views.filter(item => normType(item.type) === "procedura").length;
     el("statShares").textContent = shares.length;
+    if (el("statPending")) el("statPending").textContent = materials.filter(m => m.status === "pending").length;
     el("statCoordinates").textContent = dashboardStores.filter(x => Number.isFinite(Number(x.latitude)) && Number.isFinite(Number(x.longitude))).length;
 
     await loadMaterials();
@@ -554,8 +655,8 @@ async function loadDashboard() {
             <div class="team-member-name">
               <div class="team-avatar">${escapeHtml((email || "?").charAt(0).toUpperCase())}</div>
               <div>
-                <b>${escapeHtml(email)}</b>
-                <small>${values.videos + values.procedures} materiale încărcate</small>
+                <b>${escapeHtml(displayUser(email))}</b>
+                <small>${escapeHtml(email)} · ${values.videos + values.procedures} materiale încărcate</small>
               </div>
             </div>
             <div class="team-metrics">
@@ -568,6 +669,65 @@ async function loadDashboard() {
   } catch (error) {
     console.warn("Dashboard-ul nu a putut fi încărcat.", error);
   }
+
+  // Detaliile statisticilor se deschid numai la click, în popup.
+  bindDashboardStat("statLogins", () => openDashboardDetails(
+    "Autentificări", "Cine s-a autentificat și de unde.",
+    [...sessions].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+      title:displayUser(x.email),
+      detail:x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role||""),
+      when:dashboardTimestamp(x.createdAt)
+    }))
+  ));
+
+  bindDashboardStat("statStores", () => {
+    const storeMap = new Map();
+    sessions.forEach(x=>{
+      if(!x.storeId && !x.storeName) return;
+      const key=x.storeId||x.storeName;
+      const v=storeMap.get(key)||{name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
+      v.count++;
+      if((x.createdAt?.seconds||0)>(v.last?.seconds||0)) v.last=x.createdAt;
+      storeMap.set(key,v);
+    });
+    openDashboardDetails("Magazine active","Magazinele care au accesat SmartID Portal.",
+      [...storeMap.values()].sort((a,b)=>b.count-a.count).map(x=>({
+        title:`${x.name}${x.id ? ` · ID ${x.id}` : ""}`, detail:`${x.count} autentificări`, when:`Ultima: ${dashboardTimestamp(x.last)}`
+      })));
+  });
+
+  bindDashboardStat("statVideos", () => openDashboardDetails(
+    "Vizualizări videoclipuri","Cine a vizualizat și ce videoclip.",
+    [...views].filter(x=>x.type==="videoclip").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+      title:x.title||"Videoclip", detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`, when:dashboardTimestamp(x.createdAt)
+    }))
+  ));
+
+  bindDashboardStat("statProcedures", () => openDashboardDetails(
+    "Vizualizări proceduri","Cine a vizualizat și ce procedură.",
+    [...views].filter(x=>x.type==="procedura").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+      title:x.title||"Procedură", detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`, when:dashboardTimestamp(x.createdAt)
+    }))
+  ));
+
+  bindDashboardStat("statShares", () => openDashboardDetails(
+    "Distribuiri","Cine a distribuit și ce material.",
+    [...shares].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+      title:x.title||"Material", detail:`${displayUser(x.email)}${x.channel ? ` · ${x.channel}` : ""}`, when:dashboardTimestamp(x.createdAt)
+    }))
+  ));
+
+  document.querySelectorAll(".team-member-row").forEach(row=>{
+    row.classList.add("clickable-team-member");
+    row.onclick=()=>{
+      const email=(row.querySelector(".team-member-name small")?.textContent||"").split(" · ")[0] || "Necunoscut";
+      const own=materials.filter(m=>(m.createdBy||"Necunoscut")===email)
+        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      openDashboardDetails(displayUser(email),"Materialele încărcate de acest utilizator.",own.map(m=>({
+        title:m.title||"Material", detail:m.type==="videoclip"?"Videoclip":"Procedură", when:dashboardTimestamp(m.createdAt)
+      })));
+    };
+  });
 }
 
 async function loadStores() {
@@ -692,7 +852,7 @@ async function recommendStoreByLocation(){
 async function loadCoordinates(){await loadStores();renderCoordinates();}
 function renderCoordinates(){const term=el("coordinateSearch").value.trim().toLowerCase(),filter=el("coordinateFilter").value;const list=storesCache.filter(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return (!term||`${s.id} ${s.name||""}`.toLowerCase().includes(term))&&(filter==="all"||(filter==="ready"&&has)||(filter==="missing"&&!has));});el("coordinatesList").innerHTML=list.map(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return `<div class="coordinate-row"><div><b>${escapeHtml(s.name||s.id)}</b><div class="store-meta">ID ${escapeHtml(s.id)}</div></div><input data-lat="${s.id}" value="${has?escapeHtml(s.latitude):""}" placeholder="Latitudine"><input data-lng="${s.id}" value="${has?escapeHtml(s.longitude):""}" placeholder="Longitudine"><div class="row-actions"><button class="secondary" data-save-coord="${s.id}">Salvează</button>${has?`<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.latitude},${s.longitude}">Hartă</a>`:""}</div></div>`}).join("")||'<div class="empty">Niciun magazin.</div>';el("coordinatesList").querySelectorAll("[data-save-coord]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.saveCoord,lat=Number(document.querySelector(`[data-lat="${id}"]`).value),lng=Number(document.querySelector(`[data-lng="${id}"]`).value);if(!Number.isFinite(lat)||!Number.isFinite(lng)){alert("Completează coordonate valide.");return;}await setDoc(doc(db,"stores",id),{latitude:lat,longitude:lng},{merge:true});await loadCoordinates();}));}
 async function loadUsers(){const snap=await getDocs(collection(db,"users"));const list=snap.docs.map(d=>({email:d.id,...d.data()}));el("usersList").innerHTML=list.map(u=>`<div class="admin-material-row"><b>${escapeHtml(u.email)}</b><span class="badge">${escapeHtml(u.role||"")}</span><div class="material-info">Categorie: ${escapeHtml(u.category||"all")} · Adăugare: ${u.canAdd===true||["admin","suport"].includes(normRole(u.role))?"Da":"Nu"} · Gestionare: ${u.canManage===true||normRole(u.role)==="admin"?"Da":"Nu"}</div></div>`).join("")||'<div class="empty">Nu există conturi configurate.</div>';}
-async function saveUserProfile(){const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});el("userStatus").textContent="Drepturile au fost salvate. Contul trebuie să existe și în Firebase Authentication.";await loadUsers();}
+async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});el("userStatus").textContent="Drepturile au fost salvate. Contul trebuie să existe și în Firebase Authentication.";await loadUsers();}
 
 
 async function recordShare(method) {
@@ -871,3 +1031,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 renderEquipmentChoices();
 toggleStoreFormat();
+
+if (el("closeDashboardDetailsBtn")) el("closeDashboardDetailsBtn").addEventListener("click",()=>el("dashboardDetailsModal").classList.remove("open"));
+if (el("dashboardDetailsModal")) el("dashboardDetailsModal").addEventListener("click",e=>{if(e.target===el("dashboardDetailsModal")) el("dashboardDetailsModal").classList.remove("open");});
+
+if (el("statPending")) {
+  const pendingCard=el("statPending").closest(".stat-card");
+  if(pendingCard) pendingCard.addEventListener("click",async()=>{showPage("manageMaterialsPage");await renderAdminMaterials();});
+}

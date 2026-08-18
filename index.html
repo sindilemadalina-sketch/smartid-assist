@@ -65,24 +65,12 @@
     <main class="content">
       <section id="dashboardPage" class="page hidden">
         <div class="stats-grid">
-          <article class="stat-card" data-tip="Numărul total de autentificări înregistrate în platformă.">
-            <strong id="statLogins">0</strong><span>Autentificări</span>
-          </article>
-          <article class="stat-card" data-tip="Numărul magazinelor care au accesat platforma cel puțin o dată.">
-            <strong id="statStores">0</strong><span>Magazine active</span>
-          </article>
-          <article class="stat-card" data-tip="Numărul total de accesări ale videoclipurilor.">
-            <strong id="statVideos">0</strong><span>Vizualizări videoclipuri</span>
-          </article>
-          <article class="stat-card" data-tip="Numărul total de accesări ale procedurilor.">
-            <strong id="statProcedures">0</strong><span>Vizualizări proceduri</span>
-          </article>
-          <article class="stat-card share-stat-card" id="sharesCard" data-tip="Numărul total de distribuiri ale materialelor.">
-            <strong id="statShares">0</strong><span>Distribuiri</span>
-          </article>
-          <article class="stat-card coordinates-stat-card" id="coordinatesCard" data-tip="Magazine cu coordonate Google configurate.">
-            <strong id="statCoordinates">0</strong><span>Coordonate Google</span>
-          </article>
+          <article class="stat-card"><span>Autentificări</span><strong id="statLogins">0</strong><small>Click pentru detalii</small></article>
+          <article class="stat-card"><span>Magazine active</span><strong id="statStores">0</strong><small>Click pentru detalii</small></article>
+          <article class="stat-card"><span>Vizualizări videoclipuri</span><strong id="statVideos">0</strong><small>Click pentru detalii</small></article>
+          <article class="stat-card"><span>Vizualizări proceduri</span><strong id="statProcedures">0</strong><small>Click pentru detalii</small></article>
+          <article class="stat-card"><span>Distribuiri</span><strong id="statShares">0</strong><small>Click pentru detalii</small></article>
+          <article class="stat-card approval-stat"><span>De aprobat</span><strong id="statPending">0</strong><small>Materiale în așteptare</small></article>
         </div>
 
         <div class="dashboard-main-grid">
@@ -213,13 +201,13 @@
 
 
       <section id="manageMaterialsPage" class="page hidden">
-        <div class="page-head"><div><h1>Gestionare materiale</h1><p class="subtitle">Vizualizează, editează sau șterge materialele existente.</p></div></div>
+        <div class="page-head"><div><h1>Gestionare materiale</h1><p class="subtitle">Gestionează materialele și aprobă publicarea celor încărcate de echipă.</p></div></div>
         <section class="panel"><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
       </section>
 
       <section id="usersPage" class="page hidden">
-        <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Configurează drepturile conturilor deja create în Firebase Authentication.</p></div></div>
-        <section class="panel"><div class="form-grid"><input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Suport</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option><option value="admin">Admin</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+        <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Doar Adminul principal acordă sau modifică drepturile utilizatorilor.</p></div></div>
+        <section class="panel"><div class="form-grid"><input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
         <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
       </section>
 
@@ -299,5 +287,16 @@
   </div>
 
   <script type="module" src="app.js"></script>
+
+  <div id="dashboardDetailsModal" class="modal">
+    <section class="modal-card dashboard-details-modal">
+      <div class="shares-modal-head">
+        <div><h2 id="dashboardDetailsTitle">Detalii</h2><p id="dashboardDetailsSubtitle"></p></div>
+        <button id="closeDashboardDetailsBtn" class="back-btn">Închide</button>
+      </div>
+      <div id="dashboardDetailsBody" class="dashboard-details-body"></div>
+    </section>
+  </div>
+
 </body>
 </html>
