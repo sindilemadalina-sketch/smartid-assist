@@ -923,88 +923,85 @@ async function recommendStoreByLocation(){
 
 
 async function loadUsers() {
-  if (!isPrimaryAdmin()) {
-    el("usersList").innerHTML = '<div class="empty">Doar Adminul principal poate administra utilizatorii.</div>';
-    return;
-  }
+  const teamNames = [
+    "Nistor Ionut",
+    "Apetrei Andrei",
+    "Robert Neagu",
+    "Andreea Ianos",
+    "Dan Oros",
+    "Valentin Surugiu"
+  ];
 
-  try {
-    const snap = await getDocs(collection(db, "users"));
-    const profiles = snap.docs.map(d => ({ email: d.id, ...d.data() }));
-
-    const teamNames = [
-      "Nistor Ionut",
-      "Apetrei Andrei",
-      "Robert Neagu",
-      "Andreea Ianos",
-      "Dan Oros",
-      "Valentin Surugiu"
-    ];
-
-    const byName = new Map(
-      profiles
-        .filter(p => p.displayName)
-        .map(p => [String(p.displayName).trim().toLowerCase(), p])
-    );
-
+  // Pagina se afișează imediat, fără să depindă de răspunsul Firestore.
+  const renderTeam = profilesByName => {
     const rows = teamNames.map(name => {
-      const profile = byName.get(name.toLowerCase()) || {};
+      const saved = profilesByName?.get(name.toLowerCase()) || null;
       const preset = teamPermissionPreset(name);
-
       return {
         displayName: name,
-        email: profile.email || "",
-        role: profile.role || "suport",
-        category: profile.category || "all",
-        canAdd: profile.email ? profile.canAdd === true : preset.canAdd,
-        canDelete: profile.email ? profile.canDelete === true : preset.canDelete,
-        canAddStores: profile.email ? profile.canAddStores === true : preset.canAddStores,
-        canAddEquipment: profile.email ? profile.canAddEquipment === true : preset.canAddEquipment
+        email: saved?.email || "",
+        role: saved?.role || "suport",
+        category: saved?.category || "all",
+        canAdd: saved ? saved.canAdd === true : preset.canAdd,
+        canDelete: saved ? saved.canDelete === true : preset.canDelete,
+        canAddStores: saved ? saved.canAddStores === true : preset.canAddStores,
+        canAddEquipment: saved ? saved.canAddEquipment === true : preset.canAddEquipment
       };
     });
 
     el("usersList").innerHTML = rows.map(user => `
-      <div class="admin-material-row user-config-row" data-team-name="${escapeHtml(user.displayName)}">
+      <button type="button" class="user-team-card" data-team-name="${escapeHtml(user.displayName)}">
         <div class="user-row-main">
           <div class="team-avatar">${escapeHtml(user.displayName.charAt(0))}</div>
-          <div>
+          <div class="user-identity">
             <b>${escapeHtml(user.displayName)}</b>
-            <div class="material-info">${user.email ? escapeHtml(user.email) : "Email Firebase neasociat încă"}</div>
+            <small>${user.email ? escapeHtml(user.email) : "Click pentru configurare"}</small>
           </div>
         </div>
         <div class="user-permission-summary">
-          <span class="${user.canAdd ? "permission-yes" : "permission-no"}">Adaugă materiale: ${user.canAdd ? "Da" : "Nu"}</span>
+          <span class="${user.canAdd ? "permission-yes" : "permission-no"}">Adaugă: ${user.canAdd ? "Da" : "Nu"}</span>
           <span class="${user.canDelete ? "permission-yes" : "permission-no"}">Șterge: ${user.canDelete ? "Da" : "Nu"}</span>
           <span class="permission-yes">Magazine: ${user.canAddStores ? "Da" : "Nu"}</span>
           <span class="permission-yes">Echipamente: ${user.canAddEquipment ? "Da" : "Nu"}</span>
           <span class="permission-no">Aprobă: Nu</span>
         </div>
-      </div>
+      </button>
     `).join("");
 
-    el("usersList").querySelectorAll("[data-team-name]").forEach(row => {
-      row.addEventListener("click", () => {
-        const name = row.dataset.teamName;
+    el("usersList").querySelectorAll("[data-team-name]").forEach(card => {
+      card.onclick = () => {
+        const name = card.dataset.teamName;
         const user = rows.find(x => x.displayName === name);
         if (!user) return;
-
         el("userDisplayName").value = user.displayName;
         el("userEmail").value = user.email;
-        el("userRole").value = user.role;
-        el("userCategory").value = user.category;
+        el("userRole").value = "suport";
+        el("userCategory").value = "all";
         el("userCanAdd").checked = user.canAdd;
         el("userCanDelete").checked = user.canDelete;
         el("userCanAddStores").checked = user.canAddStores;
         el("userCanAddEquipment").checked = user.canAddEquipment;
         el("userStatus").textContent = user.email
-          ? `Editezi drepturile pentru ${user.displayName}.`
-          : `Completează emailul Firebase pentru ${user.displayName}, apoi salvează.`;
-        el("userEmail").focus();
-      });
+          ? `Configurezi drepturile pentru ${user.displayName}.`
+          : `Completează emailul Firebase pentru ${user.displayName} și apasă Salvează drepturi.`;
+        setTimeout(() => el("userEmail").focus(), 50);
+      };
     });
+  };
+
+  renderTeam(new Map());
+
+  // Încercăm să citim drepturile deja salvate, dar nu blocăm pagina dacă Firestore refuză listarea.
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    const profiles = snap.docs.map(d => ({ email: d.id, ...d.data() }));
+    const byName = new Map(
+      profiles.filter(p => p.displayName)
+        .map(p => [String(p.displayName).trim().toLowerCase(), p])
+    );
+    renderTeam(byName);
   } catch (error) {
-    console.error("Utilizatorii nu au putut fi încărcați.", error);
-    el("usersList").innerHTML = '<div class="empty">Nu am putut încărca utilizatorii din Firestore.</div>';
+    console.warn("Lista Firestore users nu poate fi citită; formularul rămâne disponibil.", error);
   }
 }
 
@@ -1047,7 +1044,7 @@ async function saveUserProfile() {
       targetEmail: email,
       title: displayName
     });
-    await loadUsers();
+    loadUsers().catch(()=>{});
   } catch (error) {
     console.error("Drepturile nu au putut fi salvate.", error);
     el("userStatus").textContent = "Nu am putut salva drepturile. Verifică regulile Firestore.";
@@ -1164,18 +1161,27 @@ document.querySelectorAll(".side-btn").forEach(button => {
       renderEquipment();
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
-    if (page === "usersPage") {
-      showPage(page);
-      await loadUsers();
-      closeMenu();
-      return;
-    }
+    if (page === "usersPage") return;
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
   });
 });
 
+
+
+const usersMenuButton = el("usersMenuBtn");
+if (usersMenuButton) {
+  usersMenuButton.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!isPrimaryAdmin()) return;
+    showPage("usersPage");
+    closeMenu();
+    // Nu așteptăm Firestore ca să deschidem pagina.
+    loadUsers().catch(error => console.warn("Utilizatori:", error));
+  });
+}
 
 document.querySelectorAll("[data-admin-category]").forEach(button => {
   button.addEventListener("click", () => {

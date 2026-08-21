@@ -591,3 +591,27 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
   .user-config-row{align-items:flex-start;flex-direction:column}
   .user-permission-summary{justify-content:flex-start}
 }
+
+/* Utilizatori - tab independent de Firestore */
+.user-team-card{
+  width:100%;
+  border:1px solid #ebe7f3;
+  border-radius:16px;
+  background:#fff;
+  padding:15px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  text-align:left;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.18s;
+}
+.user-team-card:hover{
+  transform:translateY(-2px);
+  border-color:#d4c4f5;
+  box-shadow:0 10px 26px rgba(76,29,149,.08);
+}
+.user-identity b,.user-identity small{display:block}
+.user-identity small{margin-top:3px;color:#667085}
