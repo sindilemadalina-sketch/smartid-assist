@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
   updateDoc, doc, increment, serverTimestamp
@@ -182,6 +182,36 @@ async function finishLogin() {
   }
 }
 
+
+async function applyAuthenticatedUser(user, { restored = false } = {}) {
+  currentEmail = (user?.email || "").toLowerCase();
+  if (!currentEmail) throw new Error("Contul autentificat nu are adresă de email.");
+
+  const profileSnap = await getDoc(doc(db, "users", currentEmail));
+  if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
+
+  const profile = profileSnap.data();
+  currentRole = normRole(profile.role);
+  currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
+  currentCanManage = profile.canManage === true || currentRole === "admin";
+  currentCategory = normCategory(profile.category);
+
+  if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
+    throw new Error("Rolul utilizatorului nu este valid.");
+  }
+
+  if (currentRole === "admin" || currentRole === "suport") {
+    await finishLogin();
+  } else {
+    await ensureStores();
+    el("loginPage").style.display = "none";
+    el("storeModal").classList.add("open");
+    el("storeCode").value = "";
+    el("storeCode").focus();
+    setTimeout(recommendStoreByLocation, 250);
+  }
+}
+
 async function login() {
   el("loginError").textContent = "";
   el("loginBtn").disabled = true;
@@ -194,30 +224,7 @@ async function login() {
       el("email").value.trim().toLowerCase(),
       el("password").value
     );
-
-    currentEmail = (credential.user.email || "").toLowerCase();
-    const profileSnap = await getDoc(doc(db, "users", currentEmail));
-    if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
-
-    const profile = profileSnap.data();
-    currentRole = normRole(profile.role);
-    currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
-    currentCanManage = profile.canManage === true || currentRole === "admin";
-    currentCategory = normCategory(profile.category);
-
-    if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
-      throw new Error("Rolul utilizatorului nu este valid.");
-    }
-
-    if (currentRole === "admin" || currentRole === "suport") {
-      await finishLogin();
-    } else {
-      await ensureStores();
-      el("storeModal").classList.add("open");
-      el("storeCode").value = "";
-      el("storeCode").focus();
-      setTimeout(recommendStoreByLocation, 250);
-    }
+    await applyAuthenticatedUser(credential.user);
   } catch (error) {
     const messages = {
       "auth/invalid-credential": "Email sau parolă incorectă.",
@@ -666,37 +673,39 @@ function setupDashboardInteractions() {
 }
 
 async function loadDashboard() {
-  await loadUserNameMap();
   try {
-    const [sessionsSnap, viewsSnap, sharesSnap, storesSnap] = await Promise.all([
+    await loadUserNameMap();
+    await loadMaterials();
+
+    const [sessionsSnap, viewsSnap, sharesSnap] = await Promise.all([
       getDocs(collection(db, "sessions")),
       getDocs(collection(db, "materialViews")),
-      getDocs(collection(db, "shares")),
-      getDocs(collection(db, "stores"))
+      getDocs(collection(db, "shares"))
     ]);
+
     const sessions = sessionsSnap.docs.map(item => item.data());
     const views = viewsSnap.docs.map(item => item.data());
     const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
     dashboardDetailCache = { sessions, views, shares };
-    const dashboardStores = storesSnap.docs.map(item => ({ id:item.id, ...item.data() }));
 
-    el("statLogins").textContent = sessions.length;
-    el("statStores").textContent = new Set(sessions.map(item => item.storeId).filter(Boolean)).size;
-    el("statVideos").textContent = views.filter(item => normType(item.type) === "videoclip").length;
-    el("statProcedures").textContent = views.filter(item => normType(item.type) === "procedura").length;
-    el("statShares").textContent = shares.length;
-    if (el("statPending")) el("statPending").textContent = materials.filter(m => m.status === "pending").length;
-
-    await loadMaterials();
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
     const procedureViews = views.filter(item => normType(item.type) === "procedura").length;
+    const activeStores = new Set(sessions.map(item => item.storeId).filter(Boolean)).size;
+
+    el("statLogins").textContent = sessions.length;
+    el("statStores").textContent = activeStores;
+    el("statVideos").textContent = videoViews;
+    el("statProcedures").textContent = procedureViews;
+    el("statShares").textContent = shares.length;
+    if (el("statPending")) {
+      el("statPending").textContent = materials.filter(m => (m.status || "approved") === "pending").length;
+    }
+
     const totalViews = videoViews + procedureViews;
     const videoAngle = totalViews ? (videoViews / totalViews) * 360 : 0;
-
     el("diagramVideos").textContent = videoViews;
     el("diagramProcedures").textContent = procedureViews;
     el("diagramTotal").textContent = totalViews;
-
     el("usageDiagram").style.background = totalViews
       ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
       : "conic-gradient(#e5e7eb 0deg 360deg)";
@@ -705,23 +714,21 @@ async function loadDashboard() {
     materials.forEach(item => {
       const email = item.createdBy || "Necunoscut";
       byUser[email] ??= { videos: 0, procedures: 0 };
-      if (item.type === "videoclip") byUser[email].videos++;
-      if (item.type === "procedura") byUser[email].procedures++;
+      if (normType(item.type) === "videoclip") byUser[email].videos++;
+      if (normType(item.type) === "procedura") byUser[email].procedures++;
     });
 
-    const teamVideosTotal = materials.filter(item => item.type === "videoclip").length;
-    const teamProceduresTotal = materials.filter(item => item.type === "procedura").length;
-    el("teamVideosTotal").textContent = teamVideosTotal;
-    el("teamProceduresTotal").textContent = teamProceduresTotal;
+    el("teamVideosTotal").textContent = materials.filter(item => normType(item.type) === "videoclip").length;
+    el("teamProceduresTotal").textContent = materials.filter(item => normType(item.type) === "procedura").length;
 
     const contributors = Object.entries(byUser)
       .sort((a, b) => (b[1].videos + b[1].procedures) - (a[1].videos + a[1].procedures));
 
     el("contributorsList").innerHTML = contributors.length
       ? contributors.map(([email, values]) => `
-          <div class="team-member-row">
+          <div class="team-member-row" data-team-email="${escapeHtml(email)}">
             <div class="team-member-name">
-              <div class="team-avatar">${escapeHtml((email || "?").charAt(0).toUpperCase())}</div>
+              <div class="team-avatar">${escapeHtml((displayUser(email) || "?").charAt(0).toUpperCase())}</div>
               <div>
                 <b>${escapeHtml(displayUser(email))}</b>
                 <small>${escapeHtml(email)} · ${values.videos + values.procedures} materiale încărcate</small>
@@ -734,71 +741,40 @@ async function loadDashboard() {
           </div>
         `).join("")
       : '<div class="empty">Nu există încă materiale încărcate de echipă.</div>';
-      setupDashboardInteractions();
-  } catch (error) {
-    console.warn("Dashboard-ul nu a putut fi încărcat.", error);
-  }
 
-  // Detaliile statisticilor se deschid numai la click, în popup.
-  bindDashboardStat("statLogins", () => openDashboardDetails(
-    "Autentificări", "Cine s-a autentificat și de unde.",
-    [...sessions].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-      title:displayUser(x.email),
-      detail:x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role||""),
-      when:dashboardTimestamp(x.createdAt)
-    }))
-  ));
-
-  bindDashboardStat("statStores", () => {
-    const storeMap = new Map();
-    sessions.forEach(x=>{
-      if(!x.storeId && !x.storeName) return;
-      const key=x.storeId||x.storeName;
-      const v=storeMap.get(key)||{name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
-      v.count++;
-      if((x.createdAt?.seconds||0)>(v.last?.seconds||0)) v.last=x.createdAt;
-      storeMap.set(key,v);
+    document.querySelectorAll(".team-member-row").forEach(row => {
+      row.classList.add("clickable-team-member");
+      row.onclick = () => {
+        const email = row.dataset.teamEmail || "Necunoscut";
+        const own = materials
+          .filter(m => (m.createdBy || "Necunoscut") === email)
+          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+        openDashboardDetails(
+          displayUser(email),
+          "Materialele încărcate de acest utilizator.",
+          own.map(m => ({
+            title: m.title || "Material",
+            detail: normType(m.type) === "videoclip" ? "Videoclip" : "Procedură",
+            when: dashboardTimestamp(m.createdAt)
+          }))
+        );
+      };
     });
-    openDashboardDetails("Magazine active","Magazinele care au accesat SmartID Portal.",
-      [...storeMap.values()].sort((a,b)=>b.count-a.count).map(x=>({
-        title:`${x.name}${x.id ? ` · ID ${x.id}` : ""}`, detail:`${x.count} autentificări`, when:`Ultima: ${dashboardTimestamp(x.last)}`
-      })));
-  });
 
-  bindDashboardStat("statVideos", () => openDashboardDetails(
-    "Vizualizări videoclipuri","Cine a vizualizat și ce videoclip.",
-    [...views].filter(x=>x.type==="videoclip").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-      title:x.title||"Videoclip", detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`, when:dashboardTimestamp(x.createdAt)
-    }))
-  ));
-
-  bindDashboardStat("statProcedures", () => openDashboardDetails(
-    "Vizualizări proceduri","Cine a vizualizat și ce procedură.",
-    [...views].filter(x=>x.type==="procedura").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-      title:x.title||"Procedură", detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`, when:dashboardTimestamp(x.createdAt)
-    }))
-  ));
-
-  bindDashboardStat("statShares", () => openDashboardDetails(
-    "Distribuiri","Cine a distribuit și ce material.",
-    [...shares].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-      title:x.title||"Material", detail:`${displayUser(x.email)}${x.channel ? ` · ${x.channel}` : ""}`, when:dashboardTimestamp(x.createdAt)
-    }))
-  ));
-
-  document.querySelectorAll(".team-member-row").forEach(row=>{
-    row.classList.add("clickable-team-member");
-    row.onclick=()=>{
-      const email=(row.querySelector(".team-member-name small")?.textContent||"").split(" · ")[0] || "Necunoscut";
-      const own=materials.filter(m=>(m.createdBy||"Necunoscut")===email)
-        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-      openDashboardDetails(displayUser(email),"Materialele încărcate de acest utilizator.",own.map(m=>({
-        title:m.title||"Material", detail:m.type==="videoclip"?"Videoclip":"Procedură", when:dashboardTimestamp(m.createdAt)
-      })));
-    };
-  });
+    setupDashboardInteractions();
+  } catch (error) {
+    console.error("Dashboard-ul nu a putut fi încărcat.", error);
+    if (el("dashboardPage")) {
+      const existing = el("dashboardPage").querySelector(".dashboard-load-error");
+      if (!existing) {
+        const box = document.createElement("div");
+        box.className = "panel dashboard-load-error";
+        box.innerHTML = "<b>Dashboard-ul nu s-a putut încărca.</b><p class='subtitle'>Verifică drepturile Firebase/Firestore sau reîncarcă pagina.</p>";
+        el("dashboardPage").prepend(box);
+      }
+    }
+  }
 }
-
 async function loadStores() {
   const snap = await getDocs(collection(db, "stores"));
   storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
@@ -918,31 +894,7 @@ async function recommendStoreByLocation(){
     }catch(err){box.textContent="Nu am putut calcula recomandarea.";box.className="geo-recommendation warn";}
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
 }
-async function loadCoordinates(){await loadStores();renderCoordinates();}
-function renderCoordinates(){const term=el("coordinateSearch").value.trim().toLowerCase(),filter=el("coordinateFilter").value;const list=storesCache.filter(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return (!term||`${s.id} ${s.name||""}`.toLowerCase().includes(term))&&(filter==="all"||(filter==="ready"&&has)||(filter==="missing"&&!has));});el("coordinatesList").innerHTML=list.map(s=>{const has=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));return `<div class="coordinate-row"><div><b>${escapeHtml(s.name||s.id)}</b><div class="store-meta">ID ${escapeHtml(s.id)}</div></div><input data-lat="${s.id}" value="${has?escapeHtml(s.latitude):""}" placeholder="Latitudine"><input data-lng="${s.id}" value="${has?escapeHtml(s.longitude):""}" placeholder="Longitudine"><div class="row-actions"><button class="secondary" data-save-coord="${s.id}">Salvează</button>${has?`<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.latitude},${s.longitude}">Hartă</a>`:""}</div></div>`}).join("")||'<div class="empty">Niciun magazin.</div>';el("coordinatesList").querySelectorAll("[data-save-coord]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.saveCoord,lat=Number(document.querySelector(`[data-lat="${id}"]`).value),lng=Number(document.querySelector(`[data-lng="${id}"]`).value);if(!Number.isFinite(lat)||!Number.isFinite(lng)){alert("Completează coordonate valide.");return;}await setDoc(doc(db,"stores",id),{latitude:lat,longitude:lng},{merge:true});await loadCoordinates();}));}
-async function loadUsers(){
-  const snap=await getDocs(collection(db,"users"));
-  const list=snap.docs.map(d=>({email:d.id,...d.data()}));
-  el("usersList").innerHTML=list.map(u=>`
-    <div class="admin-material-row user-config-row" data-user-email="${escapeHtml(u.email)}">
-      <b>${escapeHtml(u.displayName || u.email)}</b>
-      <span class="badge">${escapeHtml(u.role||"")}</span>
-      <div class="material-info">${u.displayName ? `${escapeHtml(u.email)} · ` : ""}Categorie: ${escapeHtml(u.category||"all")} · Adăugare: ${u.canAdd===true||["admin","suport"].includes(normRole(u.role))?"Da":"Nu"} · Gestionare: ${u.canManage===true||normRole(u.role)==="admin"?"Da":"Nu"}</div>
-    </div>`).join("")||'<div class="empty">Nu există conturi configurate.</div>';
 
-  el("usersList").querySelectorAll("[data-user-email]").forEach(row=>{
-    row.addEventListener("click",()=>{
-      const u=list.find(x=>x.email===row.dataset.userEmail);
-      if(!u) return;
-      el("userEmail").value=u.email;
-      if(el("userDisplayName")) el("userDisplayName").value=u.displayName||"";
-      el("userRole").value=u.role||"suport";
-      el("userCategory").value=u.category||"all";
-      el("userCanAdd").checked=u.canAdd===true;
-      el("userCanManage").checked=u.canManage===true;
-    });
-  });
-}
 async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
 el("userStatus").textContent="Drepturile au fost salvate.";
 await loadUsers();}
@@ -1035,6 +987,11 @@ async function cancelStoreSelection() {
   el("email").focus();
 }
 
+function onIfPresent(id, eventName, handler) {
+  const node = el(id);
+  if (node) node.addEventListener(eventName, handler);
+}
+
 el("loginBtn").addEventListener("click", login);
 el("password").addEventListener("keydown", event => { if (event.key === "Enter") login(); });
 el("storeContinueBtn").addEventListener("click", continueWithStore);
@@ -1044,8 +1001,8 @@ el("menuBtn").addEventListener("click", openMenu);
 el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
 el("shareEmailBtn").addEventListener("click", shareEmail);
 el("copyLinkBtn").addEventListener("click", copyMaterialLink);
-el("sharesCard").addEventListener("click", openSharesHistory);
-el("closeSharesModalBtn").addEventListener("click", () => el("sharesModal").classList.remove("open"));
+
+onIfPresent("closeSharesModalBtn", "click", () => el("sharesModal")?.classList.remove("open"));
 el("closeMenuBtn").addEventListener("click", closeMenu);
 el("menuOverlay").addEventListener("click", closeMenu);
 el("closeViewerBtn").addEventListener("click", () => {
@@ -1104,21 +1061,15 @@ document.querySelectorAll("[data-back]").forEach(button => {
   button.addEventListener("click", () => showPage(button.dataset.back));
 });
 
-el("detectLocationBtn").addEventListener("click", recommendStoreByLocation);
-el("manageMaterialSearch").addEventListener("input", renderAdminMaterials);
-el("manageMaterialType").addEventListener("change", renderAdminMaterials);
-el("coordinateSearch").addEventListener("input", renderCoordinates);
-el("coordinateFilter").addEventListener("change", renderCoordinates);
-el("saveUserBtn").addEventListener("click", saveUserProfile);
+onIfPresent("detectLocationBtn", "click", recommendStoreByLocation);
+onIfPresent("manageMaterialSearch", "input", renderAdminMaterials);
+onIfPresent("manageMaterialType", "change", renderAdminMaterials);
 
 
-window.addEventListener("DOMContentLoaded", async () => {
-  try { await signOut(auth); } catch {}
-  sessionStorage.clear();
-  el("email").value = "";
-  el("password").value = "";
-  el("storeCode").value = "";
-});
+onIfPresent("saveUserBtn", "click", saveUserProfile);
+
+
+
 
 renderEquipmentChoices();
 toggleStoreFormat();
@@ -1126,8 +1077,28 @@ toggleStoreFormat();
 if (el("closeDashboardDetailsBtn")) el("closeDashboardDetailsBtn").addEventListener("click",()=>el("dashboardDetailsModal").classList.remove("open"));
 if (el("dashboardDetailsModal")) el("dashboardDetailsModal").addEventListener("click",e=>{if(e.target===el("dashboardDetailsModal")) el("dashboardDetailsModal").classList.remove("open");});
 
-if (el("statPending")) {
-  const pendingCard=el("statPending").closest(".stat-card");
-  if(pendingCard) pendingCard.addEventListener("click",async()=>{showPage("manageMaterialsPage");await renderAdminMaterials();});
-}
 
+
+
+
+let authRestoreHandled = false;
+onAuthStateChanged(auth, async user => {
+  if (authRestoreHandled) return;
+  authRestoreHandled = true;
+
+  if (!user) {
+    el("loginPage").style.display = "flex";
+    el("app").classList.add("hidden");
+    return;
+  }
+
+  try {
+    await applyAuthenticatedUser(user, { restored: true });
+  } catch (error) {
+    console.warn("Sesiunea salvată nu a putut fi restaurată.", error);
+    try { await signOut(auth); } catch {}
+    el("loginPage").style.display = "flex";
+    el("app").classList.add("hidden");
+    el("loginError").textContent = error.message || "Autentifică-te din nou.";
+  }
+});
