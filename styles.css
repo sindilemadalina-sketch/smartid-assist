@@ -548,3 +548,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 @media(max-width:650px){
   .dashboard-stat-card{min-height:180px !important}
 }
+
+.permission-note{
+  padding:12px 14px;
+  border-radius:14px;
+  background:#fff7ed;
+  color:#9a3412;
+  font-size:13px;
+  font-weight:700;
+}

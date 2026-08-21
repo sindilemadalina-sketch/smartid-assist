@@ -28,7 +28,24 @@ let currentOpenMaterial = null;
 let editingMaterialId = null;
 let currentCanAdd = false;
 let currentCanManage = false;
+let currentCanDelete = false;
+let currentCanAddStores = false;
+let currentCanAddEquipment = false;
+
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+const LIMITED_TEAM_MEMBERS = new Set(["Robert Neagu", "Dan Oros"]);
+
+function teamPermissionPreset(displayName) {
+  const limited = LIMITED_TEAM_MEMBERS.has(displayName);
+  return {
+    canAdd: !limited,
+    canDelete: !limited,
+    canAddStores: true,
+    canAddEquipment: true,
+    canApprove: false
+  };
+}
+
 
 
 const TEAM_DISPLAY_NAMES = [
@@ -167,6 +184,8 @@ async function finishLogin() {
 
   el("loginPage").style.display = "none";
   el("app").classList.remove("hidden");
+  document.querySelectorAll('[data-page="storesPage"]').forEach(btn => btn.classList.toggle("hidden", !(currentRole==="admin" || currentCanAddStores)));
+
   el("menuBtn").classList.remove("hidden");
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
@@ -192,8 +211,11 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
 
   const profile = profileSnap.data();
   currentRole = normRole(profile.role);
-  currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
-  currentCanManage = profile.canManage === true || currentRole === "admin";
+  currentCanAdd = currentRole === "admin" ? true : profile.canAdd === true;
+  currentCanManage = currentRole === "admin" ? true : profile.canManage === true;
+  currentCanDelete = currentRole === "admin" ? true : profile.canDelete === true;
+  currentCanAddStores = currentRole === "admin" ? true : profile.canAddStores === true;
+  currentCanAddEquipment = currentRole === "admin" ? true : profile.canAddEquipment === true;
   currentCategory = normCategory(profile.category);
 
   if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
@@ -541,7 +563,7 @@ async function renderAdminMaterials() {
           <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
           ${isPrimaryAdmin() && (material.status || "approved") !== "approved" ? `<button class="primary" data-approve-material="${material.id}">✓ Aprobă</button>` : ""}
           ${isPrimaryAdmin() && (material.status || "approved") !== "rejected" ? `<button class="secondary" data-reject-material="${material.id}">Respinge</button>` : ""}
-          ${isPrimaryAdmin() ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
+          ${(isPrimaryAdmin() || currentCanDelete) ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
         </div>
       </div>
     `;
@@ -857,6 +879,10 @@ function toggleStoreFormat() {
 }
 
 async function saveStore() {
+  if (!(isPrimaryAdmin() || currentCanAddStores)) {
+    el("saveStoreStatus").textContent = "Nu ai dreptul să adaugi sau să modifici magazine.";
+    return;
+  }
   const id = el("newStoreId").value.trim();
   const name = el("newStoreName").value.trim();
   const category = el("newStoreCategory").value;
@@ -895,28 +921,37 @@ async function recommendStoreByLocation(){
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
 }
 
-async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
-el("userStatus").textContent="Drepturile au fost salvate.";
-await loadUsers();}
-
-
-async function recordShare(method) {
-  if (!currentOpenMaterial) return;
-  try {
-    await addDoc(collection(db, "shares"), {
-      materialId: currentOpenMaterial.id,
-      title: currentOpenMaterial.title || "",
-      type: currentOpenMaterial.type || "",
-      method,
-      email: currentEmail,
-      storeId: currentStoreId,
-      storeName: currentStoreName,
-      storeFormat: currentStoreFormat,
-      createdAt: serverTimestamp()
-    });
-  } catch (error) {
-    console.warn("Distribuirea nu a putut fi înregistrată.", error);
+async function saveUserProfile(){
+  if(!isPrimaryAdmin()){
+    el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";
+    return;
   }
+
+  const email=el("userEmail").value.trim().toLowerCase();
+  const displayName=el("userDisplayName")?.value||"";
+  if(!email){
+    el("userStatus").textContent="Completează emailul.";
+    return;
+  }
+
+  await setDoc(doc(db,"users",email),{
+    displayName,
+    role:el("userRole").value,
+    category:el("userCategory").value,
+    canAdd:el("userCanAdd").checked,
+    canManage:el("userCanAdd").checked,
+    canDelete:el("userCanDelete")?.checked===true,
+    canAddStores:el("userCanAddStores")?.checked===true,
+    canAddEquipment:el("userCanAddEquipment")?.checked===true,
+    canApprove:false,
+    canManageUsers:false,
+    updatedAt:serverTimestamp(),
+    updatedBy:currentEmail
+  },{merge:true});
+
+  el("userStatus").textContent="Drepturile au fost salvate.";
+  await logTeamActivity("rights_updated",null,{targetEmail:email,title:displayName});
+  await loadUsers();
 }
 
 async function shareWhatsApp() {
@@ -1102,3 +1137,13 @@ onAuthStateChanged(auth, async user => {
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
   }
 });
+
+if (el("userDisplayName")) {
+  el("userDisplayName").addEventListener("change", () => {
+    const preset = teamPermissionPreset(el("userDisplayName").value);
+    el("userCanAdd").checked = preset.canAdd;
+    if (el("userCanDelete")) el("userCanDelete").checked = preset.canDelete;
+    if (el("userCanAddStores")) el("userCanAddStores").checked = preset.canAddStores;
+    if (el("userCanAddEquipment")) el("userCanAddEquipment").checked = preset.canAddEquipment;
+  });
+}
