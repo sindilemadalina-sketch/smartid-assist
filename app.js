@@ -30,38 +30,7 @@ let currentCanAdd = false;
 let currentCanManage = false;
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
 
-const TEAM_LOGIN_NAMES = [
-  "Nistor Ionut",
-  "Apetrei Andrei",
-  "Robert Neagu",
-  "Andreea Ianos",
-  "Dan Oros",
-  "Valentin Surugiu"
-];
 
-function getLoginDirectory() {
-  try { return JSON.parse(localStorage.getItem("smartidLoginDirectory") || "{}"); }
-  catch { return {}; }
-}
-function saveLoginDirectory(directory) {
-  localStorage.setItem("smartidLoginDirectory", JSON.stringify(directory));
-}
-function refreshQuickLoginUsers() {
-  const select = el("quickLoginUser");
-  if (!select) return;
-  const directory = getLoginDirectory();
-  [...select.options].forEach(option => {
-    const name = option.dataset.team;
-    if (name && directory[name]) option.value = directory[name];
-  });
-}
-function rememberNamedLogin(name, email) {
-  if (!name || !email) return;
-  const directory = getLoginDirectory();
-  directory[name] = email.toLowerCase();
-  saveLoginDirectory(directory);
-  refreshQuickLoginUsers();
-}
 const TEAM_DISPLAY_NAMES = [
   "Nistor Ionut",
   "Apetrei Andrei",
@@ -227,10 +196,6 @@ async function login() {
     );
 
     currentEmail = (credential.user.email || "").toLowerCase();
-    localStorage.setItem("smartidLastLoginEmail", currentEmail);
-    const quickLogin = el("quickLoginUser");
-    const selectedOption = quickLogin?.options[quickLogin.selectedIndex];
-    if (selectedOption?.dataset?.team) rememberNamedLogin(selectedOption.dataset.team, currentEmail);
     const profileSnap = await getDoc(doc(db, "users", currentEmail));
     if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
 
@@ -625,12 +590,79 @@ function openDashboardDetails(title, subtitle, rows) {
     </div>`).join("") : '<div class="empty">Nu există încă informații.</div>';
   el("dashboardDetailsModal").classList.add("open");
 }
-function bindDashboardStat(statId, handler) {
-  const number = el(statId);
-  const card = number?.closest(".stat-card");
-  if (!card) return;
-  card.classList.add("clickable-stat");
-  card.onclick = handler;
+
+
+
+let dashboardDetailCache = { sessions: [], views: [], shares: [] };
+
+function setupDashboardInteractions() {
+  document.querySelectorAll(".dashboard-stat-card").forEach(card => {
+    card.onclick = event => {
+      if (event.target.closest(".stat-details-link")) return;
+      const key = card.dataset.stat;
+      document.querySelectorAll(".stat-explain").forEach(box => {
+        if (box.id !== `explain-${key}`) box.classList.add("hidden");
+      });
+      el(`explain-${key}`)?.classList.toggle("hidden");
+    };
+  });
+
+  document.querySelectorAll("[data-stat-details]").forEach(button => {
+    button.onclick = async event => {
+      event.stopPropagation();
+      const key = button.dataset.statDetails;
+      const { sessions, views, shares } = dashboardDetailCache;
+
+      if (key === "logins") {
+        openDashboardDetails("Autentificări", "Cine s-a autentificat, magazinul și momentul accesării.",
+          [...sessions].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+            title: displayUser(x.email),
+            detail: x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role || ""),
+            when: dashboardTimestamp(x.createdAt)
+          })));
+      } else if (key === "stores") {
+        const storeMap = new Map();
+        sessions.forEach(x => {
+          if (!x.storeId && !x.storeName) return;
+          const k=x.storeId||x.storeName;
+          const v=storeMap.get(k)||{name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
+          v.count++;
+          if((x.createdAt?.seconds||0)>(v.last?.seconds||0)) v.last=x.createdAt;
+          storeMap.set(k,v);
+        });
+        openDashboardDetails("Magazine active","Magazinele care au accesat SmartID Portal.",
+          [...storeMap.values()].sort((a,b)=>b.count-a.count).map(x=>({
+            title:`${x.name}${x.id ? ` · ID ${x.id}` : ""}`,
+            detail:`${x.count} autentificări`,
+            when:`Ultima accesare: ${dashboardTimestamp(x.last)}`
+          })));
+      } else if (key === "videos") {
+        openDashboardDetails("Vizualizări videoclipuri","Videoclipurile accesate și utilizatorii care le-au vizualizat.",
+          [...views].filter(x=>normType(x.type)==="videoclip").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+            title:x.title||"Videoclip",
+            detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
+            when:dashboardTimestamp(x.createdAt)
+          })));
+      } else if (key === "procedures") {
+        openDashboardDetails("Vizualizări proceduri","Procedurile accesate și utilizatorii care le-au consultat.",
+          [...views].filter(x=>normType(x.type)==="procedura").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+            title:x.title||"Procedură",
+            detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
+            when:dashboardTimestamp(x.createdAt)
+          })));
+      } else if (key === "shares") {
+        openDashboardDetails("Distribuiri","Materialele distribuite, cine le-a trimis și metoda folosită.",
+          [...shares].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
+            title:x.title||"Material",
+            detail:`${displayUser(x.email)} · ${x.method || x.channel || "Distribuire"}`,
+            when:dashboardTimestamp(x.createdAt)
+          })));
+      } else if (key === "pending") {
+        showPage("manageMaterialsPage");
+        await renderAdminMaterials();
+      }
+    };
+  });
 }
 
 async function loadDashboard() {
@@ -645,6 +677,7 @@ async function loadDashboard() {
     const sessions = sessionsSnap.docs.map(item => item.data());
     const views = viewsSnap.docs.map(item => item.data());
     const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
+    dashboardDetailCache = { sessions, views, shares };
     const dashboardStores = storesSnap.docs.map(item => ({ id:item.id, ...item.data() }));
 
     el("statLogins").textContent = sessions.length;
@@ -701,6 +734,7 @@ async function loadDashboard() {
           </div>
         `).join("")
       : '<div class="empty">Nu există încă materiale încărcate de echipă.</div>';
+      setupDashboardInteractions();
   } catch (error) {
     console.warn("Dashboard-ul nu a putut fi încărcat.", error);
   }
@@ -910,7 +944,6 @@ async function loadUsers(){
   });
 }
 async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
-if(savedName) rememberNamedLogin(savedName,email);
 el("userStatus").textContent="Drepturile au fost salvate.";
 await loadUsers();}
 
@@ -1006,7 +1039,7 @@ el("loginBtn").addEventListener("click", login);
 el("password").addEventListener("keydown", event => { if (event.key === "Enter") login(); });
 el("storeContinueBtn").addEventListener("click", continueWithStore);
 el("storeLogoutBtn").addEventListener("click", cancelStoreSelection);
-el("logoutBtn").addEventListener("click", async () => { await signOut(auth); sessionStorage.clear(); el("email").value=""; el("password").value=""; el("storeCode").value=""; location.reload(); });
+el("logoutBtn").addEventListener("click", async () => { await signOut(auth); location.reload(); });
 el("menuBtn").addEventListener("click", openMenu);
 el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
 el("shareEmailBtn").addEventListener("click", shareEmail);
@@ -1098,32 +1131,3 @@ if (el("statPending")) {
   if(pendingCard) pendingCard.addEventListener("click",async()=>{showPage("manageMaterialsPage");await renderAdminMaterials();});
 }
 
-function initQuickLogin() {
-  refreshQuickLoginUsers();
-  const lastEmail = localStorage.getItem("smartidLastLoginEmail") || "";
-  if (lastEmail && el("email")) el("email").value = lastEmail;
-
-  const select = el("quickLoginUser");
-  if (!select) return;
-
-  const matching = [...select.options].find(o => o.value && o.value !== "__other__" && o.value.toLowerCase() === lastEmail.toLowerCase());
-  if (matching) select.value = matching.value;
-
-  select.addEventListener("change", () => {
-    const option = select.options[select.selectedIndex];
-    if (select.value === "__other__") {
-      el("email").value = "";
-      el("email").focus();
-      return;
-    }
-    if (select.value) {
-      el("email").value = select.value;
-      el("password").focus();
-    } else if (option?.dataset?.team) {
-      el("email").value = "";
-      el("email").placeholder = `Email ${option.dataset.team} - o singură dată`;
-      el("email").focus();
-    }
-  });
-}
-initQuickLogin();
