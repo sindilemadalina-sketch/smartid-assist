@@ -921,37 +921,137 @@ async function recommendStoreByLocation(){
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
 }
 
-async function saveUserProfile(){
-  if(!isPrimaryAdmin()){
-    el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";
+
+async function loadUsers() {
+  if (!isPrimaryAdmin()) {
+    el("usersList").innerHTML = '<div class="empty">Doar Adminul principal poate administra utilizatorii.</div>';
     return;
   }
 
-  const email=el("userEmail").value.trim().toLowerCase();
-  const displayName=el("userDisplayName")?.value||"";
-  if(!email){
-    el("userStatus").textContent="Completează emailul.";
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    const profiles = snap.docs.map(d => ({ email: d.id, ...d.data() }));
+
+    const teamNames = [
+      "Nistor Ionut",
+      "Apetrei Andrei",
+      "Robert Neagu",
+      "Andreea Ianos",
+      "Dan Oros",
+      "Valentin Surugiu"
+    ];
+
+    const byName = new Map(
+      profiles
+        .filter(p => p.displayName)
+        .map(p => [String(p.displayName).trim().toLowerCase(), p])
+    );
+
+    const rows = teamNames.map(name => {
+      const profile = byName.get(name.toLowerCase()) || {};
+      const preset = teamPermissionPreset(name);
+
+      return {
+        displayName: name,
+        email: profile.email || "",
+        role: profile.role || "suport",
+        category: profile.category || "all",
+        canAdd: profile.email ? profile.canAdd === true : preset.canAdd,
+        canDelete: profile.email ? profile.canDelete === true : preset.canDelete,
+        canAddStores: profile.email ? profile.canAddStores === true : preset.canAddStores,
+        canAddEquipment: profile.email ? profile.canAddEquipment === true : preset.canAddEquipment
+      };
+    });
+
+    el("usersList").innerHTML = rows.map(user => `
+      <div class="admin-material-row user-config-row" data-team-name="${escapeHtml(user.displayName)}">
+        <div class="user-row-main">
+          <div class="team-avatar">${escapeHtml(user.displayName.charAt(0))}</div>
+          <div>
+            <b>${escapeHtml(user.displayName)}</b>
+            <div class="material-info">${user.email ? escapeHtml(user.email) : "Email Firebase neasociat încă"}</div>
+          </div>
+        </div>
+        <div class="user-permission-summary">
+          <span class="${user.canAdd ? "permission-yes" : "permission-no"}">Adaugă materiale: ${user.canAdd ? "Da" : "Nu"}</span>
+          <span class="${user.canDelete ? "permission-yes" : "permission-no"}">Șterge: ${user.canDelete ? "Da" : "Nu"}</span>
+          <span class="permission-yes">Magazine: ${user.canAddStores ? "Da" : "Nu"}</span>
+          <span class="permission-yes">Echipamente: ${user.canAddEquipment ? "Da" : "Nu"}</span>
+          <span class="permission-no">Aprobă: Nu</span>
+        </div>
+      </div>
+    `).join("");
+
+    el("usersList").querySelectorAll("[data-team-name]").forEach(row => {
+      row.addEventListener("click", () => {
+        const name = row.dataset.teamName;
+        const user = rows.find(x => x.displayName === name);
+        if (!user) return;
+
+        el("userDisplayName").value = user.displayName;
+        el("userEmail").value = user.email;
+        el("userRole").value = user.role;
+        el("userCategory").value = user.category;
+        el("userCanAdd").checked = user.canAdd;
+        el("userCanDelete").checked = user.canDelete;
+        el("userCanAddStores").checked = user.canAddStores;
+        el("userCanAddEquipment").checked = user.canAddEquipment;
+        el("userStatus").textContent = user.email
+          ? `Editezi drepturile pentru ${user.displayName}.`
+          : `Completează emailul Firebase pentru ${user.displayName}, apoi salvează.`;
+        el("userEmail").focus();
+      });
+    });
+  } catch (error) {
+    console.error("Utilizatorii nu au putut fi încărcați.", error);
+    el("usersList").innerHTML = '<div class="empty">Nu am putut încărca utilizatorii din Firestore.</div>';
+  }
+}
+
+async function saveUserProfile() {
+  if (!isPrimaryAdmin()) {
+    el("userStatus").textContent = "Doar Adminul principal poate modifica drepturile.";
     return;
   }
 
-  await setDoc(doc(db,"users",email),{
-    displayName,
-    role:el("userRole").value,
-    category:el("userCategory").value,
-    canAdd:el("userCanAdd").checked,
-    canManage:el("userCanAdd").checked,
-    canDelete:el("userCanDelete")?.checked===true,
-    canAddStores:el("userCanAddStores")?.checked===true,
-    canAddEquipment:el("userCanAddEquipment")?.checked===true,
-    canApprove:false,
-    canManageUsers:false,
-    updatedAt:serverTimestamp(),
-    updatedBy:currentEmail
-  },{merge:true});
+  const displayName = el("userDisplayName").value;
+  const email = el("userEmail").value.trim().toLowerCase();
 
-  el("userStatus").textContent="Drepturile au fost salvate.";
-  await logTeamActivity("rights_updated",null,{targetEmail:email,title:displayName});
-  await loadUsers();
+  if (!displayName) {
+    el("userStatus").textContent = "Selectează colegul.";
+    return;
+  }
+  if (!email) {
+    el("userStatus").textContent = "Completează emailul colegului creat în Firebase.";
+    return;
+  }
+
+  try {
+    await setDoc(doc(db, "users", email), {
+      displayName,
+      role: "suport",
+      category: "all",
+      canAdd: el("userCanAdd").checked,
+      canManage: el("userCanAdd").checked,
+      canDelete: el("userCanDelete").checked,
+      canAddStores: el("userCanAddStores").checked,
+      canAddEquipment: el("userCanAddEquipment").checked,
+      canApprove: false,
+      canManageUsers: false,
+      updatedAt: serverTimestamp(),
+      updatedBy: currentEmail
+    }, { merge: true });
+
+    el("userStatus").textContent = `Drepturile pentru ${displayName} au fost salvate.`;
+    await logTeamActivity("rights_updated", null, {
+      targetEmail: email,
+      title: displayName
+    });
+    await loadUsers();
+  } catch (error) {
+    console.error("Drepturile nu au putut fi salvate.", error);
+    el("userStatus").textContent = "Nu am putut salva drepturile. Verifică regulile Firestore.";
+  }
 }
 
 async function shareWhatsApp() {
@@ -1064,7 +1164,12 @@ document.querySelectorAll(".side-btn").forEach(button => {
       renderEquipment();
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
-    if (page === "usersPage") await loadUsers();
+    if (page === "usersPage") {
+      showPage(page);
+      await loadUsers();
+      closeMenu();
+      return;
+    }
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
@@ -1138,12 +1243,16 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
+
+
 if (el("userDisplayName")) {
   el("userDisplayName").addEventListener("change", () => {
-    const preset = teamPermissionPreset(el("userDisplayName").value);
+    const name = el("userDisplayName").value;
+    if (!name) return;
+    const preset = teamPermissionPreset(name);
     el("userCanAdd").checked = preset.canAdd;
-    if (el("userCanDelete")) el("userCanDelete").checked = preset.canDelete;
-    if (el("userCanAddStores")) el("userCanAddStores").checked = preset.canAddStores;
-    if (el("userCanAddEquipment")) el("userCanAddEquipment").checked = preset.canAddEquipment;
+    el("userCanDelete").checked = preset.canDelete;
+    el("userCanAddStores").checked = preset.canAddStores;
+    el("userCanAddEquipment").checked = preset.canAddEquipment;
   });
 }

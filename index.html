@@ -243,7 +243,12 @@
 
       <section id="usersPage" class="page hidden">
         <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Fiecare coleg se autentifică individual cu emailul și parola create în Firebase. Adminul principal este master și aprobă materialele. Colegii pot primi drepturi pentru materiale, magazine și echipamente.</p></div></div>
-        <section class="panel"><div class="form-grid">
+        <section class="panel users-config-panel">
+          <div class="permission-note">
+            Selectează colegul, completează emailul lui din Firebase și salvează drepturile.
+            Niciun coleg nu poate aproba materiale sau modifica drepturile altor utilizatori.
+          </div>
+          <div class="form-grid">
           <select id="userDisplayName">
             <option value="">Selectează colegul</option>
             <option value="Nistor Ionut">Nistor Ionut</option>
@@ -256,7 +261,7 @@
           <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label>
             <label><input id="userCanDelete" type="checkbox"> Poate șterge materiale</label>
             <label><input id="userCanAddStores" type="checkbox"> Poate adăuga magazine</label>
-            <label><input id="userCanAddEquipment" type="checkbox"> Poate adăuga echipamente</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+            <label><input id="userCanAddEquipment" type="checkbox"> Poate adăuga echipamente</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
         <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
       </section>
 
