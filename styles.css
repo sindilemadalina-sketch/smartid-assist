@@ -525,3 +525,26 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 @media(max-width:650px){
   .dashboard-stats{grid-template-columns:1fr !important}
 }
+
+/* Dashboard - mai mult spatiu pentru explicatii si linkul Vezi detalii */
+.dashboard-stat-card{
+  min-height:190px !important;
+  padding:24px 26px !important;
+  overflow:visible !important;
+}
+.stat-explain{
+  max-height:none !important;
+  overflow:visible !important;
+  padding-bottom:8px;
+}
+.stat-details-link{
+  margin-top:12px !important;
+  padding-bottom:4px !important;
+  line-height:1.4;
+}
+.dashboard-stats{
+  align-items:stretch !important;
+}
+@media(max-width:650px){
+  .dashboard-stat-card{min-height:180px !important}
+}
