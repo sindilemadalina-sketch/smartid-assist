@@ -967,3 +967,76 @@ html,body,#app,main,.content,.page{
 .group-head{
   cursor:pointer !important;
 }
+
+/* FIX DEFINITIV: fara bara orizontala in Dashboard */
+html,
+body{
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:hidden !important;
+}
+
+#app,
+.content,
+#dashboardPage,
+.dashboard-page-pro,
+.dashboard-pro-list,
+.dashboard-pro-card,
+.dashboard-team-pro{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  overflow-x:hidden !important;
+}
+
+.content{
+  margin:0 !important;
+  padding-left:28px !important;
+  padding-right:28px !important;
+}
+
+#dashboardPage{
+  margin:0 !important;
+  padding:0 !important;
+}
+
+/* orice copil din carduri trebuie sa poata micsora fara sa forteze latimea paginii */
+.dashboard-pro-card > *,
+.dashboard-team-pro > *,
+.team-summary > *,
+.contributors-list > *{
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+/* linia vizuala nu are voie sa impinga cardul */
+.metric-line{
+  min-width:0 !important;
+  width:100% !important;
+  overflow:hidden !important;
+}
+
+/* butoanele raman in interiorul cardului */
+.metric-details{
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+/* eliminam explicit scrollbar-ul orizontal */
+body::-webkit-scrollbar:horizontal,
+html::-webkit-scrollbar:horizontal,
+#app::-webkit-scrollbar:horizontal,
+.content::-webkit-scrollbar:horizontal,
+#dashboardPage::-webkit-scrollbar:horizontal{
+  height:0 !important;
+  display:none !important;
+}
+
+@media(max-width:1000px){
+  .content{
+    padding-left:18px !important;
+    padding-right:18px !important;
+  }
+}
