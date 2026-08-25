@@ -683,3 +683,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
   .equipment-card{align-items:flex-start !important;flex-direction:column !important}
   .equipment-card p{margin-left:0 !important}
 }
+
+.store-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important}
+.store-row-main{flex:1 1 auto!important;min-width:0!important}
+.store-delete-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;padding:8px 12px!important;border:1px solid #ef4444!important;border-radius:10px!important;background:#fff!important;color:#b91c1c!important;font-weight:800!important;cursor:pointer!important}
+.store-delete-btn:hover{background:#fef2f2!important}

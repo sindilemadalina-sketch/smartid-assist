@@ -830,7 +830,7 @@ function renderStores() {
   const renderRows = list => list
     .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"))
     .map(store => `
-      <div class="store-row">
+      <div class="store-row ${store.active === false ? "store-row-inactive" : ""}">
         <div class="store-row-main">
           <b>${escapeHtml(store.name || store.id)}</b>
           <div class="store-meta">
@@ -840,13 +840,7 @@ function renderStores() {
             </span>
           </div>
         </div>
-        ${currentRole === "admin" ? `
-          <button type="button"
-                  class="store-delete-btn"
-                  data-delete-store="${escapeHtml(store.id)}"
-                  data-store-name="${escapeHtml(store.name || store.id)}">
-            Șterge
-          </button>` : ""}
+        ${currentRole === "admin" ? `<button type="button" class="store-delete-btn" data-delete-store="${escapeHtml(store.id)}" data-store-name="${escapeHtml(store.name || store.id)}">Șterge</button>` : ""}
       </div>
     `).join("");
 
