@@ -1049,3 +1049,31 @@ html::-webkit-scrollbar:horizontal,
 .geo-safe-actions{margin-top:16px}
 @media(max-width:900px){.geo-safe-form{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.geo-safe-form{grid-template-columns:1fr}}
+
+/* Buton geocodare - Geolocalizare */
+.geo-safe-actions{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+}
+.geo-find-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 15px;
+  border:1px solid #c4b5fd;
+  border-radius:10px;
+  background:#f5f3ff;
+  color:#5b21b6;
+  font-weight:900;
+  cursor:pointer;
+}
+.geo-find-btn:hover{background:#ede9fe}
+.geo-find-btn:disabled{opacity:.6;cursor:wait}
+.geo-attribution{
+  margin-top:10px;
+  color:#667085;
+  font-size:11px;
+  line-height:1.4;
+}

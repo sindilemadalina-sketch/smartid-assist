@@ -1309,3 +1309,58 @@ document.getElementById("geoSafeSave")?.addEventListener("click", async function
     status.textContent="Eroare la salvare.";
   }
 });
+
+
+/* GEO AUTO - caută coordonatele DOAR la apăsarea utilizatorului */
+document.getElementById("geoSafeFind")?.addEventListener("click", async function() {
+  const addressInput = document.getElementById("geoSafeAddress");
+  const latInput = document.getElementById("geoSafeLat");
+  const lngInput = document.getElementById("geoSafeLng");
+  const status = document.getElementById("geoSafeStatus");
+  const storeSelect = document.getElementById("geoSafeStore");
+  const button = this;
+
+  const address = (addressInput?.value || "").trim();
+  if (!storeSelect?.value) {
+    status.textContent = "Selectează mai întâi magazinul.";
+    return;
+  }
+  if (!address) {
+    status.textContent = "Completează adresa magazinului.";
+    addressInput?.focus();
+    return;
+  }
+
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = "Se caută...";
+  status.textContent = "Caut coordonatele pentru adresa introdusă...";
+
+  try {
+    const query = encodeURIComponent(`${address}, România`);
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ro&addressdetails=1&q=${query}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Accept": "application/json", "Accept-Language": "ro" }
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const results = await response.json();
+    if (!Array.isArray(results) || !results.length) {
+      status.textContent = "Nu am găsit coordonate pentru această adresă. Verifică adresa și încearcă din nou.";
+      return;
+    }
+
+    const result = results[0];
+    latInput.value = Number(result.lat).toFixed(7);
+    lngInput.value = Number(result.lon).toFixed(7);
+    status.textContent = `Coordonate găsite. Verifică valorile și apasă Salvează.`;
+  } catch (error) {
+    console.error("Geocodare adresă:", error);
+    status.textContent = "Nu am putut căuta coordonatele acum. Adresa și câmpurile existente nu au fost modificate.";
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+});
