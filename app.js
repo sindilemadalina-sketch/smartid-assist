@@ -32,6 +32,17 @@ let currentCanAddStores = false;
 let currentCanAddEquipment = false;
 
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+
+const DASHBOARD_RESET_AT = new Date("2026-08-25T11:28:00+03:00").getTime();
+
+function timestampMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (value.seconds) return value.seconds * 1000;
+  if (value instanceof Date) return value.getTime();
+  return 0;
+}
+
 const ADMIN_ACCESS_CODES = {
   carrefour: "9999",
   franciza: "9998"
@@ -741,9 +752,15 @@ async function loadDashboard() {
       getDocs(collection(db, "shares"))
     ]);
 
-    const sessions = sessionsSnap.docs.map(item => item.data());
-    const views = viewsSnap.docs.map(item => item.data());
-    const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
+    const sessionsAll = sessionsSnap.docs.map(item => item.data());
+    const viewsAll = viewsSnap.docs.map(item => item.data());
+    const sharesAll = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
+
+    // Reset logic: dashboard counts only activity after the production reset date.
+    const sessions = sessionsAll.filter(x => timestampMillis(x.createdAt) >= DASHBOARD_RESET_AT);
+    const views = viewsAll.filter(x => timestampMillis(x.createdAt) >= DASHBOARD_RESET_AT);
+    const shares = sharesAll.filter(x => timestampMillis(x.createdAt) >= DASHBOARD_RESET_AT);
+
     dashboardDetailCache = { sessions, views, shares };
 
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
@@ -768,16 +785,23 @@ async function loadDashboard() {
       ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
       : "conic-gradient(#e5e7eb 0deg 360deg)";
 
+    // Team activity: only known users + materials uploaded after reset.
+    const teamMaterials = materials.filter(item =>
+      timestampMillis(item.createdAt) >= DASHBOARD_RESET_AT &&
+      item.createdBy &&
+      item.createdBy !== "Necunoscut"
+    );
+
     const byUser = {};
-    materials.forEach(item => {
-      const email = item.createdBy || "Necunoscut";
+    teamMaterials.forEach(item => {
+      const email = item.createdBy;
       byUser[email] ??= { videos: 0, procedures: 0 };
       if (normType(item.type) === "videoclip") byUser[email].videos++;
       if (normType(item.type) === "procedura") byUser[email].procedures++;
     });
 
-    el("teamVideosTotal").textContent = materials.filter(item => normType(item.type) === "videoclip").length;
-    el("teamProceduresTotal").textContent = materials.filter(item => normType(item.type) === "procedura").length;
+    el("teamVideosTotal").textContent = teamMaterials.filter(item => normType(item.type) === "videoclip").length;
+    el("teamProceduresTotal").textContent = teamMaterials.filter(item => normType(item.type) === "procedura").length;
 
     const contributors = Object.entries(byUser)
       .sort((a, b) => (b[1].videos + b[1].procedures) - (a[1].videos + a[1].procedures));
@@ -789,7 +813,7 @@ async function loadDashboard() {
               <div class="team-avatar">${escapeHtml((displayUser(email) || "?").charAt(0).toUpperCase())}</div>
               <div>
                 <b>${escapeHtml(displayUser(email))}</b>
-                <small>${escapeHtml(email)} · ${values.videos + values.procedures} materiale încărcate</small>
+                <small>${values.videos + values.procedures} materiale încărcate</small>
               </div>
             </div>
             <div class="team-metrics">
@@ -798,18 +822,18 @@ async function loadDashboard() {
             </div>
           </div>
         `).join("")
-      : '<div class="empty">Nu există încă materiale încărcate de echipă.</div>';
+      : '<div class="empty team-empty">Nu există încă activitate nouă a echipei după resetare.</div>';
 
     document.querySelectorAll(".team-member-row").forEach(row => {
       row.classList.add("clickable-team-member");
       row.onclick = () => {
-        const email = row.dataset.teamEmail || "Necunoscut";
-        const own = materials
-          .filter(m => (m.createdBy || "Necunoscut") === email)
-          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+        const email = row.dataset.teamEmail || "";
+        const own = teamMaterials
+          .filter(m => m.createdBy === email)
+          .sort((a,b)=>timestampMillis(b.createdAt)-timestampMillis(a.createdAt));
         openDashboardDetails(
           displayUser(email),
-          "Materialele încărcate de acest utilizator.",
+          "Materialele încărcate de acest utilizator după resetare.",
           own.map(m => ({
             title: m.title || "Material",
             detail: normType(m.type) === "videoclip" ? "Videoclip" : "Procedură",
@@ -822,108 +846,8 @@ async function loadDashboard() {
     setupDashboardInteractions();
   } catch (error) {
     console.error("Dashboard-ul nu a putut fi încărcat.", error);
-    if (el("dashboardPage")) {
-      const existing = el("dashboardPage").querySelector(".dashboard-load-error");
-      if (!existing) {
-        const box = document.createElement("div");
-        box.className = "panel dashboard-load-error";
-        box.innerHTML = "<b>Dashboard-ul nu s-a putut încărca.</b><p class='subtitle'>Verifică drepturile Firebase/Firestore sau reîncarcă pagina.</p>";
-        el("dashboardPage").prepend(box);
-      }
-    }
   }
 }
-
-async function loadGeolocationStores() {
-  if (!isPrimaryAdmin()) return;
-  try {
-    const snap = await getDocs(collection(db, "stores"));
-    storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
-    renderGeolocationStores();
-  } catch (error) {
-    console.error("Geolocalizare:", error);
-    el("geoStoresList").innerHTML = '<div class="empty">Magazinele nu au putut fi încărcate.</div>';
-  }
-}
-
-function renderGeolocationStores() {
-  const container = el("geoStoresList");
-  if (!container) return;
-
-  const term = (el("geoStoreSearch")?.value || "").trim().toLowerCase();
-  const filter = el("geoStoreFilter")?.value || "all";
-
-  const rows = storesCache
-    .filter(store => store.active !== false)
-    .filter(store => {
-      const category = normCategory(store.category || store.type);
-      const hasCoords = Number.isFinite(Number(store.latitude)) && Number.isFinite(Number(store.longitude));
-      const text = `${store.id} ${store.name || ""} ${store.address || ""}`.toLowerCase();
-      const matchesText = !term || text.includes(term);
-      const matchesFilter =
-        filter === "all" ||
-        filter === category ||
-        (filter === "missing" && !hasCoords);
-      return matchesText && matchesFilter;
-    })
-    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"));
-
-  container.innerHTML = rows.length ? rows.map(store => {
-    const lat = store.latitude ?? "";
-    const lon = store.longitude ?? "";
-    const mapsQuery = encodeURIComponent(store.address || `${store.name || ""}, Romania`);
-    return `
-      <div class="geo-store-row" data-geo-store="${escapeHtml(store.id)}">
-        <div class="geo-store-main">
-          <b>${escapeHtml(store.name || store.id)}</b>
-          <small>ID ${escapeHtml(store.id)} · ${escapeHtml(normCategory(store.category || store.type) || "")}</small>
-          <span>${escapeHtml(store.address || "Adresă indisponibilă")}</span>
-        </div>
-        <div class="geo-coordinates">
-          <label>Latitudine
-            <input data-geo-lat="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lat))}" placeholder="ex. 44.4268">
-          </label>
-          <label>Longitudine
-            <input data-geo-lon="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lon))}" placeholder="ex. 26.1025">
-          </label>
-        </div>
-        <div class="geo-actions">
-          <a class="secondary geo-map-link" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Google Maps</a>
-          <button type="button" class="primary" data-save-geo="${escapeHtml(store.id)}">Salvează</button>
-        </div>
-      </div>
-    `;
-  }).join("") : '<div class="empty">Nu există magazine pentru filtrul selectat.</div>';
-
-  container.querySelectorAll("[data-save-geo]").forEach(button => {
-    button.onclick = async () => {
-      const id = button.dataset.saveGeo;
-      const latRaw = container.querySelector(`[data-geo-lat="${CSS.escape(id)}"]`)?.value.trim() || "";
-      const lonRaw = container.querySelector(`[data-geo-lon="${CSS.escape(id)}"]`)?.value.trim() || "";
-      const latitude = Number(latRaw.replace(",", "."));
-      const longitude = Number(lonRaw.replace(",", "."));
-
-      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
-          !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-        el("geoStatus").textContent = "Coordonatele introduse nu sunt valide.";
-        return;
-      }
-
-      try {
-        await updateDoc(doc(db, "stores", id), { latitude, longitude });
-        const local = storesCache.find(s => String(s.id) === String(id));
-        if (local) { local.latitude = latitude; local.longitude = longitude; }
-        el("geoStatus").textContent = `Coordonatele pentru ${local?.name || id} au fost salvate.`;
-        button.textContent = "Salvat ✓";
-        setTimeout(() => button.textContent = "Salvează", 1200);
-      } catch (error) {
-        console.error("Salvare coordonate:", error);
-        el("geoStatus").textContent = "Coordonatele nu au putut fi salvate.";
-      }
-    };
-  });
-}
-
 async function loadStores() {
   const snap = await getDocs(collection(db, "stores"));
   storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
@@ -953,15 +877,23 @@ function renderStores() {
     })
     .map(store => `
       <div class="store-row ${store.active === false ? "store-row-inactive" : ""}">
-        <b>${escapeHtml(store.name || store.id)}</b>
-        <div class="store-meta">
-          ID: ${escapeHtml(store.id)} ·
-          <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
-            ${store.active === false ? "Inactiv" : "Activ"}
-          </span>
-        
-        ${isPrimaryAdmin() ? `<button type="button" class="store-delete-btn" data-delete-store="${escapeHtml(store.id)}" data-store-name="${escapeHtml(store.name || store.id)}">Șterge</button>` : ""}
-      </div>
+        <div class="store-row-main">
+          <b>${escapeHtml(store.name || store.id)}</b>
+          <div class="store-meta">
+            ID: ${escapeHtml(store.id)} ·
+            <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
+              ${store.active === false ? "Inactiv" : "Activ"}
+            </span>
+          </div>
+        </div>
+        ${isPrimaryAdmin() ? `
+          <button
+            type="button"
+            class="store-delete-btn"
+            data-delete-store="${escapeHtml(store.id)}"
+            data-store-name="${escapeHtml(store.name || store.id)}">
+            🗑 Șterge
+          </button>` : ""}
       </div>
     `).join("");
 

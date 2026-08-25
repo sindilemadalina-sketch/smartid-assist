@@ -64,45 +64,52 @@
 
     <main class="content">
       <section id="dashboardPage" class="page hidden">
+        <div class="dashboard-title-row">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="subtitle">Activitatea SmartID Portal de la ultima resetare.</p>
+          </div>
+          <span class="dashboard-reset-badge"><span class="pulse-dot"></span> Portal activ</span>
+        </div>
 
         <div class="stats-grid dashboard-stats">
-          <article class="stat-card dashboard-stat-card" data-stat="logins">
-            <div class="stat-top"><strong id="statLogins">0</strong><span>Autentificări</span></div>
+          <article class="stat-card dashboard-stat-card" data-stat="logins" data-icon="↗">
+            <div class="stat-top"><strong id="statLogins">0</strong><span>Autentificări</span><small>Accesări portal</small></div>
             <div class="stat-explain hidden" id="explain-logins">
               Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.
               <button class="stat-details-link" data-stat-details="logins">Vezi cine s-a autentificat</button>
             </div>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="stores">
-            <div class="stat-top"><strong id="statStores">0</strong><span>Magazine active</span></div>
+          <article class="stat-card dashboard-stat-card" data-stat="stores" data-icon="⌂">
+            <div class="stat-top"><strong id="statStores">0</strong><span>Magazine active</span><small>Magazine distincte</small></div>
             <div class="stat-explain hidden" id="explain-stores">
               Arată câte magazine distincte au accesat portalul.
               <button class="stat-details-link" data-stat-details="stores">Vezi magazinele</button>
             </div>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="videos">
-            <div class="stat-top"><strong id="statVideos">0</strong><span>Vizualizări videoclipuri</span></div>
+          <article class="stat-card dashboard-stat-card" data-stat="videos" data-icon="▶">
+            <div class="stat-top"><strong id="statVideos">0</strong><span>Vizualizări videoclipuri</span><small>Accesări clipuri</small></div>
             <div class="stat-explain hidden" id="explain-videos">
               Arată numărul total de accesări ale videoclipurilor.
               <button class="stat-details-link" data-stat-details="videos">Vezi ce s-a vizionat și de cine</button>
             </div>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="procedures">
-            <div class="stat-top"><strong id="statProcedures">0</strong><span>Vizualizări proceduri</span></div>
+          <article class="stat-card dashboard-stat-card" data-stat="procedures" data-icon="▤">
+            <div class="stat-top"><strong id="statProcedures">0</strong><span>Vizualizări proceduri</span><small>Accesări documente</small></div>
             <div class="stat-explain hidden" id="explain-procedures">
               Arată numărul total de accesări ale procedurilor.
               <button class="stat-details-link" data-stat-details="procedures">Vezi ce proceduri s-au accesat</button>
             </div>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="shares">
-            <div class="stat-top"><strong id="statShares">0</strong><span>Distribuiri</span></div>
+          <article class="stat-card dashboard-stat-card" data-stat="shares" data-icon="↗">
+            <div class="stat-top"><strong id="statShares">0</strong><span>Distribuiri</span><small>WhatsApp / e-mail / link</small></div>
             <div class="stat-explain hidden" id="explain-shares">
               Arată de câte ori au fost distribuite materialele din portal.
               <button class="stat-details-link" data-stat-details="shares">Vezi distribuirile</button>
             </div>
           </article>
-          <article class="stat-card dashboard-stat-card approval-stat" data-stat="pending">
-            <div class="stat-top"><strong id="statPending">0</strong><span>De aprobat</span></div>
+          <article class="stat-card dashboard-stat-card approval-stat" data-stat="pending" data-icon="✓">
+            <div class="stat-top"><strong id="statPending">0</strong><span>De aprobat</span><small>Materiale în așteptare</small></div>
             <div class="stat-explain hidden" id="explain-pending">
               Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.
               <button class="stat-details-link" data-stat-details="pending">Deschide materialele de aprobat</button>
