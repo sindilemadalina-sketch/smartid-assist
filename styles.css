@@ -689,180 +689,252 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .store-delete-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;padding:8px 12px!important;border:1px solid #ef4444!important;border-radius:10px!important;background:#fff!important;color:#b91c1c!important;font-weight:800!important;cursor:pointer!important}
 .store-delete-btn:hover{background:#fef2f2!important}
 
-/* DASHBOARD PRO - SAFE: doar layout/vizibilitate, fără logică */
-.dashboard-pro-head{
-  display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 18px;
-}
-.dashboard-pro-head h1{margin:0;font-size:30px;letter-spacing:-.4px}
-.dashboard-pro-head p{margin:5px 0 0;color:#667085;font-size:14px}
-.dashboard-pro-status{
-  display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
-  background:#fff;border:1px solid #e7e3ef;color:#475467;font-size:12px;font-weight:800
-}
-.dashboard-pro-status span{width:8px;height:8px;border-radius:50%;background:#22c55e}
+/* ==========================================================
+   DASHBOARD LIST PRO
+   Doar CSS. Nu modifica logica, Firebase, login sau magazine.
+   ========================================================== */
 
-.dashboard-stats{
-  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:16px !important;
-  align-items:stretch !important;
-}
-.dashboard-stat-card{
-  min-height:190px !important;height:auto !important;overflow:visible !important;
-  padding:22px 24px !important;border-radius:20px !important;
-  border:1px solid #e9e5f1 !important;
-  background:linear-gradient(180deg,#fff 0%,#fbfaff 100%) !important;
-  box-shadow:0 12px 30px rgba(35,24,66,.07) !important;
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
-}
-.dashboard-stat-card:hover{
-  transform:translateY(-3px) !important;
-  box-shadow:0 18px 40px rgba(76,29,149,.11) !important;
-  border-color:#d8cdf1 !important;
-}
-.stat-top{min-height:auto !important}
-.stat-top strong{font-size:40px !important;line-height:1 !important;color:#5420a3 !important}
-.stat-top span{
-  display:block !important;margin-top:10px !important;font-size:15px !important;font-weight:900 !important
-}
-.stat-explain{
-  max-height:none !important;height:auto !important;overflow:visible !important;
-  margin-top:16px !important;padding:14px 0 4px !important;
-  border-top:1px solid #eeeaf5 !important;color:#667085 !important;
-  line-height:1.5 !important;font-size:13px !important
-}
-.stat-details-link{
-  display:inline-flex !important;align-items:center !important;width:auto !important;
-  margin-top:10px !important;padding:8px 12px !important;border-radius:10px !important;
-  background:#f2ecff !important;color:#5b21b6 !important;font-weight:900 !important;
-  font-size:12px !important;line-height:1.2 !important;text-decoration:none !important;cursor:pointer !important
-}
-.stat-details-link:hover{background:#e9ddff !important}
-
-.dashboard-stat-card,
-.dashboard-stat-card *,
-.stat-explain{scrollbar-width:none !important}
-.dashboard-stat-card::-webkit-scrollbar,
-.stat-explain::-webkit-scrollbar{display:none !important}
-
-.dashboard-main-grid{
-  grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr) !important;
-  gap:18px !important;margin-top:18px !important
-}
-.dashboard-main-grid .panel{
-  border-radius:20px !important;border:1px solid #e9e5f1 !important;
-  box-shadow:0 12px 30px rgba(35,24,66,.07) !important
-}
-@media(max-width:1100px){
-  .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
-  .dashboard-main-grid{grid-template-columns:1fr !important}
-}
-@media(max-width:650px){
-  .dashboard-pro-head{align-items:flex-start;flex-direction:column}
-  .dashboard-stats{grid-template-columns:1fr !important}
-  .dashboard-stat-card{min-height:175px !important}
+/* Elimină scroll-ul orizontal creat de vechiul layout */
+html, body{
+  overflow-x:hidden !important;
 }
 
-/* Detalii permanent vizibile pe Dashboard */
-.dashboard-stat-card{
+#dashboardPage{
+  width:min(1180px, calc(100% - 40px)) !important;
+  max-width:1180px !important;
+  margin:0 auto !important;
+  padding:20px 0 42px !important;
+  box-sizing:border-box !important;
+}
+
+/* Statisticile: O SINGURĂ COLOANĂ */
+#dashboardPage .dashboard-stats{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  width:100% !important;
+  max-width:none !important;
+}
+
+/* Card statistic tip listă */
+#dashboardPage .dashboard-stat-card{
   position:relative !important;
-  min-height:165px !important;
+  display:grid !important;
+  grid-template-columns:minmax(240px, 360px) 1fr auto !important;
+  align-items:center !important;
+  gap:24px !important;
+  width:100% !important;
+  max-width:none !important;
+  min-height:112px !important;
   height:auto !important;
-  padding:22px 24px !important;
-  padding-right:122px !important;
+  padding:18px 22px !important;
+  padding-right:118px !important;
   overflow:visible !important;
+  border:1px solid #e8e4f0 !important;
+  border-radius:17px !important;
+  background:#fff !important;
+  box-shadow:0 7px 22px rgba(27,39,78,.055) !important;
 }
 
-.stat-quick-details{
+/* Număr + titlu */
+#dashboardPage .dashboard-stat-card .stat-top{
+  min-height:0 !important;
+  display:block !important;
+}
+#dashboardPage .dashboard-stat-card .stat-top strong{
+  display:block !important;
+  margin:0 0 7px !important;
+  font-size:31px !important;
+  line-height:1 !important;
+  color:#5b21b6 !important;
+}
+#dashboardPage .dashboard-stat-card .stat-top span{
+  display:block !important;
+  margin:0 !important;
+  font-size:15px !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+  color:#111827 !important;
+}
+
+/* Explicația este mereu lizibilă, fără bară */
+#dashboardPage .dashboard-stat-card .stat-explain{
+  display:block !important;
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  color:#667085 !important;
+  font-size:13px !important;
+  line-height:1.45 !important;
+  opacity:1 !important;
+}
+
+/* Detalii rămâne în dreapta și este mereu accesibil */
+#dashboardPage .stat-quick-details,
+#dashboardPage .stat-details-link{
   position:absolute !important;
-  top:18px !important;
-  right:18px !important;
+  top:50% !important;
+  right:20px !important;
+  left:auto !important;
+  transform:translateY(-50%) !important;
   z-index:10 !important;
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
-  min-width:88px !important;
+  width:auto !important;
+  min-width:82px !important;
+  margin:0 !important;
   padding:9px 12px !important;
-  border:1px solid #d8cdf4 !important;
+  border:1px solid #d8c7ff !important;
   border-radius:10px !important;
-  background:#f4efff !important;
+  background:#f6f1ff !important;
   color:#5b21b6 !important;
   font-size:12px !important;
-  font-weight:900 !important;
   line-height:1 !important;
+  font-weight:900 !important;
+  text-decoration:none !important;
   cursor:pointer !important;
   visibility:visible !important;
   opacity:1 !important;
 }
-.stat-quick-details:hover{
-  background:#e9ddff !important;
-  border-color:#c5b2ee !important;
-  transform:translateY(-1px);
-}
 
-.stat-explain{
-  max-height:none !important;
-  height:auto !important;
-  overflow:visible !important;
-  margin-top:18px !important;
-  padding:14px 0 2px !important;
+/* Fără bare interne */
+#dashboardPage .dashboard-stat-card,
+#dashboardPage .dashboard-stat-card *,
+#dashboardPage .stat-explain{
+  scrollbar-width:none !important;
 }
-
-.dashboard-stat-card::-webkit-scrollbar,
-.stat-explain::-webkit-scrollbar{
+#dashboardPage .dashboard-stat-card::-webkit-scrollbar,
+#dashboardPage .stat-explain::-webkit-scrollbar{
   display:none !important;
 }
 
-@media(max-width:650px){
-  .dashboard-stat-card{
-    padding-right:24px !important;
-    padding-top:62px !important;
+/* Panourile de jos tot unul sub altul */
+#dashboardPage .dashboard-main-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:14px !important;
+  width:100% !important;
+  max-width:none !important;
+  margin-top:16px !important;
+}
+#dashboardPage .dashboard-main-grid .panel{
+  width:100% !important;
+  min-width:0 !important;
+  border:1px solid #e8e4f0 !important;
+  border-radius:17px !important;
+  background:#fff !important;
+  box-shadow:0 7px 22px rgba(27,39,78,.055) !important;
+}
+
+/* Donut mai compact */
+#dashboardPage .usage-diagram{
+  width:150px !important;
+  height:150px !important;
+}
+
+/* Hover discret */
+#dashboardPage .dashboard-stat-card{
+  transition:transform .16s ease, box-shadow .16s ease !important;
+}
+#dashboardPage .dashboard-stat-card:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:0 12px 28px rgba(76,29,149,.09) !important;
+}
+
+/* Bara de jos inutilă dispare */
+#dashboardPage,
+#dashboardPage .dashboard-stats,
+#dashboardPage .dashboard-main-grid,
+#dashboardPage .panel{
+  overflow-x:visible !important;
+}
+
+/* Responsive */
+@media(max-width:760px){
+  #dashboardPage{
+    width:calc(100% - 24px) !important;
   }
-  .stat-quick-details{
-    top:16px !important;
-    left:22px !important;
+  #dashboardPage .dashboard-stat-card{
+    display:block !important;
+    min-height:140px !important;
+    padding:18px 18px 58px !important;
+  }
+  #dashboardPage .dashboard-stat-card .stat-explain{
+    margin-top:10px !important;
+  }
+  #dashboardPage .stat-quick-details,
+  #dashboardPage .stat-details-link{
+    top:auto !important;
     right:auto !important;
+    left:18px !important;
+    bottom:14px !important;
+    transform:none !important;
   }
 }
 
-/* FIX: lățime Dashboard / carduri - fără modificări de logică */
-#dashboardPage{
-  width:calc(100vw - 64px) !important;
-  max-width:none !important;
-  margin-left:32px !important;
-  margin-right:32px !important;
-  padding-left:0 !important;
-  padding-right:0 !important;
-  box-sizing:border-box !important;
+/* UPDATE FINAL: layout vertical comun pe toate conturile */
+.type-grid,
+.equipment-grid,
+.materials-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  width:100% !important;
+  max-width:1100px !important;
 }
-#dashboardPage .dashboard-stats{
+
+.type-card,
+.equipment-card{
   width:100% !important;
   max-width:none !important;
-  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  min-height:84px !important;
+  display:flex !important;
+  align-items:center !important;
   gap:16px !important;
+  padding:16px 20px !important;
+  text-align:left !important;
+  border-radius:16px !important;
 }
-#dashboardPage .dashboard-stat-card{
-  width:100% !important;
-  max-width:none !important;
-  box-sizing:border-box !important;
+
+.type-card span,
+.equipment-icon{
+  flex:0 0 50px !important;
+  width:50px !important;
+  height:50px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  font-size:25px !important;
 }
+
+.type-card h2,
+.equipment-card h2{
+  margin:0 !important;
+}
+
+/* Iconuri coerente pentru Videoclipuri și Proceduri */
+.type-card[data-type="videoclip"] span,
+.type-card[data-material-type="videoclip"] span{
+  background:#eef4ff !important;
+  color:#2563eb !important;
+}
+.type-card[data-type="procedura"] span,
+.type-card[data-material-type="procedura"] span{
+  background:#fff4e8 !important;
+  color:#f97316 !important;
+}
+
+/* După scoaterea distribuției, Activitate echipă ocupă frumos lățimea */
 #dashboardPage .dashboard-main-grid{
+  grid-template-columns:1fr !important;
+}
+#dashboardPage .dashboard-main-grid .panel{
   width:100% !important;
   max-width:none !important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) !important;
-  gap:18px !important;
-}
-#dashboardPage .dashboard-main-grid > *{
-  width:100% !important;
-  min-width:0 !important;
-}
-@media(max-width:900px){
-  #dashboardPage{
-    width:calc(100vw - 32px) !important;
-    margin-left:16px !important;
-    margin-right:16px !important;
-  }
-  #dashboardPage .dashboard-stats,
-  #dashboardPage .dashboard-main-grid{
-    grid-template-columns:1fr !important;
-  }
 }
