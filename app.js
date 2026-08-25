@@ -649,11 +649,12 @@ function setupDashboardInteractions() {
         sessions.forEach(x => {
           if (!x.storeId && !x.storeName) return;
           const k = x.storeId || x.storeName;
-          const v = storeMap.get(k) || {name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
+          const v = storeMap.get(k) || { name:x.storeName || "Magazin", id:x.storeId || "", count:0, last:x.createdAt };
           v.count++;
-          if ((x.createdAt?.seconds||0) > (v.last?.seconds||0)) v.last=x.createdAt;
-          storeMap.set(k,v);
+          if ((x.createdAt?.seconds||0) > (v.last?.seconds||0)) v.last = x.createdAt;
+          storeMap.set(k, v);
         });
+
         openDashboardDetails(
           "Magazine active",
           "Magazinele care au accesat SmartID Portal.",
@@ -673,7 +674,7 @@ function setupDashboardInteractions() {
             .filter(x=>normType(x.type)==="videoclip")
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title||"Videoclip",
+              title:x.title || "Videoclip",
               detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
               when:dashboardTimestamp(x.createdAt)
             }))
@@ -686,7 +687,7 @@ function setupDashboardInteractions() {
             .filter(x=>normType(x.type)==="procedura")
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title||"Procedură",
+              title:x.title || "Procedură",
               detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
               when:dashboardTimestamp(x.createdAt)
             }))
@@ -698,16 +699,13 @@ function setupDashboardInteractions() {
           [...shares]
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title||"Material",
+              title:x.title || "Material",
               detail:`${displayUser(x.email)} · ${x.method || x.channel || "Distribuire"}`,
               when:dashboardTimestamp(x.createdAt)
             }))
         );
       } else if (key === "pending") {
-        const pending = materials
-          .filter(m => (m.status || "approved") === "pending")
-          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-
+        const pending = materials.filter(m => (m.status || "approved") === "pending");
         openDashboardDetails(
           "Materiale de aprobat",
           "Materialele încărcate de echipă care așteaptă aprobarea Adminului principal.",
@@ -871,16 +869,20 @@ function renderStores() {
             </span>
           </div>
         </div>
-        ${currentRole === "admin" ? `<button type="button" class="store-delete-btn" data-delete-store="${escapeHtml(store.id)}" data-store-name="${escapeHtml(store.name || store.id)}">Șterge</button>` : ""}
+        ${currentRole === "admin" ? `
+          <div class="store-row-actions">
+            <button type="button" class="store-edit-btn" data-edit-store="${escapeHtml(store.id)}">Edit</button>
+            <button type="button" class="store-delete-btn" data-delete-store="${escapeHtml(store.id)}" data-store-name="${escapeHtml(store.name || store.id)}">Șterge</button>
+          </div>` : ""}
       </div>
     `).join("");
 
   const group = (title, list, key) => `
     <div class="group-block">
       <button class="group-head" data-store-group="${key}">
-        <span>${title}</span><span>${list.length} ▾</span>
+        <span>${title}</span><span>${list.length} ▸</span>
       </button>
-      <div class="group-body" id="group-${key}">
+      <div class="group-body collapsed" id="group-${key}">
         ${list.length ? renderRows(list) : '<div class="store-row"><small>Nu există magazine.</small></div>'}
       </div>
     </div>`;
@@ -915,9 +917,52 @@ function renderStores() {
     });
   });
 
+  bindStoreEditButtons();
   bindStoreDeleteButtons();
 }
 
+
+
+function editStore(storeId) {
+  if (currentRole !== "admin") return;
+
+  const store = storesCache.find(item => String(item.id) === String(storeId));
+  if (!store) {
+    if (el("saveStoreStatus")) el("saveStoreStatus").textContent = "Magazinul nu a fost găsit.";
+    return;
+  }
+
+  el("newStoreId").value = store.id || storeId;
+  el("newStoreName").value = store.name || "";
+  el("newStoreCategory").value = normCategory(store.category || store.type) || "carrefour";
+  toggleStoreFormat();
+
+  if (el("newStoreCategory").value === "carrefour") {
+    el("newStoreFormat").value = String(store.format || "hiper").toLowerCase();
+  }
+
+  el("newStoreActive").value = store.active === false ? "false" : "true";
+
+  if (el("saveStoreStatus")) {
+    el("saveStoreStatus").textContent = `Editezi magazinul ${store.name || storeId} · ID ${storeId}.`;
+  }
+
+  const formTarget = el("newStoreId");
+  if (formTarget) {
+    formTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => el("newStoreName")?.focus(), 300);
+  }
+}
+
+function bindStoreEditButtons() {
+  document.querySelectorAll("[data-edit-store]").forEach(button => {
+    button.onclick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      editStore(button.dataset.editStore);
+    };
+  });
+}
 
 async function deleteStorePermanently(storeId, storeName) {
   if (currentRole !== "admin") return;
@@ -969,9 +1014,10 @@ async function saveStore() {
   else data.format = "";
 
   await setDoc(doc(db, "stores", id), data, { merge: true });
-  el("saveStoreStatus").textContent = "Magazinul a fost salvat.";
+  el("saveStoreStatus").textContent = "Magazinul a fost salvat. Lista rămâne restrânsă.";
   el("newStoreId").value = "";
   el("newStoreName").value = "";
+  el("newStoreActive").value = "true";
   await loadStores();
 }
 

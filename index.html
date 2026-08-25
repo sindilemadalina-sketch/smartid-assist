@@ -62,102 +62,109 @@
     </aside>
 
     <main class="content">
-      <section id="dashboardPage" class="page hidden">
-        <div class="dashboard-safe-head">
+      
+      <section id="dashboardPage" class="page hidden dashboard-page-pro">
+        <div class="dashboard-pro-header">
           <div>
             <h1>Dashboard</h1>
             <p>Activitatea SmartID Portal</p>
           </div>
-          <div class="portal-live"><span></span> Portal activ</div>
+          <div class="dashboard-pro-badges">
+            <span class="status-chip"><i></i> Portal activ</span>
+          </div>
         </div>
 
-        <div class="stats-grid dashboard-stats">
-          <article class="stat-card dashboard-stat-card" data-stat="logins">
-            <div class="stat-icon stat-icon-logins">👥</div>
-            <div class="stat-copy">
+        <div class="dashboard-pro-list">
+          <article class="dashboard-pro-card card-logins">
+            <div class="metric-icon">👥</div>
+            <div class="metric-copy">
               <strong id="statLogins">0</strong>
-              <span>Autentificări</span>
-              <small>Vezi mai multe informații și statistici.</small>
+              <h3>Autentificări</h3>
+              <p>Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.</p>
             </div>
-            <div class="stat-trend stat-trend-logins" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-logins" data-stat-details="logins">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="logins">Vezi cine s-a autentificat ›</button>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="stores">
-            <div class="stat-icon stat-icon-stores">🏪</div>
-            <div class="stat-copy">
+
+          <article class="dashboard-pro-card card-stores">
+            <div class="metric-icon">🏪</div>
+            <div class="metric-copy">
               <strong id="statStores">0</strong>
-              <span>Magazine active</span>
-              <small>Află câte magazine distincte au accesat portalul.</small>
+              <h3>Magazine active</h3>
+              <p>Află câte magazine distincte au accesat portalul.</p>
             </div>
-            <div class="stat-trend stat-trend-stores" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-stores" data-stat-details="stores">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="stores">Vezi magazinele ›</button>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="videos">
-            <div class="stat-icon stat-icon-videos">▶</div>
-            <div class="stat-copy">
+
+          <article class="dashboard-pro-card card-videos">
+            <div class="metric-icon">▶</div>
+            <div class="metric-copy">
               <strong id="statVideos">0</strong>
-              <span>Vizualizări videoclipuri</span>
-              <small>Vezi performanța videoclipurilor.</small>
+              <h3>Vizualizări videoclipuri</h3>
+              <p>Arată numărul total de accesări ale videoclipurilor.</p>
             </div>
-            <div class="stat-trend stat-trend-videos" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-videos" data-stat-details="videos">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="videos">Vezi cele vizionate ›</button>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="procedures">
-            <div class="stat-icon stat-icon-procedures">▤</div>
-            <div class="stat-copy">
+
+          <article class="dashboard-pro-card card-procedures">
+            <div class="metric-icon">▤</div>
+            <div class="metric-copy">
               <strong id="statProcedures">0</strong>
-              <span>Vizualizări proceduri</span>
-              <small>Vezi performanța procedurilor.</small>
+              <h3>Vizualizări proceduri</h3>
+              <p>Arată numărul total de accesări ale procedurilor.</p>
             </div>
-            <div class="stat-trend stat-trend-procedures" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-procedures" data-stat-details="procedures">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="procedures">Vezi procedurile ›</button>
           </article>
-          <article class="stat-card dashboard-stat-card" data-stat="shares">
-            <div class="stat-icon stat-icon-shares">↗</div>
-            <div class="stat-copy">
+
+          <article class="dashboard-pro-card card-shares">
+            <div class="metric-icon">↧</div>
+            <div class="metric-copy">
               <strong id="statShares">0</strong>
-              <span>Distribuiri</span>
-              <small>Vezi câte materiale au fost distribuite.</small>
+              <h3>Distribuiri</h3>
+              <p>Arată de câte ori au fost distribuite materialele din portal.</p>
             </div>
-            <div class="stat-trend stat-trend-shares" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-shares" data-stat-details="shares">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="shares">Vezi distribuirile ›</button>
           </article>
-          <article class="stat-card dashboard-stat-card approval-stat" data-stat="pending">
-            <div class="stat-icon stat-icon-pending">✓</div>
-            <div class="stat-copy">
+
+          <article class="dashboard-pro-card card-pending">
+            <div class="metric-icon">✓</div>
+            <div class="metric-copy">
               <strong id="statPending">0</strong>
-              <span>De aprobat</span>
-              <small>Materiale în așteptare pentru aprobare.</small>
+              <h3>De aprobat</h3>
+              <p>Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.</p>
             </div>
-            <div class="stat-trend stat-trend-pending" aria-hidden="true"><span></span></div>
-            <button class="stat-details-link stat-details-pending" data-stat-details="pending">Detalii →</button>
+            <div class="metric-line" aria-hidden="true"></div>
+            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button>
           </article>
         </div>
 
-<div class="dashboard-main-grid dashboard-main-single">
-          
+        <section class="panel team-panel dashboard-team-pro">
+          <div class="panel-head">
+            <div>
+              <h2>Activitate echipă</h2>
+              <p class="subtitle">Materialele încărcate de fiecare coleg.</p>
+            </div>
+          </div>
 
-          <section class="panel team-panel">
-            <div class="panel-head">
-              <div>
-                <h2>Activitate echipă</h2>
-                <p class="subtitle">Materialele încărcate de fiecare coleg.</p>
-              </div>
+          <div class="team-summary">
+            <div class="team-summary-card">
+              <span>Videoclipuri încărcate</span>
+              <strong id="teamVideosTotal">0</strong>
             </div>
-            <div class="team-summary">
-              <div class="team-summary-card">
-                <span>Videoclipuri încărcate</span>
-                <strong id="teamVideosTotal">0</strong>
-              </div>
-              <div class="team-summary-card">
-                <span>Proceduri încărcate</span>
-                <strong id="teamProceduresTotal">0</strong>
-              </div>
+            <div class="team-summary-card">
+              <span>Proceduri încărcate</span>
+              <strong id="teamProceduresTotal">0</strong>
             </div>
-            <div id="contributorsList" class="contributors-list"></div>
-          </section>
-        </div>
+          </div>
+
+          <div id="contributorsList" class="contributors-list"></div>
+        </section>
       </section>
+
 
       <section id="equipmentPage" class="page hidden">
         <div class="page-head">
