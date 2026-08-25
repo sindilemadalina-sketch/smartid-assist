@@ -690,91 +690,316 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .store-delete-btn:hover{background:#fef2f2!important}
 
 /* ==========================================================
-   DASHBOARD CA ÎN MOCKUP - FULL PAGE
+   DASHBOARD LIST PRO
+   Doar CSS. Nu modifica logica, Firebase, login sau magazine.
    ========================================================== */
-html,body,#app,main,.content,.page{
-  max-width:none !important;
-  min-width:0 !important;
+
+/* Elimină scroll-ul orizontal creat de vechiul layout */
+html, body{
   overflow-x:hidden !important;
+}
+
+#dashboardPage{
+  width:min(1180px, calc(100% - 40px)) !important;
+  max-width:1180px !important;
+  margin:0 auto !important;
+  padding:20px 0 42px !important;
   box-sizing:border-box !important;
 }
 
-.content{
+/* Statisticile: O SINGURĂ COLOANĂ */
+#dashboardPage .dashboard-stats{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
   width:100% !important;
-  padding:26px 34px 42px !important;
-  margin:0 !important;
-  background:
-    radial-gradient(circle at 15% 0%,rgba(109,40,217,.05),transparent 28%),
-    linear-gradient(180deg,#fbfcff,#f5f7fb) !important;
+  max-width:none !important;
 }
 
-.dashboard-page-pro{
+/* Card statistic tip listă */
+#dashboardPage .dashboard-stat-card{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:minmax(240px, 360px) 1fr auto !important;
+  align-items:center !important;
+  gap:24px !important;
+  width:100% !important;
+  max-width:none !important;
+  min-height:112px !important;
+  height:auto !important;
+  padding:18px 22px !important;
+  padding-right:118px !important;
+  overflow:visible !important;
+  border:1px solid #e8e4f0 !important;
+  border-radius:17px !important;
+  background:#fff !important;
+  box-shadow:0 7px 22px rgba(27,39,78,.055) !important;
+}
+
+/* Număr + titlu */
+#dashboardPage .dashboard-stat-card .stat-top{
+  min-height:0 !important;
+  display:block !important;
+}
+#dashboardPage .dashboard-stat-card .stat-top strong{
+  display:block !important;
+  margin:0 0 7px !important;
+  font-size:31px !important;
+  line-height:1 !important;
+  color:#5b21b6 !important;
+}
+#dashboardPage .dashboard-stat-card .stat-top span{
+  display:block !important;
+  margin:0 !important;
+  font-size:15px !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+  color:#111827 !important;
+}
+
+/* Explicația este mereu lizibilă, fără bară */
+#dashboardPage .dashboard-stat-card .stat-explain{
+  display:block !important;
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  color:#667085 !important;
+  font-size:13px !important;
+  line-height:1.45 !important;
+  opacity:1 !important;
+}
+
+/* Detalii rămâne în dreapta și este mereu accesibil */
+#dashboardPage .stat-quick-details,
+#dashboardPage .stat-details-link{
+  position:absolute !important;
+  top:50% !important;
+  right:20px !important;
+  left:auto !important;
+  transform:translateY(-50%) !important;
+  z-index:10 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  min-width:82px !important;
+  margin:0 !important;
+  padding:9px 12px !important;
+  border:1px solid #d8c7ff !important;
+  border-radius:10px !important;
+  background:#f6f1ff !important;
+  color:#5b21b6 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
+/* Fără bare interne */
+#dashboardPage .dashboard-stat-card,
+#dashboardPage .dashboard-stat-card *,
+#dashboardPage .stat-explain{
+  scrollbar-width:none !important;
+}
+#dashboardPage .dashboard-stat-card::-webkit-scrollbar,
+#dashboardPage .stat-explain::-webkit-scrollbar{
+  display:none !important;
+}
+
+/* Panourile de jos tot unul sub altul */
+#dashboardPage .dashboard-main-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:14px !important;
+  width:100% !important;
+  max-width:none !important;
+  margin-top:16px !important;
+}
+#dashboardPage .dashboard-main-grid .panel{
+  width:100% !important;
+  min-width:0 !important;
+  border:1px solid #e8e4f0 !important;
+  border-radius:17px !important;
+  background:#fff !important;
+  box-shadow:0 7px 22px rgba(27,39,78,.055) !important;
+}
+
+/* Donut mai compact */
+#dashboardPage .usage-diagram{
+  width:150px !important;
+  height:150px !important;
+}
+
+/* Hover discret */
+#dashboardPage .dashboard-stat-card{
+  transition:transform .16s ease, box-shadow .16s ease !important;
+}
+#dashboardPage .dashboard-stat-card:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:0 12px 28px rgba(76,29,149,.09) !important;
+}
+
+/* Bara de jos inutilă dispare */
+#dashboardPage,
+#dashboardPage .dashboard-stats,
+#dashboardPage .dashboard-main-grid,
+#dashboardPage .panel{
+  overflow-x:visible !important;
+}
+
+/* Responsive */
+@media(max-width:760px){
+  #dashboardPage{
+    width:calc(100% - 24px) !important;
+  }
+  #dashboardPage .dashboard-stat-card{
+    display:block !important;
+    min-height:140px !important;
+    padding:18px 18px 58px !important;
+  }
+  #dashboardPage .dashboard-stat-card .stat-explain{
+    margin-top:10px !important;
+  }
+  #dashboardPage .stat-quick-details,
+  #dashboardPage .stat-details-link{
+    top:auto !important;
+    right:auto !important;
+    left:18px !important;
+    bottom:14px !important;
+    transform:none !important;
+  }
+}
+
+/* UPDATE FINAL: layout vertical comun pe toate conturile */
+.type-grid,
+.equipment-grid,
+.materials-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  width:100% !important;
+  max-width:1100px !important;
+}
+
+.type-card,
+.equipment-card{
+  width:100% !important;
+  max-width:none !important;
+  min-height:84px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:16px !important;
+  padding:16px 20px !important;
+  text-align:left !important;
+  border-radius:16px !important;
+}
+
+.type-card span,
+.equipment-icon{
+  flex:0 0 50px !important;
+  width:50px !important;
+  height:50px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  font-size:25px !important;
+}
+
+.type-card h2,
+.equipment-card h2{
+  margin:0 !important;
+}
+
+/* Iconuri coerente pentru Videoclipuri și Proceduri */
+.type-card[data-type="videoclip"] span,
+.type-card[data-material-type="videoclip"] span{
+  background:#eef4ff !important;
+  color:#2563eb !important;
+}
+.type-card[data-type="procedura"] span,
+.type-card[data-material-type="procedura"] span{
+  background:#fff4e8 !important;
+  color:#f97316 !important;
+}
+
+/* După scoaterea distribuției, Activitate echipă ocupă frumos lățimea */
+#dashboardPage .dashboard-main-grid{
+  grid-template-columns:1fr !important;
+}
+#dashboardPage .dashboard-main-grid .panel{
+  width:100% !important;
+  max-width:none !important;
+}
+
+/* ============================================================
+   FINAL DASHBOARD - listă, culori, popup, fără bară inutilă
+   ============================================================ */
+html, body{
+  overflow-x:hidden !important;
+}
+
+.content{
+  max-width:none !important;
+  width:100% !important;
+  padding:24px 34px 42px !important;
+  box-sizing:border-box !important;
+}
+
+#dashboardPage{
   width:100% !important;
   max-width:none !important;
   margin:0 !important;
+  padding:0 !important;
+  overflow-x:hidden !important;
 }
 
-.dashboard-pro-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  margin-bottom:18px;
-}
-.dashboard-pro-header h1{
-  margin:0;
-  font-size:30px;
-  letter-spacing:-.5px;
-}
-.dashboard-pro-header p{
-  margin:5px 0 0;
-  color:#667085;
-}
-.status-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 12px;
-  border:1px solid #e4e7ec;
-  border-radius:12px;
-  background:#fff;
-  color:#475467;
-  font-size:12px;
-  font-weight:800;
-}
-.status-chip i{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#22c55e;
+#dashboardPage .dashboard-safe-head{
+  max-width:none !important;
+  width:100% !important;
+  margin:0 0 18px !important;
 }
 
-.dashboard-pro-list{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:11px;
+#dashboardPage .dashboard-stats{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:11px !important;
+  width:100% !important;
+  max-width:none !important;
 }
 
-.dashboard-pro-card{
-  display:grid;
-  grid-template-columns:76px minmax(260px,390px) minmax(240px,1fr) 170px;
-  align-items:center;
-  gap:22px;
-  width:100%;
-  min-height:118px;
-  padding:16px 20px;
-  border:1px solid #e6eaf0;
-  border-radius:18px;
-  background:#fff;
-  box-shadow:0 7px 22px rgba(20,34,70,.05);
-  transition:.16s ease;
-}
-.dashboard-pro-card:hover{
-  transform:translateY(-1px);
-  box-shadow:0 11px 28px rgba(53,38,100,.08);
+#dashboardPage .dashboard-stat-card{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:76px minmax(250px,390px) minmax(220px,1fr) 110px !important;
+  align-items:center !important;
+  gap:22px !important;
+  width:100% !important;
+  min-height:116px !important;
+  height:auto !important;
+  padding:16px 20px !important;
+  border:1px solid #e7eaf0 !important;
+  border-radius:18px !important;
+  background:#fff !important;
+  box-shadow:0 7px 22px rgba(20,34,70,.055) !important;
+  overflow:hidden !important;
+  cursor:default !important;
+  transform:none !important;
 }
 
-.metric-icon{
+#dashboardPage .dashboard-stat-card:hover{
+  transform:translateY(-1px) !important;
+  box-shadow:0 11px 28px rgba(43,34,90,.08) !important;
+}
+
+.stat-icon{
   width:66px;
   height:66px;
   display:grid;
@@ -783,110 +1008,145 @@ html,body,#app,main,.content,.page{
   font-size:29px;
   font-weight:900;
 }
-.card-logins .metric-icon{background:#f1eaff;color:#6d28d9}
-.card-stores .metric-icon{background:#e7f8e9;color:#16a34a}
-.card-videos .metric-icon{background:#e8f1ff;color:#2563eb}
-.card-procedures .metric-icon{background:#fff1df;color:#f59e0b}
-.card-shares .metric-icon{background:#e3f8f7;color:#0faaa6}
-.card-pending .metric-icon{background:#ffe8ef;color:#e91e63}
+.stat-icon-logins{background:#f1eaff;color:#6d28d9}
+.stat-icon-stores{background:#e8f8ea;color:#16a34a}
+.stat-icon-videos{background:#eaf2ff;color:#2563eb}
+.stat-icon-procedures{background:#fff2df;color:#f59e0b}
+.stat-icon-shares{background:#e5f8f8;color:#0faaa6}
+.stat-icon-pending{background:#ffe8ef;color:#e91e63}
 
-.metric-copy strong{
+.stat-copy{
+  min-width:0;
+}
+.stat-copy strong{
   display:block;
-  margin-bottom:6px;
-  font-size:31px;
+  font-size:32px;
   line-height:1;
+  margin-bottom:6px;
 }
-.card-logins .metric-copy strong{color:#6d28d9}
-.card-stores .metric-copy strong{color:#16a34a}
-.card-videos .metric-copy strong{color:#2563eb}
-.card-procedures .metric-copy strong{color:#f59e0b}
-.card-shares .metric-copy strong{color:#0faaa6}
-.card-pending .metric-copy strong{color:#e91e63}
+.dashboard-stat-card[data-stat="logins"] .stat-copy strong{color:#6d28d9}
+.dashboard-stat-card[data-stat="stores"] .stat-copy strong{color:#16a34a}
+.dashboard-stat-card[data-stat="videos"] .stat-copy strong{color:#2563eb}
+.dashboard-stat-card[data-stat="procedures"] .stat-copy strong{color:#f59e0b}
+.dashboard-stat-card[data-stat="shares"] .stat-copy strong{color:#0faaa6}
+.dashboard-stat-card[data-stat="pending"] .stat-copy strong{color:#e91e63}
 
-.metric-copy h3{
-  margin:0;
+.stat-copy span{
+  display:block;
   font-size:15px;
-  line-height:1.25;
+  line-height:1.2;
+  font-weight:900;
+  color:#111827;
 }
-.metric-copy p{
-  margin:5px 0 0;
+.stat-copy small{
+  display:block;
+  margin-top:5px;
   color:#667085;
   font-size:12px;
   line-height:1.35;
 }
 
-.metric-line{
+/* Linie vizuală tip mini-diagramă, fără logică nouă */
+.stat-trend{
   position:relative;
+  height:36px;
   width:100%;
-  height:32px;
-  color:#6d28d9;
+  min-width:180px;
 }
-.card-stores .metric-line{color:#16a34a}
-.card-videos .metric-line{color:#2563eb}
-.card-procedures .metric-line{color:#f59e0b}
-.card-shares .metric-line{color:#0faaa6}
-.card-pending .metric-line{color:#e91e63}
-.metric-line::before{
+.stat-trend::before{
   content:"";
   position:absolute;
   left:4%;
   right:4%;
   top:50%;
   height:2px;
-  background:currentColor;
   border-radius:99px;
-  opacity:.8;
+  background:currentColor;
+  opacity:.75;
 }
-.metric-line::after{
-  content:"●     ●     ●     ●     ●     ●";
+.stat-trend::after{
+  content:"●   ●   ●   ●   ●   ●";
   position:absolute;
   left:4%;
-  top:calc(50% - 7px);
   right:4%;
+  top:calc(50% - 8px);
+  display:flex;
+  justify-content:space-between;
   overflow:hidden;
-  white-space:nowrap;
+  letter-spacing:18px;
+  font-size:10px;
   color:currentColor;
-  font-size:9px;
-  letter-spacing:13px;
+}
+.stat-trend-logins{color:#7c3aed}
+.stat-trend-stores{color:#16a34a}
+.stat-trend-videos{color:#2563eb}
+.stat-trend-procedures{color:#f59e0b}
+.stat-trend-shares{color:#0faaa6}
+.stat-trend-pending{color:#e91e63}
+
+#dashboardPage .stat-details-link{
+  position:static !important;
+  transform:none !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:96px !important;
+  min-width:96px !important;
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-radius:10px !important;
+  background:#fff !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+}
+.stat-details-logins{border:1px solid #bfa5ff !important;color:#6d28d9 !important}
+.stat-details-stores{border:1px solid #8bd59a !important;color:#15803d !important}
+.stat-details-videos{border:1px solid #91b8ff !important;color:#2563eb !important}
+.stat-details-procedures{border:1px solid #ffc46c !important;color:#ea8500 !important}
+.stat-details-shares{border:1px solid #78d6d2 !important;color:#0f8f8b !important}
+.stat-details-pending{border:1px solid #ff9dbd !important;color:#db2777 !important}
+
+/* Fără donut / distribuție vizualizări */
+#dashboardPage .usage-panel,
+#dashboardPage .diagram-wrap,
+#dashboardPage .usage-diagram{
+  display:none !important;
 }
 
-.metric-details{
-  justify-self:end;
-  min-width:150px;
-  padding:11px 14px;
-  border-radius:10px;
-  background:#fff;
-  font-size:12px;
-  font-weight:900;
-  cursor:pointer;
-}
-.card-logins .metric-details{border:1px solid #c9b4ff;color:#6d28d9}
-.card-stores .metric-details{border:1px solid #8bd59a;color:#15803d}
-.card-videos .metric-details{border:1px solid #9cbcff;color:#2563eb}
-.card-procedures .metric-details{border:1px solid #ffc46c;color:#ea8500}
-.card-shares .metric-details{border:1px solid #79d5d2;color:#0f8f8b}
-.card-pending .metric-details{border:1px solid #ff9dbd;color:#db2777}
-
-.dashboard-team-pro{
-  margin-top:14px !important;
+#dashboardPage .dashboard-main-grid,
+#dashboardPage .dashboard-main-single{
+  display:grid !important;
+  grid-template-columns:1fr !important;
   width:100% !important;
-  min-height:250px !important;
-  border:1px solid #e6eaf0 !important;
+  max-width:none !important;
+  gap:12px !important;
+  margin-top:13px !important;
+}
+#dashboardPage .team-panel{
+  width:100% !important;
+  min-height:260px !important;
+  border:1px solid #e7eaf0 !important;
   border-radius:18px !important;
   background:#fff !important;
-  box-shadow:0 7px 22px rgba(20,34,70,.05) !important;
+  box-shadow:0 7px 22px rgba(20,34,70,.055) !important;
 }
 
-/* popup */
+/* POPUP detalii mare și curat */
 #dashboardDetailsModal{
   padding:24px !important;
-  background:rgba(8,18,38,.64) !important;
+  background:rgba(8,18,38,.62) !important;
   backdrop-filter:blur(8px) !important;
 }
-#dashboardDetailsModal.open{display:flex !important}
+#dashboardDetailsModal.open{
+  display:flex !important;
+}
 .dashboard-details-modal{
-  width:min(1050px,calc(100vw - 48px)) !important;
+  width:min(1080px, calc(100vw - 48px)) !important;
   max-height:84vh !important;
+  padding:0 !important;
   border-radius:22px !important;
   overflow:hidden !important;
   background:#fff !important;
@@ -894,42 +1154,68 @@ html,body,#app,main,.content,.page{
 }
 .dashboard-details-modal .shares-modal-head{
   padding:22px 24px !important;
-  background:linear-gradient(180deg,#faf8ff,#fff) !important;
   border-bottom:1px solid #edf0f5 !important;
+  background:linear-gradient(180deg,#fbf9ff,#fff) !important;
+}
+.dashboard-details-modal .shares-modal-head h2{
+  margin:0 0 5px !important;
+  font-size:24px !important;
+}
+.dashboard-details-modal .shares-modal-head p{
+  margin:0 !important;
+  color:#667085 !important;
+}
+.dashboard-details-modal .back-btn{
+  border:1px solid #d7c6ff !important;
+  background:#f5f0ff !important;
+  color:#5b21b6 !important;
+  border-radius:10px !important;
+  padding:9px 13px !important;
 }
 .dashboard-details-body{
   padding:18px 22px 24px !important;
+  gap:9px !important;
   background:#f8f9fc !important;
 }
+.dashboard-detail-row{
+  border:1px solid #e7eaf0 !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  padding:13px 15px !important;
+  box-shadow:0 4px 12px rgba(20,34,70,.035) !important;
+}
 
-/* fără scroll orizontal nicăieri */
-.dashboard-page-pro,
-.dashboard-pro-list,
-.dashboard-pro-card,
-.dashboard-team-pro{
-  max-width:100% !important;
+/* Elimină bara orizontală la nivel de aplicație */
+#app,
+main,
+.content,
+.page,
+#dashboardPage,
+.dashboard-stats,
+.dashboard-main-grid{
   min-width:0 !important;
+  max-width:100% !important;
   overflow-x:hidden !important;
+  box-sizing:border-box !important;
 }
 
-@media(max-width:1000px){
-  .dashboard-pro-card{
-    grid-template-columns:64px minmax(220px,1fr) 140px;
+@media(max-width:900px){
+  .content{padding:18px 16px 36px !important}
+  #dashboardPage .dashboard-stat-card{
+    grid-template-columns:64px 1fr 100px !important;
   }
-  .metric-line{display:none}
+  .stat-trend{display:none !important}
 }
-@media(max-width:680px){
-  .content{padding:18px 14px 34px !important}
-  .dashboard-pro-header{align-items:flex-start;flex-direction:column}
-  .dashboard-pro-card{
-    grid-template-columns:56px 1fr;
-    padding:14px;
+@media(max-width:620px){
+  #dashboardPage .dashboard-stat-card{
+    grid-template-columns:56px 1fr !important;
+    padding:14px !important;
   }
-  .metric-icon{width:50px;height:50px;font-size:22px}
-  .metric-details{
+  .stat-icon{width:50px;height:50px;font-size:22px}
+  #dashboardPage .stat-details-link{
     grid-column:2;
+    width:auto !important;
     justify-self:start;
-    min-width:0;
-    margin-top:4px;
+    margin-top:5px !important;
   }
 }

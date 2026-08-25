@@ -649,12 +649,11 @@ function setupDashboardInteractions() {
         sessions.forEach(x => {
           if (!x.storeId && !x.storeName) return;
           const k = x.storeId || x.storeName;
-          const v = storeMap.get(k) || { name:x.storeName || "Magazin", id:x.storeId || "", count:0, last:x.createdAt };
+          const v = storeMap.get(k) || {name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
           v.count++;
-          if ((x.createdAt?.seconds||0) > (v.last?.seconds||0)) v.last = x.createdAt;
-          storeMap.set(k, v);
+          if ((x.createdAt?.seconds||0) > (v.last?.seconds||0)) v.last=x.createdAt;
+          storeMap.set(k,v);
         });
-
         openDashboardDetails(
           "Magazine active",
           "Magazinele care au accesat SmartID Portal.",
@@ -674,7 +673,7 @@ function setupDashboardInteractions() {
             .filter(x=>normType(x.type)==="videoclip")
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title || "Videoclip",
+              title:x.title||"Videoclip",
               detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
               when:dashboardTimestamp(x.createdAt)
             }))
@@ -687,7 +686,7 @@ function setupDashboardInteractions() {
             .filter(x=>normType(x.type)==="procedura")
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title || "Procedură",
+              title:x.title||"Procedură",
               detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
               when:dashboardTimestamp(x.createdAt)
             }))
@@ -699,13 +698,16 @@ function setupDashboardInteractions() {
           [...shares]
             .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
             .map(x=>({
-              title:x.title || "Material",
+              title:x.title||"Material",
               detail:`${displayUser(x.email)} · ${x.method || x.channel || "Distribuire"}`,
               when:dashboardTimestamp(x.createdAt)
             }))
         );
       } else if (key === "pending") {
-        const pending = materials.filter(m => (m.status || "approved") === "pending");
+        const pending = materials
+          .filter(m => (m.status || "approved") === "pending")
+          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
         openDashboardDetails(
           "Materiale de aprobat",
           "Materialele încărcate de echipă care așteaptă aprobarea Adminului principal.",
