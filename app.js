@@ -1,8 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
-  updateDoc, doc, increment, serverTimestamp
+  initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"; import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"; import {   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc, updateDoc, doc, increment, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { INITIAL_STORES } from "./stores-seed.js";
@@ -29,6 +26,18 @@ let editingMaterialId = null;
 let currentCanAdd = false;
 let currentCanManage = false;
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+
+const ADMIN_STORE_CODE = "9999";
+
+
+const DASHBOARD_RESET_AT = new Date("2026-08-25T12:34:00+03:00").getTime();
+function valueToMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (value.seconds) return value.seconds * 1000;
+  return 0;
+}
+
 
 
 const TEAM_DISPLAY_NAMES = [
@@ -244,6 +253,18 @@ async function continueWithStore() {
   el("storeError").textContent = "";
   if (!code) {
     el("storeError").textContent = "Introdu ID-ul magazinului.";
+    return;
+  }
+
+  if (currentRole === "admin" && code === ADMIN_STORE_CODE) {
+    if (!["carrefour","franciza"].includes(currentCategory)) currentCategory = "carrefour";
+    currentStoreId = "";
+    currentStoreName = currentCategory === "franciza" ? "Admin Franciză" : "Admin Carrefour";
+    currentStoreFormat = "";
+    el("storeModal").classList.remove("open");
+    await loadMaterials();
+    renderEquipment();
+    showPage("equipmentPage");
     return;
   }
 
@@ -683,9 +704,18 @@ async function loadDashboard() {
       getDocs(collection(db, "shares"))
     ]);
 
-    const sessions = sessionsSnap.docs.map(item => item.data());
-    const views = viewsSnap.docs.map(item => item.data());
-    const shares = sharesSnap.docs.map(item => ({ id: item.id, ...item.data() }));
+    const sessions = sessionsSnap.docs
+      .map(item => item.data())
+      .filter(item => valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT);
+
+    const views = viewsSnap.docs
+      .map(item => item.data())
+      .filter(item => valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT);
+
+    const shares = sharesSnap.docs
+      .map(item => ({ id: item.id, ...item.data() }))
+      .filter(item => valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT);
+
     dashboardDetailCache = { sessions, views, shares };
 
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
@@ -697,6 +727,7 @@ async function loadDashboard() {
     el("statVideos").textContent = videoViews;
     el("statProcedures").textContent = procedureViews;
     el("statShares").textContent = shares.length;
+
     if (el("statPending")) {
       el("statPending").textContent = materials.filter(m => (m.status || "approved") === "pending").length;
     }
@@ -710,19 +741,28 @@ async function loadDashboard() {
       ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
       : "conic-gradient(#e5e7eb 0deg 360deg)";
 
+    // Activitate echipa = doar materiale noi, cu autor cunoscut.
+    const recentTeamMaterials = materials.filter(item =>
+      valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT &&
+      item.createdBy &&
+      String(item.createdBy).trim().toLowerCase() !== "necunoscut"
+    );
+
     const byUser = {};
-    materials.forEach(item => {
-      const email = item.createdBy || "Necunoscut";
+    recentTeamMaterials.forEach(item => {
+      const email = item.createdBy;
       byUser[email] ??= { videos: 0, procedures: 0 };
       if (normType(item.type) === "videoclip") byUser[email].videos++;
       if (normType(item.type) === "procedura") byUser[email].procedures++;
     });
 
-    el("teamVideosTotal").textContent = materials.filter(item => normType(item.type) === "videoclip").length;
-    el("teamProceduresTotal").textContent = materials.filter(item => normType(item.type) === "procedura").length;
+    el("teamVideosTotal").textContent =
+      recentTeamMaterials.filter(item => normType(item.type) === "videoclip").length;
+    el("teamProceduresTotal").textContent =
+      recentTeamMaterials.filter(item => normType(item.type) === "procedura").length;
 
     const contributors = Object.entries(byUser)
-      .sort((a, b) => (b[1].videos + b[1].procedures) - (a[1].videos + a[1].procedures));
+      .sort((a,b) => (b[1].videos + b[1].procedures) - (a[1].videos + a[1].procedures));
 
     el("contributorsList").innerHTML = contributors.length
       ? contributors.map(([email, values]) => `
@@ -731,7 +771,7 @@ async function loadDashboard() {
               <div class="team-avatar">${escapeHtml((displayUser(email) || "?").charAt(0).toUpperCase())}</div>
               <div>
                 <b>${escapeHtml(displayUser(email))}</b>
-                <small>${escapeHtml(email)} · ${values.videos + values.procedures} materiale încărcate</small>
+                <small>${values.videos + values.procedures} materiale încărcate</small>
               </div>
             </div>
             <div class="team-metrics">
@@ -740,15 +780,15 @@ async function loadDashboard() {
             </div>
           </div>
         `).join("")
-      : '<div class="empty">Nu există încă materiale încărcate de echipă.</div>';
+      : '<div class="empty">Nu există încă activitate nouă a echipei.</div>';
 
     document.querySelectorAll(".team-member-row").forEach(row => {
-      row.classList.add("clickable-team-member");
       row.onclick = () => {
-        const email = row.dataset.teamEmail || "Necunoscut";
-        const own = materials
-          .filter(m => (m.createdBy || "Necunoscut") === email)
-          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+        const email = row.dataset.teamEmail || "";
+        const own = recentTeamMaterials
+          .filter(m => m.createdBy === email)
+          .sort((a,b) => valueToMillis(b.createdAt) - valueToMillis(a.createdAt));
+
         openDashboardDetails(
           displayUser(email),
           "Materialele încărcate de acest utilizator.",
@@ -763,16 +803,7 @@ async function loadDashboard() {
 
     setupDashboardInteractions();
   } catch (error) {
-    console.error("Dashboard-ul nu a putut fi încărcat.", error);
-    if (el("dashboardPage")) {
-      const existing = el("dashboardPage").querySelector(".dashboard-load-error");
-      if (!existing) {
-        const box = document.createElement("div");
-        box.className = "panel dashboard-load-error";
-        box.innerHTML = "<b>Dashboard-ul nu s-a putut încărca.</b><p class='subtitle'>Verifică drepturile Firebase/Firestore sau reîncarcă pagina.</p>";
-        el("dashboardPage").prepend(box);
-      }
-    }
+    console.error("Dashboard:", error);
   }
 }
 async function loadStores() {
@@ -800,13 +831,22 @@ function renderStores() {
     .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"))
     .map(store => `
       <div class="store-row">
-        <b>${escapeHtml(store.name || store.id)}</b>
-        <div class="store-meta">
-          ID: ${escapeHtml(store.id)} ·
-          <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
-            ${store.active === false ? "Inactiv" : "Activ"}
-          </span>
+        <div class="store-row-main">
+          <b>${escapeHtml(store.name || store.id)}</b>
+          <div class="store-meta">
+            ID: ${escapeHtml(store.id)} ·
+            <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
+              ${store.active === false ? "Inactiv" : "Activ"}
+            </span>
+          </div>
         </div>
+        ${currentRole === "admin" ? `
+          <button type="button"
+                  class="store-delete-btn"
+                  data-delete-store="${escapeHtml(store.id)}"
+                  data-store-name="${escapeHtml(store.name || store.id)}">
+            Șterge
+          </button>` : ""}
       </div>
     `).join("");
 
@@ -848,6 +888,35 @@ function renderStores() {
       const count = body.querySelectorAll(".store-row").length;
       button.querySelector("span:last-child").textContent = `${count} ${body.classList.contains("collapsed") ? "▸" : "▾"}`;
     });
+  });
+
+  bindStoreDeleteButtons();
+}
+
+
+async function deleteStorePermanently(storeId, storeName) {
+  if (currentRole !== "admin") return;
+
+  const confirmed = confirm(`Sigur vrei să ștergi definitiv magazinul "${storeName}" (ID ${storeId})?`);
+  if (!confirmed) return;
+
+  try {
+    await deleteDoc(doc(db, "stores", String(storeId)));
+    el("saveStoreStatus").textContent = `Magazinul ${storeName} a fost șters definitiv.`;
+    await loadStores();
+  } catch (error) {
+    console.error("Ștergere magazin:", error);
+    el("saveStoreStatus").textContent = "Magazinul nu a putut fi șters.";
+  }
+}
+
+function bindStoreDeleteButtons() {
+  document.querySelectorAll("[data-delete-store]").forEach(button => {
+    button.onclick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      deleteStorePermanently(button.dataset.deleteStore, button.dataset.storeName || button.dataset.deleteStore);
+    };
   });
 }
 

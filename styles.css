@@ -525,3 +525,161 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 @media(max-width:650px){
   .dashboard-stats{grid-template-columns:1fr !important}
 }
+
+/* Singura modificare peste RESCUE: buton stergere magazin */
+.store-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.store-row-main{min-width:0}
+.store-delete-btn{
+  flex:0 0 auto;
+  padding:7px 11px;
+  border:1px solid #fecaca;
+  border-radius:9px;
+  background:#fff;
+  color:#b91c1c;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.store-delete-btn:hover{
+  background:#fef2f2;
+}
+
+/* ===== SAFE PORTAL UPGRADE ===== */
+
+/* Dashboard profesional, fara schimbarea structurii functionale */
+.dashboard-safe-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin:0 0 18px;
+  padding:4px 2px;
+}
+.dashboard-safe-head h1{
+  margin:0;
+  font-size:30px;
+  letter-spacing:-.5px;
+}
+.dashboard-safe-head p{
+  margin:5px 0 0;
+  color:#667085;
+}
+.portal-live{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid #e7e2f0;
+  border-radius:999px;
+  background:#fff;
+  font-size:12px;
+  font-weight:800;
+  color:#475467;
+}
+.portal-live span{
+  width:8px;height:8px;border-radius:50%;background:#22c55e;
+}
+
+.dashboard-stats{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:14px !important;
+}
+.dashboard-stat-card{
+  min-height:150px !important;
+  border-radius:20px !important;
+  border:1px solid #e9e5f1 !important;
+  background:linear-gradient(180deg,#fff 0%,#fbfaff 100%) !important;
+  box-shadow:0 10px 28px rgba(34,24,66,.07) !important;
+  transition:transform .18s ease, box-shadow .18s ease !important;
+}
+.dashboard-stat-card:hover{
+  transform:translateY(-3px) !important;
+  box-shadow:0 16px 38px rgba(76,29,149,.11) !important;
+}
+.dashboard-main-grid{
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr) !important;
+  gap:18px !important;
+}
+.dashboard-main-grid .panel{
+  border-radius:20px !important;
+  border:1px solid #e9e5f1 !important;
+  box-shadow:0 12px 32px rgba(34,24,66,.07) !important;
+}
+
+/* Totul lista una sub alta */
+.type-grid,
+.equipment-grid,
+.materials-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  width:100% !important;
+  max-width:1100px !important;
+}
+.type-card,
+.equipment-card{
+  width:100% !important;
+  min-height:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:16px !important;
+  text-align:left !important;
+  padding:18px 22px !important;
+}
+.type-card span,
+.equipment-icon{
+  flex:0 0 50px;
+  margin:0 !important;
+}
+.type-card h2,
+.equipment-card h2{
+  margin:0 !important;
+}
+.equipment-card p{
+  margin-left:auto !important;
+  margin-bottom:0 !important;
+}
+
+/* Materialele raman o lista clara, cu vizualizarile vizibile */
+.material-card{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:180px minmax(0,1fr) !important;
+  min-height:120px !important;
+  border-radius:16px !important;
+}
+.material-card .thumb{
+  min-height:120px !important;
+  height:100% !important;
+}
+.material-info{
+  font-weight:700;
+  color:#6d28d9;
+}
+.rank-badge{
+  box-shadow:0 5px 14px rgba(15,23,42,.18);
+}
+
+.admin-code-inline{
+  margin-top:10px;
+  font-size:12px;
+  color:#667085;
+}
+.admin-code-inline b{color:#5b21b6}
+
+@media(max-width:1000px){
+  .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  .dashboard-main-grid{grid-template-columns:1fr !important}
+}
+@media(max-width:650px){
+  .dashboard-stats{grid-template-columns:1fr !important}
+  .material-card{grid-template-columns:1fr !important}
+  .equipment-card{align-items:flex-start !important;flex-direction:column !important}
+  .equipment-card p{margin-left:0 !important}
+}
