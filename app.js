@@ -2,8 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
-  updateDoc, doc, increment, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  updateDoc, doc, increment, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { INITIAL_STORES } from "./stores-seed.js";
 import { EQUIPMENT } from "./equipment-config.js";
@@ -33,6 +32,24 @@ let currentCanAddStores = false;
 let currentCanAddEquipment = false;
 
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
+const ADMIN_ACCESS_CODES = {
+  carrefour: "9999",
+  franciza: "9998"
+};
+
+function updateAdminAccessCode() {
+  if (!el("adminAccessCode")) return;
+  if (currentRole !== "admin") {
+    el("adminAccessCode").classList.add("hidden");
+    return;
+  }
+  const category = currentCategory === "franciza" ? "franciza" : "carrefour";
+  updateAdminAccessCode();
+  el("adminAccessCode").textContent =
+    `Acces Admin ${category === "franciza" ? "Franciză" : "Carrefour"} · Cod ${ADMIN_ACCESS_CODES[category]}`;
+  el("adminAccessCode").classList.remove("hidden");
+}
+
 const LIMITED_TEAM_MEMBERS = new Set(["Robert Neagu", "Dan Oros"]);
 
 function teamPermissionPreset(displayName) {
@@ -266,6 +283,25 @@ async function continueWithStore() {
   el("storeError").textContent = "";
   if (!code) {
     el("storeError").textContent = "Introdu ID-ul magazinului.";
+    return;
+  }
+
+  if (currentRole === "admin" && code === ADMIN_ACCESS_CODES.carrefour) {
+    currentCategory = "carrefour";
+    currentStoreId = "";
+    currentStoreName = "Acces Admin Carrefour";
+    currentStoreFormat = "";
+    el("storeModal").classList.remove("open");
+    await finishLogin();
+    return;
+  }
+  if (currentRole === "admin" && code === ADMIN_ACCESS_CODES.franciza) {
+    currentCategory = "franciza";
+    currentStoreId = "";
+    currentStoreName = "Acces Admin Franciză";
+    currentStoreFormat = "";
+    el("storeModal").classList.remove("open");
+    await finishLogin();
     return;
   }
 
@@ -797,6 +833,97 @@ async function loadDashboard() {
     }
   }
 }
+
+async function loadGeolocationStores() {
+  if (!isPrimaryAdmin()) return;
+  try {
+    const snap = await getDocs(collection(db, "stores"));
+    storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
+    renderGeolocationStores();
+  } catch (error) {
+    console.error("Geolocalizare:", error);
+    el("geoStoresList").innerHTML = '<div class="empty">Magazinele nu au putut fi încărcate.</div>';
+  }
+}
+
+function renderGeolocationStores() {
+  const container = el("geoStoresList");
+  if (!container) return;
+
+  const term = (el("geoStoreSearch")?.value || "").trim().toLowerCase();
+  const filter = el("geoStoreFilter")?.value || "all";
+
+  const rows = storesCache
+    .filter(store => store.active !== false)
+    .filter(store => {
+      const category = normCategory(store.category || store.type);
+      const hasCoords = Number.isFinite(Number(store.latitude)) && Number.isFinite(Number(store.longitude));
+      const text = `${store.id} ${store.name || ""} ${store.address || ""}`.toLowerCase();
+      const matchesText = !term || text.includes(term);
+      const matchesFilter =
+        filter === "all" ||
+        filter === category ||
+        (filter === "missing" && !hasCoords);
+      return matchesText && matchesFilter;
+    })
+    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"));
+
+  container.innerHTML = rows.length ? rows.map(store => {
+    const lat = store.latitude ?? "";
+    const lon = store.longitude ?? "";
+    const mapsQuery = encodeURIComponent(store.address || `${store.name || ""}, Romania`);
+    return `
+      <div class="geo-store-row" data-geo-store="${escapeHtml(store.id)}">
+        <div class="geo-store-main">
+          <b>${escapeHtml(store.name || store.id)}</b>
+          <small>ID ${escapeHtml(store.id)} · ${escapeHtml(normCategory(store.category || store.type) || "")}</small>
+          <span>${escapeHtml(store.address || "Adresă indisponibilă")}</span>
+        </div>
+        <div class="geo-coordinates">
+          <label>Latitudine
+            <input data-geo-lat="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lat))}" placeholder="ex. 44.4268">
+          </label>
+          <label>Longitudine
+            <input data-geo-lon="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lon))}" placeholder="ex. 26.1025">
+          </label>
+        </div>
+        <div class="geo-actions">
+          <a class="secondary geo-map-link" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Google Maps</a>
+          <button type="button" class="primary" data-save-geo="${escapeHtml(store.id)}">Salvează</button>
+        </div>
+      </div>
+    `;
+  }).join("") : '<div class="empty">Nu există magazine pentru filtrul selectat.</div>';
+
+  container.querySelectorAll("[data-save-geo]").forEach(button => {
+    button.onclick = async () => {
+      const id = button.dataset.saveGeo;
+      const latRaw = container.querySelector(`[data-geo-lat="${CSS.escape(id)}"]`)?.value.trim() || "";
+      const lonRaw = container.querySelector(`[data-geo-lon="${CSS.escape(id)}"]`)?.value.trim() || "";
+      const latitude = Number(latRaw.replace(",", "."));
+      const longitude = Number(lonRaw.replace(",", "."));
+
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+          !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        el("geoStatus").textContent = "Coordonatele introduse nu sunt valide.";
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, "stores", id), { latitude, longitude });
+        const local = storesCache.find(s => String(s.id) === String(id));
+        if (local) { local.latitude = latitude; local.longitude = longitude; }
+        el("geoStatus").textContent = `Coordonatele pentru ${local?.name || id} au fost salvate.`;
+        button.textContent = "Salvat ✓";
+        setTimeout(() => button.textContent = "Salvează", 1200);
+      } catch (error) {
+        console.error("Salvare coordonate:", error);
+        el("geoStatus").textContent = "Coordonatele nu au putut fi salvate.";
+      }
+    };
+  });
+}
+
 async function loadStores() {
   const snap = await getDocs(collection(db, "stores"));
   storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
@@ -832,7 +959,9 @@ function renderStores() {
           <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
             ${store.active === false ? "Inactiv" : "Activ"}
           </span>
-        </div>
+        
+        ${isPrimaryAdmin() ? `<button type="button" class="store-delete-btn" data-delete-store="${escapeHtml(store.id)}" data-store-name="${escapeHtml(store.name || store.id)}">Șterge</button>` : ""}
+      </div>
       </div>
     `).join("");
 
@@ -875,6 +1004,8 @@ function renderStores() {
       button.querySelector("span:last-child").textContent = `${count} ${body.classList.contains("collapsed") ? "▸" : "▾"}`;
     });
   });
+
+  bindStoreDeleteButtons();
 }
 
 function toggleStoreFormat() {
@@ -882,6 +1013,38 @@ function toggleStoreFormat() {
   el("newStoreFormat").classList.toggle("hidden", !isCarrefour);
 }
 
+
+
+async function deleteStorePermanently(storeId, storeName) {
+  if (!isPrimaryAdmin()) return;
+
+  const ok = confirm(
+    `Sigur vrei să ștergi definitiv magazinul "${storeName}" (ID ${storeId})?\n\nMagazinul va fi eliminat din baza de magazine.`
+  );
+  if (!ok) return;
+
+  try {
+    await deleteDoc(doc(db, "stores", String(storeId)));
+    el("saveStoreStatus").textContent = `Magazinul ${storeName} a fost șters definitiv.`;
+    await loadStores();
+  } catch (error) {
+    console.error("Ștergere magazin:", error);
+    el("saveStoreStatus").textContent = "Magazinul nu a putut fi șters. Verifică drepturile Firestore.";
+  }
+}
+
+function bindStoreDeleteButtons() {
+  document.querySelectorAll("[data-delete-store]").forEach(button => {
+    button.onclick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      deleteStorePermanently(
+        button.dataset.deleteStore,
+        button.dataset.storeName || button.dataset.deleteStore
+      );
+    };
+  });
+}
 
 async function loadStoreIntoFormById() {
   const id = el("newStoreId").value.trim();
@@ -1219,6 +1382,13 @@ document.querySelectorAll(".side-btn").forEach(button => {
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
     if (page === "usersPage") return;
+    if (page === "geolocationPage") {
+      if (!isPrimaryAdmin()) return;
+      showPage(page);
+      closeMenu();
+      await loadGeolocationStores();
+      return;
+    }
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
@@ -1322,3 +1492,6 @@ if (el("userDisplayName")) {
 
 onIfPresent("newStoreId", "change", loadStoreIntoFormById);
 onIfPresent("newStoreId", "blur", loadStoreIntoFormById);
+
+onIfPresent("geoStoreSearch", "input", renderGeolocationStores);
+onIfPresent("geoStoreFilter", "change", renderGeolocationStores);

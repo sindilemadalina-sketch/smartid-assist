@@ -629,3 +629,80 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
   text-decoration:line-through;
   text-decoration-thickness:1px;
 }
+
+.store-delete-btn{
+  margin-left:auto;
+  padding:7px 11px;
+  border:1px solid #fecaca;
+  border-radius:10px;
+  background:#fff;
+  color:#b91c1c;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.store-delete-btn:hover{
+  background:#fef2f2;
+  border-color:#fca5a5;
+}
+.store-row{
+  position:relative;
+}
+
+/* Coduri Admin */
+.admin-access-code{
+  display:inline-flex;
+  margin:10px 0 12px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#ede9fe;
+  color:#5b21b6;
+  font-size:12px;
+  font-weight:900;
+}
+
+/* Geolocalizare */
+.geo-toolbar{
+  display:grid;
+  grid-template-columns:1fr 220px;
+  gap:12px;
+  margin-bottom:12px;
+}
+.geo-help{
+  padding:12px 14px;
+  margin-bottom:16px;
+  border-radius:14px;
+  background:#f8f7ff;
+  color:#667085;
+  font-size:13px;
+}
+.geo-stores-list{display:grid;gap:12px}
+.geo-store-row{
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) minmax(340px,.9fr) auto;
+  gap:16px;
+  align-items:center;
+  padding:16px;
+  border:1px solid #ebe7f3;
+  border-radius:16px;
+  background:#fff;
+}
+.geo-store-main b,.geo-store-main small,.geo-store-main span{display:block}
+.geo-store-main small{margin-top:4px;color:#6b7280}
+.geo-store-main span{margin-top:6px;color:#475467;font-size:13px}
+.geo-coordinates{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.geo-coordinates label{font-size:11px;font-weight:800;color:#667085}
+.geo-coordinates input{margin-top:5px;width:100%}
+.geo-actions{display:flex;gap:8px;align-items:center}
+.geo-map-link{text-decoration:none;display:inline-flex;align-items:center}
+@media(max-width:1050px){
+  .geo-store-row{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  .geo-toolbar,.geo-coordinates{grid-template-columns:1fr}
+  .geo-actions{flex-wrap:wrap}
+}
