@@ -1,6 +1,8 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
-  initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"; import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"; import {   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc, updateDoc, doc, increment, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
+  updateDoc, doc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { INITIAL_STORES } from "./stores-seed.js";
 import { EQUIPMENT } from "./equipment-config.js";
