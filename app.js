@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
-  updateDoc, doc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  updateDoc, doc, increment, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { INITIAL_STORES } from "./stores-seed.js";
 import { EQUIPMENT } from "./equipment-config.js";
@@ -27,41 +28,7 @@ let currentOpenMaterial = null;
 let editingMaterialId = null;
 let currentCanAdd = false;
 let currentCanManage = false;
-let currentCanDelete = false;
-let currentCanAddStores = false;
-let currentCanAddEquipment = false;
-
 const PRIMARY_ADMIN_EMAIL = "admin@smartid.com";
-const ADMIN_ACCESS_CODES = {
-  carrefour: "9999",
-  franciza: "9998"
-};
-
-function updateAdminAccessCode() {
-  if (!el("adminAccessCode")) return;
-  if (currentRole !== "admin") {
-    el("adminAccessCode").classList.add("hidden");
-    return;
-  }
-  const category = currentCategory === "franciza" ? "franciza" : "carrefour";
-  el("adminAccessCode").textContent =
-    `Acces Admin ${category === "franciza" ? "Franciză" : "Carrefour"} · Cod ${ADMIN_ACCESS_CODES[category]}`;
-  el("adminAccessCode").classList.remove("hidden");
-}
-
-const LIMITED_TEAM_MEMBERS = new Set(["Robert Neagu", "Dan Oros"]);
-
-function teamPermissionPreset(displayName) {
-  const limited = LIMITED_TEAM_MEMBERS.has(displayName);
-  return {
-    canAdd: !limited,
-    canDelete: !limited,
-    canAddStores: true,
-    canAddEquipment: true,
-    canApprove: false
-  };
-}
-
 
 
 const TEAM_DISPLAY_NAMES = [
@@ -200,8 +167,6 @@ async function finishLogin() {
 
   el("loginPage").style.display = "none";
   el("app").classList.remove("hidden");
-  document.querySelectorAll('[data-page="storesPage"]').forEach(btn => btn.classList.toggle("hidden", !(currentRole==="admin" || currentCanAddStores)));
-
   el("menuBtn").classList.remove("hidden");
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
@@ -227,11 +192,8 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
 
   const profile = profileSnap.data();
   currentRole = normRole(profile.role);
-  currentCanAdd = currentRole === "admin" ? true : profile.canAdd === true;
-  currentCanManage = currentRole === "admin" ? true : profile.canManage === true;
-  currentCanDelete = currentRole === "admin" ? true : profile.canDelete === true;
-  currentCanAddStores = currentRole === "admin" ? true : profile.canAddStores === true;
-  currentCanAddEquipment = currentRole === "admin" ? true : profile.canAddEquipment === true;
+  currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
+  currentCanManage = profile.canManage === true || currentRole === "admin";
   currentCategory = normCategory(profile.category);
 
   if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
@@ -282,25 +244,6 @@ async function continueWithStore() {
   el("storeError").textContent = "";
   if (!code) {
     el("storeError").textContent = "Introdu ID-ul magazinului.";
-    return;
-  }
-
-  if (currentRole === "admin" && code === ADMIN_ACCESS_CODES.carrefour) {
-    currentCategory = "carrefour";
-    currentStoreId = "";
-    currentStoreName = "Acces Admin Carrefour";
-    currentStoreFormat = "";
-    el("storeModal").classList.remove("open");
-    await finishLogin();
-    return;
-  }
-  if (currentRole === "admin" && code === ADMIN_ACCESS_CODES.franciza) {
-    currentCategory = "franciza";
-    currentStoreId = "";
-    currentStoreName = "Acces Admin Franciză";
-    currentStoreFormat = "";
-    el("storeModal").classList.remove("open");
-    await finishLogin();
     return;
   }
 
@@ -598,7 +541,7 @@ async function renderAdminMaterials() {
           <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
           ${isPrimaryAdmin() && (material.status || "approved") !== "approved" ? `<button class="primary" data-approve-material="${material.id}">✓ Aprobă</button>` : ""}
           ${isPrimaryAdmin() && (material.status || "approved") !== "rejected" ? `<button class="secondary" data-reject-material="${material.id}">Respinge</button>` : ""}
-          ${(isPrimaryAdmin() || currentCanDelete) ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
+          ${isPrimaryAdmin() ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
         </div>
       </div>
     `;
@@ -832,97 +775,6 @@ async function loadDashboard() {
     }
   }
 }
-
-async function loadGeolocationStores() {
-  if (!isPrimaryAdmin()) return;
-  try {
-    const snap = await getDocs(collection(db, "stores"));
-    storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
-    renderGeolocationStores();
-  } catch (error) {
-    console.error("Geolocalizare:", error);
-    el("geoStoresList").innerHTML = '<div class="empty">Magazinele nu au putut fi încărcate.</div>';
-  }
-}
-
-function renderGeolocationStores() {
-  const container = el("geoStoresList");
-  if (!container) return;
-
-  const term = (el("geoStoreSearch")?.value || "").trim().toLowerCase();
-  const filter = el("geoStoreFilter")?.value || "all";
-
-  const rows = storesCache
-    .filter(store => store.active !== false)
-    .filter(store => {
-      const category = normCategory(store.category || store.type);
-      const hasCoords = Number.isFinite(Number(store.latitude)) && Number.isFinite(Number(store.longitude));
-      const text = `${store.id} ${store.name || ""} ${store.address || ""}`.toLowerCase();
-      const matchesText = !term || text.includes(term);
-      const matchesFilter =
-        filter === "all" ||
-        filter === category ||
-        (filter === "missing" && !hasCoords);
-      return matchesText && matchesFilter;
-    })
-    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"));
-
-  container.innerHTML = rows.length ? rows.map(store => {
-    const lat = store.latitude ?? "";
-    const lon = store.longitude ?? "";
-    const mapsQuery = encodeURIComponent(store.address || `${store.name || ""}, Romania`);
-    return `
-      <div class="geo-store-row" data-geo-store="${escapeHtml(store.id)}">
-        <div class="geo-store-main">
-          <b>${escapeHtml(store.name || store.id)}</b>
-          <small>ID ${escapeHtml(store.id)} · ${escapeHtml(normCategory(store.category || store.type) || "")}</small>
-          <span>${escapeHtml(store.address || "Adresă indisponibilă")}</span>
-        </div>
-        <div class="geo-coordinates">
-          <label>Latitudine
-            <input data-geo-lat="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lat))}" placeholder="ex. 44.4268">
-          </label>
-          <label>Longitudine
-            <input data-geo-lon="${escapeHtml(store.id)}" inputmode="decimal" value="${escapeHtml(String(lon))}" placeholder="ex. 26.1025">
-          </label>
-        </div>
-        <div class="geo-actions">
-          <a class="secondary geo-map-link" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Google Maps</a>
-          <button type="button" class="primary" data-save-geo="${escapeHtml(store.id)}">Salvează</button>
-        </div>
-      </div>
-    `;
-  }).join("") : '<div class="empty">Nu există magazine pentru filtrul selectat.</div>';
-
-  container.querySelectorAll("[data-save-geo]").forEach(button => {
-    button.onclick = async () => {
-      const id = button.dataset.saveGeo;
-      const latRaw = container.querySelector(`[data-geo-lat="${CSS.escape(id)}"]`)?.value.trim() || "";
-      const lonRaw = container.querySelector(`[data-geo-lon="${CSS.escape(id)}"]`)?.value.trim() || "";
-      const latitude = Number(latRaw.replace(",", "."));
-      const longitude = Number(lonRaw.replace(",", "."));
-
-      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
-          !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-        el("geoStatus").textContent = "Coordonatele introduse nu sunt valide.";
-        return;
-      }
-
-      try {
-        await updateDoc(doc(db, "stores", id), { latitude, longitude });
-        const local = storesCache.find(s => String(s.id) === String(id));
-        if (local) { local.latitude = latitude; local.longitude = longitude; }
-        el("geoStatus").textContent = `Coordonatele pentru ${local?.name || id} au fost salvate.`;
-        button.textContent = "Salvat ✓";
-        setTimeout(() => button.textContent = "Salvează", 1200);
-      } catch (error) {
-        console.error("Salvare coordonate:", error);
-        el("geoStatus").textContent = "Coordonatele nu au putut fi salvate.";
-      }
-    };
-  });
-}
-
 async function loadStores() {
   const snap = await getDocs(collection(db, "stores"));
   storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
@@ -945,29 +797,16 @@ function renderStores() {
   const franciza = filtered.filter(s => normCategory(s.category || s.type) === "franciza");
 
   const renderRows = list => list
-    .sort((a,b) => {
-      const inactiveFirst = Number(a.active === false) - Number(b.active === false);
-      if (inactiveFirst !== 0) return inactiveFirst;
-      return String(a.name || "").localeCompare(String(b.name || ""), "ro");
-    })
+    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"))
     .map(store => `
-      <div class="store-row ${store.active === false ? "store-row-inactive" : ""}">
-        <div class="store-row-main">
-          <b>${escapeHtml(store.name || store.id)}</b>
-          <div class="store-meta">
-            ID: ${escapeHtml(store.id)} ·
-            <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
-              ${store.active === false ? "Inactiv" : "Activ"}
-            </span>
-          </div>
+      <div class="store-row">
+        <b>${escapeHtml(store.name || store.id)}</b>
+        <div class="store-meta">
+          ID: ${escapeHtml(store.id)} ·
+          <span class="${store.active === false ? "store-status-inactive" : "store-status-active"}">
+            ${store.active === false ? "Inactiv" : "Activ"}
+          </span>
         </div>
-        ${isPrimaryAdmin() ? `
-          <button type="button"
-                  class="store-delete-btn"
-                  data-delete-store="${escapeHtml(store.id)}"
-                  data-store-name="${escapeHtml(store.name || store.id)}">
-            Șterge
-          </button>` : ""}
       </div>
     `).join("");
 
@@ -1010,8 +849,6 @@ function renderStores() {
       button.querySelector("span:last-child").textContent = `${count} ${body.classList.contains("collapsed") ? "▸" : "▾"}`;
     });
   });
-
-  bindStoreDeleteButtons();
 }
 
 function toggleStoreFormat() {
@@ -1019,118 +856,29 @@ function toggleStoreFormat() {
   el("newStoreFormat").classList.toggle("hidden", !isCarrefour);
 }
 
-
-
-async function deleteStorePermanently(storeId, storeName) {
-  if (!isPrimaryAdmin()) return;
-
-  const ok = confirm(
-    `Sigur vrei să ștergi definitiv magazinul "${storeName}" (ID ${storeId})?\n\nMagazinul va fi eliminat din baza de magazine.`
-  );
-  if (!ok) return;
-
-  try {
-    await deleteDoc(doc(db, "stores", String(storeId)));
-    el("saveStoreStatus").textContent = `Magazinul ${storeName} a fost șters definitiv.`;
-    await loadStores();
-  } catch (error) {
-    console.error("Ștergere magazin:", error);
-    el("saveStoreStatus").textContent = "Magazinul nu a putut fi șters. Verifică drepturile Firestore.";
-  }
-}
-
-function bindStoreDeleteButtons() {
-  document.querySelectorAll("[data-delete-store]").forEach(button => {
-    button.onclick = event => {
-      event.preventDefault();
-      event.stopPropagation();
-      deleteStorePermanently(
-        button.dataset.deleteStore,
-        button.dataset.storeName || button.dataset.deleteStore
-      );
-    };
-  });
-}
-
-async function loadStoreIntoFormById() {
-  const id = el("newStoreId").value.trim();
-  if (!id) return;
-
-  try {
-    let store = storesCache.find(s => String(s.id) === id) || null;
-    if (!store) {
-      const snap = await getDoc(doc(db, "stores", id));
-      if (snap.exists()) store = { id, ...snap.data() };
-    }
-    if (!store) return;
-
-    el("newStoreName").value = store.name || "";
-    el("newStoreCategory").value = normCategory(store.category || store.type) || "carrefour";
-    toggleStoreFormat();
-
-    if (el("newStoreCategory").value === "carrefour") {
-      el("newStoreFormat").value = String(store.format || "hiper").toLowerCase();
-    }
-
-    el("newStoreActive").value = store.active === false ? "false" : "true";
-    el("saveStoreStatus").textContent =
-      `Editezi ${store.name || id}. Categoria și formatul existente au fost încărcate automat.`;
-  } catch (error) {
-    console.warn("Magazinul nu a putut fi încărcat în formular.", error);
-  }
-}
-
 async function saveStore() {
-  if (!(isPrimaryAdmin() || currentCanAddStores)) {
-    el("saveStoreStatus").textContent = "Nu ai dreptul să adaugi sau să modifici magazine.";
-    return;
-  }
-
   const id = el("newStoreId").value.trim();
   const name = el("newStoreName").value.trim();
+  const category = el("newStoreCategory").value;
 
   if (!id || !name) {
     el("saveStoreStatus").textContent = "Completează ID-ul și numele magazinului.";
     return;
   }
 
-  try {
-    const storeRef = doc(db, "stores", id);
-    const existingSnap = await getDoc(storeRef);
-    const existing = existingSnap.exists() ? existingSnap.data() : null;
+  const data = {
+    name,
+    category,
+    active: el("newStoreActive").value === "true"
+  };
+  if (category === "carrefour") data.format = el("newStoreFormat").value;
+  else data.format = "";
 
-    const selectedCategory = el("newStoreCategory").value;
-    const selectedFormat = selectedCategory === "carrefour"
-      ? el("newStoreFormat").value
-      : "";
-
-    const data = {
-      name,
-      active: el("newStoreActive").value === "true",
-      category: existing?.category || selectedCategory,
-      format: existing?.format ?? selectedFormat
-    };
-
-    // Pentru magazin nou folosim categoria/formatul ales.
-    if (!existing) {
-      data.category = selectedCategory;
-      data.format = selectedFormat;
-    }
-
-    await setDoc(storeRef, data, { merge: true });
-
-    el("saveStoreStatus").textContent = data.active
-      ? "Magazinul a fost salvat ca Activ."
-      : "Magazinul a fost marcat Inactiv și a rămas în categoria lui.";
-
-    el("newStoreId").value = "";
-    el("newStoreName").value = "";
-    el("newStoreActive").value = "true";
-    await loadStores();
-  } catch (error) {
-    console.error(error);
-    el("saveStoreStatus").textContent = "Magazinul nu a putut fi salvat.";
-  }
+  await setDoc(doc(db, "stores", id), data, { merge: true });
+  el("saveStoreStatus").textContent = "Magazinul a fost salvat.";
+  el("newStoreId").value = "";
+  el("newStoreName").value = "";
+  await loadStores();
 }
 
 
@@ -1147,133 +895,27 @@ async function recommendStoreByLocation(){
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
 }
 
+async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
+el("userStatus").textContent="Drepturile au fost salvate.";
+await loadUsers();}
 
-async function loadUsers() {
-  const teamNames = [
-    "Nistor Ionut",
-    "Apetrei Andrei",
-    "Robert Neagu",
-    "Andreea Ianos",
-    "Dan Oros",
-    "Valentin Surugiu"
-  ];
 
-  // Pagina se afișează imediat, fără să depindă de răspunsul Firestore.
-  const renderTeam = profilesByName => {
-    const rows = teamNames.map(name => {
-      const saved = profilesByName?.get(name.toLowerCase()) || null;
-      const preset = teamPermissionPreset(name);
-      return {
-        displayName: name,
-        email: saved?.email || "",
-        role: saved?.role || "suport",
-        category: saved?.category || "all",
-        canAdd: saved ? saved.canAdd === true : preset.canAdd,
-        canDelete: saved ? saved.canDelete === true : preset.canDelete,
-        canAddStores: saved ? saved.canAddStores === true : preset.canAddStores,
-        canAddEquipment: saved ? saved.canAddEquipment === true : preset.canAddEquipment
-      };
-    });
-
-    el("usersList").innerHTML = rows.map(user => `
-      <button type="button" class="user-team-card" data-team-name="${escapeHtml(user.displayName)}">
-        <div class="user-row-main">
-          <div class="team-avatar">${escapeHtml(user.displayName.charAt(0))}</div>
-          <div class="user-identity">
-            <b>${escapeHtml(user.displayName)}</b>
-            <small>${user.email ? escapeHtml(user.email) : "Click pentru configurare"}</small>
-          </div>
-        </div>
-        <div class="user-permission-summary">
-          <span class="${user.canAdd ? "permission-yes" : "permission-no"}">Adaugă: ${user.canAdd ? "Da" : "Nu"}</span>
-          <span class="${user.canDelete ? "permission-yes" : "permission-no"}">Șterge: ${user.canDelete ? "Da" : "Nu"}</span>
-          <span class="permission-yes">Magazine: ${user.canAddStores ? "Da" : "Nu"}</span>
-          <span class="permission-yes">Echipamente: ${user.canAddEquipment ? "Da" : "Nu"}</span>
-          <span class="permission-no">Aprobă: Nu</span>
-        </div>
-      </button>
-    `).join("");
-
-    el("usersList").querySelectorAll("[data-team-name]").forEach(card => {
-      card.onclick = () => {
-        const name = card.dataset.teamName;
-        const user = rows.find(x => x.displayName === name);
-        if (!user) return;
-        el("userDisplayName").value = user.displayName;
-        el("userEmail").value = user.email;
-        el("userRole").value = "suport";
-        el("userCategory").value = "all";
-        el("userCanAdd").checked = user.canAdd;
-        el("userCanDelete").checked = user.canDelete;
-        el("userCanAddStores").checked = user.canAddStores;
-        el("userCanAddEquipment").checked = user.canAddEquipment;
-        el("userStatus").textContent = user.email
-          ? `Configurezi drepturile pentru ${user.displayName}.`
-          : `Completează emailul Firebase pentru ${user.displayName} și apasă Salvează drepturi.`;
-        setTimeout(() => el("userEmail").focus(), 50);
-      };
-    });
-  };
-
-  renderTeam(new Map());
-
-  // Încercăm să citim drepturile deja salvate, dar nu blocăm pagina dacă Firestore refuză listarea.
+async function recordShare(method) {
+  if (!currentOpenMaterial) return;
   try {
-    const snap = await getDocs(collection(db, "users"));
-    const profiles = snap.docs.map(d => ({ email: d.id, ...d.data() }));
-    const byName = new Map(
-      profiles.filter(p => p.displayName)
-        .map(p => [String(p.displayName).trim().toLowerCase(), p])
-    );
-    renderTeam(byName);
-  } catch (error) {
-    console.warn("Lista Firestore users nu poate fi citită; formularul rămâne disponibil.", error);
-  }
-}
-
-async function saveUserProfile() {
-  if (!isPrimaryAdmin()) {
-    el("userStatus").textContent = "Doar Adminul principal poate modifica drepturile.";
-    return;
-  }
-
-  const displayName = el("userDisplayName").value;
-  const email = el("userEmail").value.trim().toLowerCase();
-
-  if (!displayName) {
-    el("userStatus").textContent = "Selectează colegul.";
-    return;
-  }
-  if (!email) {
-    el("userStatus").textContent = "Completează emailul colegului creat în Firebase.";
-    return;
-  }
-
-  try {
-    await setDoc(doc(db, "users", email), {
-      displayName,
-      role: "suport",
-      category: "all",
-      canAdd: el("userCanAdd").checked,
-      canManage: el("userCanAdd").checked,
-      canDelete: el("userCanDelete").checked,
-      canAddStores: el("userCanAddStores").checked,
-      canAddEquipment: el("userCanAddEquipment").checked,
-      canApprove: false,
-      canManageUsers: false,
-      updatedAt: serverTimestamp(),
-      updatedBy: currentEmail
-    }, { merge: true });
-
-    el("userStatus").textContent = `Drepturile pentru ${displayName} au fost salvate.`;
-    await logTeamActivity("rights_updated", null, {
-      targetEmail: email,
-      title: displayName
+    await addDoc(collection(db, "shares"), {
+      materialId: currentOpenMaterial.id,
+      title: currentOpenMaterial.title || "",
+      type: currentOpenMaterial.type || "",
+      method,
+      email: currentEmail,
+      storeId: currentStoreId,
+      storeName: currentStoreName,
+      storeFormat: currentStoreFormat,
+      createdAt: serverTimestamp()
     });
-    loadUsers().catch(()=>{});
   } catch (error) {
-    console.error("Drepturile nu au putut fi salvate.", error);
-    el("userStatus").textContent = "Nu am putut salva drepturile. Verifică regulile Firestore.";
+    console.warn("Distribuirea nu a putut fi înregistrată.", error);
   }
 }
 
@@ -1387,34 +1029,13 @@ document.querySelectorAll(".side-btn").forEach(button => {
       renderEquipment();
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
-    if (page === "usersPage") return;
-    if (page === "geolocationPage") {
-      if (!isPrimaryAdmin()) return;
-      showPage(page);
-      closeMenu();
-      await loadGeolocationStores();
-      return;
-    }
+    if (page === "usersPage") await loadUsers();
     if (page === "storesPage") await loadStores();
     showPage(page);
     closeMenu();
   });
 });
 
-
-
-const usersMenuButton = el("usersMenuBtn");
-if (usersMenuButton) {
-  usersMenuButton.addEventListener("click", event => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!isPrimaryAdmin()) return;
-    showPage("usersPage");
-    closeMenu();
-    // Nu așteptăm Firestore ca să deschidem pagina.
-    loadUsers().catch(error => console.warn("Utilizatori:", error));
-  });
-}
 
 document.querySelectorAll("[data-admin-category]").forEach(button => {
   button.addEventListener("click", () => {
@@ -1481,23 +1102,3 @@ onAuthStateChanged(auth, async user => {
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
   }
 });
-
-
-
-if (el("userDisplayName")) {
-  el("userDisplayName").addEventListener("change", () => {
-    const name = el("userDisplayName").value;
-    if (!name) return;
-    const preset = teamPermissionPreset(name);
-    el("userCanAdd").checked = preset.canAdd;
-    el("userCanDelete").checked = preset.canDelete;
-    el("userCanAddStores").checked = preset.canAddStores;
-    el("userCanAddEquipment").checked = preset.canAddEquipment;
-  });
-}
-
-onIfPresent("newStoreId", "change", loadStoreIntoFormById);
-onIfPresent("newStoreId", "blur", loadStoreIntoFormById);
-
-onIfPresent("geoStoreSearch", "input", renderGeolocationStores);
-onIfPresent("geoStoreFilter", "change", renderGeolocationStores);

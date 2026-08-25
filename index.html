@@ -57,8 +57,7 @@
       <button class="side-btn" data-page="dashboardPage">📊 Dashboard</button>
       <button class="side-btn" data-page="addMaterialPage" data-permission="add">＋ Adăugare materiale</button>
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
-       <button id="usersMenuBtn" class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
-      <button class="side-btn" data-page="geolocationPage" data-permission="users">📍 Geolocalizare</button>
+       <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
     </aside>
 
@@ -159,7 +158,6 @@
           <div>
             <h1 id="equipmentPageTitle">Materiale</h1><span id="carrefourBrand" class="carrefour-brand hidden"><img src="carrefour-logo.svg" alt="Carrefour" class="carrefour-logo"></span>
             <p id="storeWelcome" class="subtitle"></p>
-            <div id="adminAccessCode" class="admin-access-code hidden"></div>
             <div id="adminCategoryChooser" class="admin-category-chooser hidden">
               <button class="category-choice active" data-admin-category="carrefour">Carrefour</button>
               <button class="category-choice" data-admin-category="franciza">Franciză</button>
@@ -244,13 +242,8 @@
       </section>
 
       <section id="usersPage" class="page hidden">
-        <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Fiecare coleg se autentifică individual cu emailul și parola create în Firebase. Adminul principal este master și aprobă materialele. Colegii pot primi drepturi pentru materiale, magazine și echipamente.</p></div></div>
-        <section class="panel users-config-panel">
-          <div class="permission-note">
-            Selectează colegul, completează emailul lui din Firebase și salvează drepturile.
-            Niciun coleg nu poate aproba materiale sau modifica drepturile altor utilizatori.
-          </div>
-          <div class="form-grid">
+        <div class="page-head"><div><h1>Utilizatori</h1><p class="subtitle">Fiecare coleg se autentifică individual cu emailul și parola create în Firebase. Doar Adminul principal acordă sau modifică drepturile.</p></div></div>
+        <section class="panel"><div class="form-grid">
           <select id="userDisplayName">
             <option value="">Selectează colegul</option>
             <option value="Nistor Ionut">Nistor Ionut</option>
@@ -260,39 +253,8 @@
             <option value="Dan Oros">Dan Oros</option>
             <option value="Valentin Surugiu">Valentin Surugiu</option>
           </select>
-          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label>
-            <label><input id="userCanDelete" type="checkbox"> Poate șterge materiale</label>
-            <label><input id="userCanAddStores" type="checkbox"> Poate adăuga magazine</label>
-            <label><input id="userCanAddEquipment" type="checkbox"> Poate adăuga echipamente</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
-        <section class="panel"><h2>Echipa</h2><p class="subtitle">Selectează un coleg pentru a-i configura drepturile.</p><div id="usersList"></div></section>
-      </section>
-
-
-      <section id="geolocationPage" class="page hidden">
-        <div class="page-head">
-          <div>
-            <h1>Geolocalizare magazine</h1>
-            <p class="subtitle">Coordonate Google folosite pentru recomandarea automată a magazinului la autentificare.</p>
-          </div>
-        </div>
-
-        <section class="panel">
-          <div class="geo-toolbar">
-            <input id="geoStoreSearch" placeholder="Caută după ID, nume sau adresă...">
-            <select id="geoStoreFilter">
-              <option value="all">Toate</option>
-              <option value="carrefour">Carrefour</option>
-              <option value="franciza">Franciză</option>
-              <option value="missing">Fără coordonate</option>
-            </select>
-          </div>
-          <div class="geo-help">
-            Pentru fiecare magazin completezi <b>Latitudine</b> și <b>Longitudine</b>.
-            Linkul Google Maps se deschide după adresa magazinului pentru verificare.
-          </div>
-          <div id="geoStoresList" class="geo-stores-list"></div>
-          <div id="geoStatus" class="status"></div>
-        </section>
+          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+        <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
       </section>
 
       <section id="storesPage" class="page hidden">
@@ -317,7 +279,6 @@
           </div>
           <button id="saveStoreBtn" class="primary">Adaugă / actualizează magazin</button>
           <div id="saveStoreStatus" class="status"></div>
-<div class="store-edit-note">Pentru un magazin existent, introdu ID-ul. Datele se încarcă automat; apoi schimbă doar ce dorești, de exemplu Activ/Inactiv.</div>
         </section>
 
         <section class="panel">
