@@ -45,7 +45,7 @@
           <span>⌕</span>
           <input id="searchInput" class="search" placeholder="Caută după titlu, descriere sau tag...">
         </div>
-<button id="logoutBtn" class="logout">Logout</button>
+        <button id="logoutBtn" class="logout">Logout</button>
       </div>
     </header>
 
@@ -59,6 +59,7 @@
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
        <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
+      <button class="side-btn" data-page="geolocationPage" data-permission="geo">📍 Geolocalizare</button>
     </aside>
 
     <main class="content">
@@ -84,10 +85,6 @@
             </div>
             <div class="metric-line" aria-hidden="true"></div>
             <button class="metric-details" data-stat-details="logins">Vezi cine s-a autentificat ›</button>
-          <button type="button" class="nav-btn" id="geolocationNavBtn">
-            <span>📍</span>
-            <span>Geolocalizare</span>
-          </button>
           </article>
 
           <article class="dashboard-pro-card card-stores">
@@ -313,6 +310,49 @@
           <div id="storesList"></div>
         </section>
       </section>
+
+      <section id="geolocationPage" class="page hidden">
+        <div class="page-head">
+          <div>
+            <h1>Geolocalizare magazine</h1>
+            <p class="subtitle">Completează manual latitudinea și longitudinea pentru magazinele care au adresă confirmată.</p>
+          </div>
+        </div>
+
+        <section class="panel geo-admin-panel">
+          <div class="geo-admin-grid">
+            <div>
+              <label for="geoStoreSelect">Magazin</label>
+              <select id="geoStoreSelect"><option value="">Selectează magazinul...</option></select>
+            </div>
+            <div>
+              <label for="geoAddress">Adresă</label>
+              <input id="geoAddress" placeholder="Adresa magazinului">
+            </div>
+            <div>
+              <label for="geoLatitude">Latitudine</label>
+              <input id="geoLatitude" inputmode="decimal" placeholder="ex. 44.4268">
+            </div>
+            <div>
+              <label for="geoLongitude">Longitudine</label>
+              <input id="geoLongitude" inputmode="decimal" placeholder="ex. 26.1025">
+            </div>
+          </div>
+          <div class="geo-admin-actions">
+            <button id="saveGeoBtn" class="primary" type="button">Salvează coordonatele</button>
+            <button id="clearGeoBtn" class="secondary" type="button">Golește</button>
+          </div>
+          <div id="geoSaveStatus" class="status"></div>
+        </section>
+
+        <section class="panel">
+          <div class="store-toolbar">
+            <input id="geoSearch" placeholder="Caută după ID, nume sau adresă...">
+          </div>
+          <div id="geoStoresList" class="geo-stores-list"></div>
+        </section>
+      </section>
+
     </main>
   </div>
 
