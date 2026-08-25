@@ -823,3 +823,46 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
     right:auto !important;
   }
 }
+
+/* FIX: lățime Dashboard / carduri - fără modificări de logică */
+#dashboardPage{
+  width:calc(100vw - 64px) !important;
+  max-width:none !important;
+  margin-left:32px !important;
+  margin-right:32px !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  box-sizing:border-box !important;
+}
+#dashboardPage .dashboard-stats{
+  width:100% !important;
+  max-width:none !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:16px !important;
+}
+#dashboardPage .dashboard-stat-card{
+  width:100% !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+#dashboardPage .dashboard-main-grid{
+  width:100% !important;
+  max-width:none !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) !important;
+  gap:18px !important;
+}
+#dashboardPage .dashboard-main-grid > *{
+  width:100% !important;
+  min-width:0 !important;
+}
+@media(max-width:900px){
+  #dashboardPage{
+    width:calc(100vw - 32px) !important;
+    margin-left:16px !important;
+    margin-right:16px !important;
+  }
+  #dashboardPage .dashboard-stats,
+  #dashboardPage .dashboard-main-grid{
+    grid-template-columns:1fr !important;
+  }
+}
