@@ -1,8 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc,
-  updateDoc, doc, increment, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"; import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"; import {   getFirestore, collection, getDocs, addDoc, getDoc, setDoc, deleteDoc, updateDoc, doc, increment, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { INITIAL_STORES } from "./stores-seed.js";
 import { EQUIPMENT } from "./equipment-config.js";
@@ -44,7 +42,6 @@ function updateAdminAccessCode() {
     return;
   }
   const category = currentCategory === "franciza" ? "franciza" : "carrefour";
-  updateAdminAccessCode();
   el("adminAccessCode").textContent =
     `Acces Admin ${category === "franciza" ? "Franciză" : "Carrefour"} · Cod ${ADMIN_ACCESS_CODES[category]}`;
   el("adminAccessCode").classList.remove("hidden");
