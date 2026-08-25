@@ -761,3 +761,65 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
   .dashboard-stats{grid-template-columns:1fr !important}
   .dashboard-stat-card{min-height:175px !important}
 }
+
+/* Detalii permanent vizibile pe Dashboard */
+.dashboard-stat-card{
+  position:relative !important;
+  min-height:165px !important;
+  height:auto !important;
+  padding:22px 24px !important;
+  padding-right:122px !important;
+  overflow:visible !important;
+}
+
+.stat-quick-details{
+  position:absolute !important;
+  top:18px !important;
+  right:18px !important;
+  z-index:10 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:88px !important;
+  padding:9px 12px !important;
+  border:1px solid #d8cdf4 !important;
+  border-radius:10px !important;
+  background:#f4efff !important;
+  color:#5b21b6 !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  cursor:pointer !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.stat-quick-details:hover{
+  background:#e9ddff !important;
+  border-color:#c5b2ee !important;
+  transform:translateY(-1px);
+}
+
+.stat-explain{
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+  margin-top:18px !important;
+  padding:14px 0 2px !important;
+}
+
+.dashboard-stat-card::-webkit-scrollbar,
+.stat-explain::-webkit-scrollbar{
+  display:none !important;
+}
+
+@media(max-width:650px){
+  .dashboard-stat-card{
+    padding-right:24px !important;
+    padding-top:62px !important;
+  }
+  .stat-quick-details{
+    top:16px !important;
+    left:22px !important;
+    right:auto !important;
+  }
+}
