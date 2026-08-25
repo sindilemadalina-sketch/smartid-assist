@@ -819,9 +819,13 @@ function renderStores() {
   const franciza = filtered.filter(s => normCategory(s.category || s.type) === "franciza");
 
   const renderRows = list => list
-    .sort((a,b) => String(a.name || "").localeCompare(String(b.name || ""), "ro"))
+    .sort((a,b) => {
+      const inactiveOrder = Number(a.active === false) - Number(b.active === false);
+      if (inactiveOrder !== 0) return inactiveOrder;
+      return String(a.name || "").localeCompare(String(b.name || ""), "ro");
+    })
     .map(store => `
-      <div class="store-row">
+      <div class="store-row ${store.active === false ? "store-row-inactive" : ""}">
         <b>${escapeHtml(store.name || store.id)}</b>
         <div class="store-meta">
           ID: ${escapeHtml(store.id)} ·
@@ -878,33 +882,86 @@ function toggleStoreFormat() {
   el("newStoreFormat").classList.toggle("hidden", !isCarrefour);
 }
 
+
+async function loadStoreIntoFormById() {
+  const id = el("newStoreId").value.trim();
+  if (!id) return;
+
+  try {
+    let store = storesCache.find(s => String(s.id) === id) || null;
+    if (!store) {
+      const snap = await getDoc(doc(db, "stores", id));
+      if (snap.exists()) store = { id, ...snap.data() };
+    }
+    if (!store) return;
+
+    el("newStoreName").value = store.name || "";
+    el("newStoreCategory").value = normCategory(store.category || store.type) || "carrefour";
+    toggleStoreFormat();
+
+    if (el("newStoreCategory").value === "carrefour") {
+      el("newStoreFormat").value = String(store.format || "hiper").toLowerCase();
+    }
+
+    el("newStoreActive").value = store.active === false ? "false" : "true";
+    el("saveStoreStatus").textContent =
+      `Editezi ${store.name || id}. Categoria și formatul existente au fost încărcate automat.`;
+  } catch (error) {
+    console.warn("Magazinul nu a putut fi încărcat în formular.", error);
+  }
+}
+
 async function saveStore() {
   if (!(isPrimaryAdmin() || currentCanAddStores)) {
     el("saveStoreStatus").textContent = "Nu ai dreptul să adaugi sau să modifici magazine.";
     return;
   }
+
   const id = el("newStoreId").value.trim();
   const name = el("newStoreName").value.trim();
-  const category = el("newStoreCategory").value;
 
   if (!id || !name) {
     el("saveStoreStatus").textContent = "Completează ID-ul și numele magazinului.";
     return;
   }
 
-  const data = {
-    name,
-    category,
-    active: el("newStoreActive").value === "true"
-  };
-  if (category === "carrefour") data.format = el("newStoreFormat").value;
-  else data.format = "";
+  try {
+    const storeRef = doc(db, "stores", id);
+    const existingSnap = await getDoc(storeRef);
+    const existing = existingSnap.exists() ? existingSnap.data() : null;
 
-  await setDoc(doc(db, "stores", id), data, { merge: true });
-  el("saveStoreStatus").textContent = "Magazinul a fost salvat.";
-  el("newStoreId").value = "";
-  el("newStoreName").value = "";
-  await loadStores();
+    const selectedCategory = el("newStoreCategory").value;
+    const selectedFormat = selectedCategory === "carrefour"
+      ? el("newStoreFormat").value
+      : "";
+
+    const data = {
+      name,
+      active: el("newStoreActive").value === "true",
+      category: existing?.category || selectedCategory,
+      format: existing?.format ?? selectedFormat
+    };
+
+    // Pentru magazin nou folosim categoria/formatul ales.
+    if (!existing) {
+      data.category = selectedCategory;
+      data.format = selectedFormat;
+    }
+
+    await setDoc(storeRef, data, { merge: true });
+
+    el("saveStoreStatus").textContent = data.active
+      ? "Magazinul a fost salvat ca Activ."
+      : "Magazinul a fost marcat Inactiv și a rămas în categoria lui.";
+
+    el("newStoreId").value = "";
+    el("newStoreName").value = "";
+    el("newStoreActive").value = "true";
+    await loadStores();
+  } catch (error) {
+    console.error(error);
+    el("saveStoreStatus").textContent = "Magazinul nu a putut fi salvat.";
+  }
 }
 
 
@@ -1262,3 +1319,6 @@ if (el("userDisplayName")) {
     el("userCanAddEquipment").checked = preset.canAddEquipment;
   });
 }
+
+onIfPresent("newStoreId", "change", loadStoreIntoFormById);
+onIfPresent("newStoreId", "blur", loadStoreIntoFormById);

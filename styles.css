@@ -615,3 +615,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 }
 .user-identity b,.user-identity small{display:block}
 .user-identity small{margin-top:3px;color:#667085}
+
+.store-edit-note{
+  margin-top:10px;
+  color:#667085;
+  font-size:12px;
+}
+.store-row-inactive{
+  opacity:.72;
+  background:#fafafa;
+}
+.store-row-inactive b{
+  text-decoration:line-through;
+  text-decoration-thickness:1px;
+}
