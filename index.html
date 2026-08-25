@@ -73,65 +73,69 @@
 
         <div class="stats-grid dashboard-stats">
           <article class="stat-card dashboard-stat-card" data-stat="logins">
-            <div class="stat-top"><strong id="statLogins">0</strong><span>Autentificări</span></div>
-            <div class="stat-explain hidden" id="explain-logins">
-              Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.
-              <button class="stat-details-link" data-stat-details="logins">Vezi cine s-a autentificat</button>
+            <div class="stat-icon stat-icon-logins">👥</div>
+            <div class="stat-copy">
+              <strong id="statLogins">0</strong>
+              <span>Autentificări</span>
+              <small>Vezi mai multe informații și statistici.</small>
             </div>
+            <div class="stat-trend stat-trend-logins" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-logins" data-stat-details="logins">Detalii →</button>
           </article>
           <article class="stat-card dashboard-stat-card" data-stat="stores">
-            <div class="stat-top"><strong id="statStores">0</strong><span>Magazine active</span></div>
-            <div class="stat-explain hidden" id="explain-stores">
-              Arată câte magazine distincte au accesat portalul.
-              <button class="stat-details-link" data-stat-details="stores">Vezi magazinele</button>
+            <div class="stat-icon stat-icon-stores">🏪</div>
+            <div class="stat-copy">
+              <strong id="statStores">0</strong>
+              <span>Magazine active</span>
+              <small>Află câte magazine distincte au accesat portalul.</small>
             </div>
+            <div class="stat-trend stat-trend-stores" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-stores" data-stat-details="stores">Detalii →</button>
           </article>
           <article class="stat-card dashboard-stat-card" data-stat="videos">
-            <div class="stat-top"><strong id="statVideos">0</strong><span>Vizualizări videoclipuri</span></div>
-            <div class="stat-explain hidden" id="explain-videos">
-              Arată numărul total de accesări ale videoclipurilor.
-              <button class="stat-details-link" data-stat-details="videos">Vezi ce s-a vizionat și de cine</button>
+            <div class="stat-icon stat-icon-videos">▶</div>
+            <div class="stat-copy">
+              <strong id="statVideos">0</strong>
+              <span>Vizualizări videoclipuri</span>
+              <small>Vezi performanța videoclipurilor.</small>
             </div>
+            <div class="stat-trend stat-trend-videos" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-videos" data-stat-details="videos">Detalii →</button>
           </article>
           <article class="stat-card dashboard-stat-card" data-stat="procedures">
-            <div class="stat-top"><strong id="statProcedures">0</strong><span>Vizualizări proceduri</span></div>
-            <div class="stat-explain hidden" id="explain-procedures">
-              Arată numărul total de accesări ale procedurilor.
-              <button class="stat-details-link" data-stat-details="procedures">Vezi ce proceduri s-au accesat</button>
+            <div class="stat-icon stat-icon-procedures">▤</div>
+            <div class="stat-copy">
+              <strong id="statProcedures">0</strong>
+              <span>Vizualizări proceduri</span>
+              <small>Vezi performanța procedurilor.</small>
             </div>
+            <div class="stat-trend stat-trend-procedures" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-procedures" data-stat-details="procedures">Detalii →</button>
           </article>
           <article class="stat-card dashboard-stat-card" data-stat="shares">
-            <div class="stat-top"><strong id="statShares">0</strong><span>Distribuiri</span></div>
-            <div class="stat-explain hidden" id="explain-shares">
-              Arată de câte ori au fost distribuite materialele din portal.
-              <button class="stat-details-link" data-stat-details="shares">Vezi distribuirile</button>
+            <div class="stat-icon stat-icon-shares">↗</div>
+            <div class="stat-copy">
+              <strong id="statShares">0</strong>
+              <span>Distribuiri</span>
+              <small>Vezi câte materiale au fost distribuite.</small>
             </div>
+            <div class="stat-trend stat-trend-shares" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-shares" data-stat-details="shares">Detalii →</button>
           </article>
           <article class="stat-card dashboard-stat-card approval-stat" data-stat="pending">
-            <div class="stat-top"><strong id="statPending">0</strong><span>De aprobat</span></div>
-            <div class="stat-explain hidden" id="explain-pending">
-              Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.
-              <button class="stat-details-link" data-stat-details="pending">Deschide materialele de aprobat</button>
+            <div class="stat-icon stat-icon-pending">✓</div>
+            <div class="stat-copy">
+              <strong id="statPending">0</strong>
+              <span>De aprobat</span>
+              <small>Materiale în așteptare pentru aprobare.</small>
             </div>
+            <div class="stat-trend stat-trend-pending" aria-hidden="true"><span></span></div>
+            <button class="stat-details-link stat-details-pending" data-stat-details="pending">Detalii →</button>
           </article>
         </div>
 
-<div class="dashboard-main-grid">
-          <section class="panel usage-panel">
-            
-            <div class="diagram-wrap">
-              <div id="usageDiagram" class="usage-diagram">
-                <div class="diagram-center">
-                  <strong id="diagramTotal">0</strong>
-                  <span>Total</span>
-                </div>
-              </div>
-              <div class="diagram-legend">
-                <div><span class="legend-dot video-dot"></span>Videoclipuri <b id="diagramVideos">0</b></div>
-                <div><span class="legend-dot procedure-dot"></span>Proceduri <b id="diagramProcedures">0</b></div>
-              </div>
-            </div>
-          </section>
+<div class="dashboard-main-grid dashboard-main-single">
+          
 
           <section class="panel team-panel">
             <div class="panel-head">

@@ -624,70 +624,99 @@ function openDashboardDetails(title, subtitle, rows) {
 let dashboardDetailCache = { sessions: [], views: [], shares: [] };
 
 function setupDashboardInteractions() {
-  document.querySelectorAll(".dashboard-stat-card").forEach(card => {
-    card.onclick = event => {
-      if (event.target.closest(".stat-details-link")) return;
-      const key = card.dataset.stat;
-      document.querySelectorAll(".stat-explain").forEach(box => {
-        if (box.id !== `explain-${key}`) box.classList.add("hidden");
-      });
-      el(`explain-${key}`)?.classList.toggle("hidden");
-    };
-  });
-
   document.querySelectorAll("[data-stat-details]").forEach(button => {
     button.onclick = async event => {
+      event.preventDefault();
       event.stopPropagation();
+
       const key = button.dataset.statDetails;
       const { sessions, views, shares } = dashboardDetailCache;
 
       if (key === "logins") {
-        openDashboardDetails("Autentificări", "Cine s-a autentificat, magazinul și momentul accesării.",
-          [...sessions].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-            title: displayUser(x.email),
-            detail: x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role || ""),
-            when: dashboardTimestamp(x.createdAt)
-          })));
+        openDashboardDetails(
+          "Autentificări",
+          "Cine s-a autentificat, magazinul și momentul accesării.",
+          [...sessions]
+            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
+            .map(x=>({
+              title: displayUser(x.email),
+              detail: x.storeName ? `${x.storeName}${x.storeId ? ` · ID ${x.storeId}` : ""}` : (x.role || ""),
+              when: dashboardTimestamp(x.createdAt)
+            }))
+        );
       } else if (key === "stores") {
         const storeMap = new Map();
         sessions.forEach(x => {
           if (!x.storeId && !x.storeName) return;
-          const k=x.storeId||x.storeName;
-          const v=storeMap.get(k)||{name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
+          const k = x.storeId || x.storeName;
+          const v = storeMap.get(k) || {name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};
           v.count++;
-          if((x.createdAt?.seconds||0)>(v.last?.seconds||0)) v.last=x.createdAt;
+          if ((x.createdAt?.seconds||0) > (v.last?.seconds||0)) v.last=x.createdAt;
           storeMap.set(k,v);
         });
-        openDashboardDetails("Magazine active","Magazinele care au accesat SmartID Portal.",
-          [...storeMap.values()].sort((a,b)=>b.count-a.count).map(x=>({
-            title:`${x.name}${x.id ? ` · ID ${x.id}` : ""}`,
-            detail:`${x.count} autentificări`,
-            when:`Ultima accesare: ${dashboardTimestamp(x.last)}`
-          })));
+        openDashboardDetails(
+          "Magazine active",
+          "Magazinele care au accesat SmartID Portal.",
+          [...storeMap.values()]
+            .sort((a,b)=>b.count-a.count)
+            .map(x=>({
+              title:`${x.name}${x.id ? ` · ID ${x.id}` : ""}`,
+              detail:`${x.count} autentificări`,
+              when:`Ultima accesare: ${dashboardTimestamp(x.last)}`
+            }))
+        );
       } else if (key === "videos") {
-        openDashboardDetails("Vizualizări videoclipuri","Videoclipurile accesate și utilizatorii care le-au vizualizat.",
-          [...views].filter(x=>normType(x.type)==="videoclip").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-            title:x.title||"Videoclip",
-            detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
-            when:dashboardTimestamp(x.createdAt)
-          })));
+        openDashboardDetails(
+          "Vizualizări videoclipuri",
+          "Videoclipurile accesate și utilizatorii care le-au vizualizat.",
+          [...views]
+            .filter(x=>normType(x.type)==="videoclip")
+            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
+            .map(x=>({
+              title:x.title||"Videoclip",
+              detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
+              when:dashboardTimestamp(x.createdAt)
+            }))
+        );
       } else if (key === "procedures") {
-        openDashboardDetails("Vizualizări proceduri","Procedurile accesate și utilizatorii care le-au consultat.",
-          [...views].filter(x=>normType(x.type)==="procedura").sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-            title:x.title||"Procedură",
-            detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
-            when:dashboardTimestamp(x.createdAt)
-          })));
+        openDashboardDetails(
+          "Vizualizări proceduri",
+          "Procedurile accesate și utilizatorii care le-au consultat.",
+          [...views]
+            .filter(x=>normType(x.type)==="procedura")
+            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
+            .map(x=>({
+              title:x.title||"Procedură",
+              detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
+              when:dashboardTimestamp(x.createdAt)
+            }))
+        );
       } else if (key === "shares") {
-        openDashboardDetails("Distribuiri","Materialele distribuite, cine le-a trimis și metoda folosită.",
-          [...shares].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(x=>({
-            title:x.title||"Material",
-            detail:`${displayUser(x.email)} · ${x.method || x.channel || "Distribuire"}`,
-            when:dashboardTimestamp(x.createdAt)
-          })));
+        openDashboardDetails(
+          "Distribuiri",
+          "Materialele distribuite, cine le-a trimis și metoda folosită.",
+          [...shares]
+            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
+            .map(x=>({
+              title:x.title||"Material",
+              detail:`${displayUser(x.email)} · ${x.method || x.channel || "Distribuire"}`,
+              when:dashboardTimestamp(x.createdAt)
+            }))
+        );
       } else if (key === "pending") {
-        showPage("manageMaterialsPage");
-        await renderAdminMaterials();
+        const pending = materials
+          .filter(m => (m.status || "approved") === "pending")
+          .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
+        openDashboardDetails(
+          "Materiale de aprobat",
+          "Materialele încărcate de echipă care așteaptă aprobarea Adminului principal.",
+          pending.map(m=>({
+            title:m.title || "Material",
+            detail:`${normType(m.type)==="videoclip" ? "Videoclip" : "Procedură"} · ${displayUser(m.createdBy)}`,
+            when:dashboardTimestamp(m.createdAt)
+          }))
+        );
       }
     };
   });
@@ -734,12 +763,14 @@ async function loadDashboard() {
 
     const totalViews = videoViews + procedureViews;
     const videoAngle = totalViews ? (videoViews / totalViews) * 360 : 0;
-    el("diagramVideos").textContent = videoViews;
-    el("diagramProcedures").textContent = procedureViews;
-    el("diagramTotal").textContent = totalViews;
-    el("usageDiagram").style.background = totalViews
-      ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
-      : "conic-gradient(#e5e7eb 0deg 360deg)";
+    if (el("diagramVideos")) el("diagramVideos").textContent = videoViews;
+    if (el("diagramProcedures")) el("diagramProcedures").textContent = procedureViews;
+    if (el("diagramTotal")) el("diagramTotal").textContent = totalViews;
+    if (el("usageDiagram")) {
+      el("usageDiagram").style.background = totalViews
+        ? `conic-gradient(#6d28d9 0deg ${videoAngle}deg, #c026d3 ${videoAngle}deg 360deg)`
+        : "conic-gradient(#e5e7eb 0deg 360deg)";
+    }
 
     // Activitate echipa = doar materiale noi, cu autor cunoscut.
     const recentTeamMaterials = materials.filter(item =>
