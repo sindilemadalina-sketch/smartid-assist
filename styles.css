@@ -1041,36 +1041,11 @@ html::-webkit-scrollbar:horizontal,
   }
 }
 
-/* Geolocalizare Admin */
-.geo-admin-grid{
-  display:grid;
-  grid-template-columns:1.2fr 2fr 1fr 1fr;
-  gap:14px;
+.geo-safe-form{
+ display:grid;grid-template-columns:1.2fr 2fr 1fr 1fr;gap:14px
 }
-.geo-admin-grid label{
-  display:block;
-  margin:0 0 6px;
-  font-size:12px;
-  font-weight:800;
-  color:#475467;
-}
-.geo-admin-grid input,.geo-admin-grid select{width:100%}
-.geo-admin-actions{display:flex;gap:10px;margin-top:16px}
-.geo-stores-list{display:grid;gap:8px;margin-top:14px}
-.geo-store-row{
-  display:grid;
-  grid-template-columns:minmax(240px,1.4fr) minmax(250px,1fr) auto;
-  align-items:center;
-  gap:16px;
-  padding:13px 15px;
-  border:1px solid #e7eaf0;
-  border-radius:13px;
-  background:#fff;
-}
-.geo-store-row small{display:block;margin-top:4px;color:#667085}
-.geo-coordinates{display:flex;gap:18px;color:#475467;font-size:13px}
-@media(max-width:850px){
-  .geo-admin-grid{grid-template-columns:1fr 1fr}
-  .geo-store-row{grid-template-columns:1fr}
-}
-@media(max-width:560px){.geo-admin-grid{grid-template-columns:1fr}}
+.geo-safe-form label{display:block;font-weight:800;font-size:12px;margin-bottom:6px;color:#475467}
+.geo-safe-form input,.geo-safe-form select{width:100%}
+.geo-safe-actions{margin-top:16px}
+@media(max-width:900px){.geo-safe-form{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.geo-safe-form{grid-template-columns:1fr}}

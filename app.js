@@ -180,7 +180,6 @@ async function finishLogin() {
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
-  document.querySelectorAll('[data-permission="geo"]').forEach(x => x.classList.toggle("hidden", currentRole !== "admin"));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
 
   if (currentRole === "admin") {
@@ -836,102 +835,6 @@ async function loadDashboard() {
     console.error("Dashboard:", error);
   }
 }
-
-async function loadGeolocationAdmin() {
-  if (currentRole !== "admin") return;
-  if (!storesCache.length) {
-    const snap = await getDocs(collection(db, "stores"));
-    storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
-  }
-  renderGeolocationAdmin();
-}
-
-function renderGeolocationAdmin() {
-  const select = el("geoStoreSelect");
-  if (!select) return;
-
-  const sorted = [...storesCache]
-    .filter(store => store.active !== false)
-    .sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id),"ro"));
-
-  const current = select.value;
-  select.innerHTML = '<option value="">Selectează magazinul...</option>' +
-    sorted.map(store => `<option value="${escapeHtml(store.id)}">${escapeHtml(store.name || store.id)} · ID ${escapeHtml(store.id)}</option>`).join("");
-  if (sorted.some(x=>String(x.id)===String(current))) select.value=current;
-
-  const term = (el("geoSearch")?.value || "").trim().toLowerCase();
-  const list = sorted.filter(store =>
-    !term || `${store.id} ${store.name||""} ${store.address||""}`.toLowerCase().includes(term)
-  );
-
-  el("geoStoresList").innerHTML = list.length ? list.map(store => `
-    <div class="geo-store-row" data-geo-edit="${escapeHtml(store.id)}">
-      <div>
-        <b>${escapeHtml(store.name || store.id)}</b>
-        <small>ID ${escapeHtml(store.id)}${store.address ? ` · ${escapeHtml(store.address)}` : ""}</small>
-      </div>
-      <div class="geo-coordinates">
-        <span>Lat: ${store.latitude ?? "—"}</span>
-        <span>Long: ${store.longitude ?? "—"}</span>
-      </div>
-      <button type="button" class="store-edit-btn">Completează / Edit</button>
-    </div>
-  `).join("") : '<div class="empty">Nu există magazine pentru căutarea curentă.</div>';
-
-  document.querySelectorAll("[data-geo-edit]").forEach(row => {
-    row.querySelector("button").onclick = () => {
-      select.value = row.dataset.geoEdit;
-      fillGeoStoreForm();
-      window.scrollTo({top:0,behavior:"smooth"});
-    };
-  });
-}
-
-function fillGeoStoreForm() {
-  const store = storesCache.find(x => String(x.id) === String(el("geoStoreSelect")?.value));
-  if (!store) {
-    if (el("geoAddress")) el("geoAddress").value="";
-    if (el("geoLatitude")) el("geoLatitude").value="";
-    if (el("geoLongitude")) el("geoLongitude").value="";
-    return;
-  }
-  el("geoAddress").value = store.address || "";
-  el("geoLatitude").value = store.latitude ?? "";
-  el("geoLongitude").value = store.longitude ?? "";
-  el("geoSaveStatus").textContent = "";
-}
-
-async function saveStoreGeolocation() {
-  if (currentRole !== "admin") return;
-  const id = el("geoStoreSelect").value;
-  const address = el("geoAddress").value.trim();
-  const latRaw = el("geoLatitude").value.trim().replace(",", ".");
-  const lngRaw = el("geoLongitude").value.trim().replace(",", ".");
-  const latitude = Number(latRaw);
-  const longitude = Number(lngRaw);
-
-  if (!id) { el("geoSaveStatus").textContent="Selectează un magazin."; return; }
-  if (!address) { el("geoSaveStatus").textContent="Completează adresa înainte de coordonate."; return; }
-  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
-    el("geoSaveStatus").textContent="Latitudinea nu este validă."; return;
-  }
-  if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-    el("geoSaveStatus").textContent="Longitudinea nu este validă."; return;
-  }
-
-  try {
-    await setDoc(doc(db,"stores",String(id)), {address, latitude, longitude}, {merge:true});
-    const store=storesCache.find(x=>String(x.id)===String(id));
-    if (store) Object.assign(store,{address,latitude,longitude});
-    el("geoSaveStatus").textContent="Coordonatele au fost salvate.";
-    renderGeolocationAdmin();
-    el("geoStoreSelect").value=id;
-  } catch(error) {
-    console.error("Salvare geolocalizare:",error);
-    el("geoSaveStatus").textContent="Coordonatele nu au putut fi salvate.";
-  }
-}
-
 async function loadStores() {
   const snap = await getDocs(collection(db, "stores"));
   storesCache = snap.docs.map(item => ({ id: item.id, ...item.data() }));
@@ -1268,7 +1171,6 @@ document.querySelectorAll(".side-btn").forEach(button => {
     if (page === "manageMaterialsPage") await renderAdminMaterials();
     if (page === "usersPage") await loadUsers();
     if (page === "storesPage") await loadStores();
-    if (page === "geolocationPage") await loadGeolocationAdmin();
     showPage(page);
     closeMenu();
   });
@@ -1309,15 +1211,6 @@ onIfPresent("saveUserBtn", "click", saveUserProfile);
 
 
 
-onIfPresent("geoStoreSelect", "change", fillGeoStoreForm);
-onIfPresent("geoSearch", "input", renderGeolocationAdmin);
-onIfPresent("saveGeoBtn", "click", saveStoreGeolocation);
-onIfPresent("clearGeoBtn", "click", () => {
-  el("geoStoreSelect").value="";
-  fillGeoStoreForm();
-  el("geoSaveStatus").textContent="";
-});
-
 renderEquipmentChoices();
 toggleStoreFormat();
 
@@ -1347,5 +1240,72 @@ onAuthStateChanged(auth, async user => {
     el("loginPage").style.display = "flex";
     el("app").classList.add("hidden");
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
+  }
+});
+
+
+/* GEOLOCALIZARE - modul izolat, nu modifică routerul existent */
+async function openGeoSafePage() {
+  try {
+    document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+    const page = document.getElementById("geoSafePage");
+    if (page) page.classList.remove("hidden");
+
+    let list = Array.isArray(storesCache) ? storesCache : [];
+    if (!list.length) {
+      const snap = await getDocs(collection(db, "stores"));
+      list = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    }
+
+    const select = document.getElementById("geoSafeStore");
+    if (!select) return;
+    select.innerHTML = '<option value="">Selectează magazinul...</option>' +
+      list.filter(s => s.active !== false)
+          .sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id),"ro"))
+          .map(s=>`<option value="${escapeHtml(String(s.id))}">${escapeHtml(s.name||String(s.id))} · ID ${escapeHtml(String(s.id))}</option>`)
+          .join("");
+  } catch(err) {
+    console.error("Geolocalizare:", err);
+  }
+}
+
+document.getElementById("geoSafeBtn")?.addEventListener("click", openGeoSafePage);
+
+document.getElementById("geoSafeStore")?.addEventListener("change", async function() {
+  const id = this.value;
+  if (!id) return;
+  let store = Array.isArray(storesCache) ? storesCache.find(s=>String(s.id)===String(id)) : null;
+  if (!store) {
+    const snap = await getDoc(doc(db,"stores",String(id)));
+    if (snap.exists()) store = {id:snap.id,...snap.data()};
+  }
+  if (!store) return;
+  document.getElementById("geoSafeAddress").value = store.address || "";
+  document.getElementById("geoSafeLat").value = store.latitude ?? "";
+  document.getElementById("geoSafeLng").value = store.longitude ?? "";
+});
+
+document.getElementById("geoSafeSave")?.addEventListener("click", async function() {
+  const id = document.getElementById("geoSafeStore").value;
+  const address = document.getElementById("geoSafeAddress").value.trim();
+  const lat = Number(document.getElementById("geoSafeLat").value.trim().replace(",","."));
+  const lng = Number(document.getElementById("geoSafeLng").value.trim().replace(",","."));
+  const status = document.getElementById("geoSafeStatus");
+
+  if (!id) { status.textContent="Selectează magazinul."; return; }
+  if (!address) { status.textContent="Completează adresa."; return; }
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) { status.textContent="Latitudine invalidă."; return; }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) { status.textContent="Longitudine invalidă."; return; }
+
+  try {
+    await setDoc(doc(db,"stores",String(id)), {address, latitude:lat, longitude:lng}, {merge:true});
+    if (Array.isArray(storesCache)) {
+      const s=storesCache.find(x=>String(x.id)===String(id));
+      if (s) Object.assign(s,{address,latitude:lat,longitude:lng});
+    }
+    status.textContent="Coordonatele au fost salvate.";
+  } catch(err) {
+    console.error(err);
+    status.textContent="Eroare la salvare.";
   }
 });
