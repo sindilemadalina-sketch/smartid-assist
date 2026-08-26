@@ -312,38 +312,10 @@
       </section>
 
       <section id="geoSafePage" class="page hidden">
-        <div class="page-head">
-          <div>
-            <h1>Geolocalizare</h1>
-            <p class="subtitle">Coordonate pentru magazinele active.</p>
-          </div>
-        </div>
-        <section class="panel">
-          <div class="geo-safe-form">
-            <div>
-              <label>Magazin</label>
-              <select id="geoSafeStore"><option value="">Selectează magazinul...</option></select>
-            </div>
-            <div>
-              <label>Adresă</label>
-              <input id="geoSafeAddress" placeholder="Adresa magazinului">
-            </div>
-            <div>
-              <label>Latitudine</label>
-              <input id="geoSafeLat" placeholder="44.4268">
-            </div>
-            <div>
-              <label>Longitudine</label>
-              <input id="geoSafeLng" placeholder="26.1025">
-            </div>
-          </div>
-          <div class="geo-safe-actions">
-            <button type="button" class="geo-find-btn" id="geoSafeFind">📍 Găsește coordonatele</button>
-            <button type="button" class="primary" id="geoSafeSave">Salvează</button>
-          </div>
-          <div id="geoSafeStatus" class="status"></div>
-        </section>
-      </section>
+<div class="page-head"><div><h1>Geolocalizare magazine</h1><p class="subtitle">Lista magazinelor si coordonatele folosite pentru identificarea automata.</p></div></div>
+<section class="panel"><div class="geo-list-toolbar"><input id="geoListSearch" placeholder="Cauta magazin sau adresa..."><span id="geoListCount"></span></div>
+<div class="geo-table-wrap"><table class="geo-table"><thead><tr><th>Magazin</th><th>Adresa</th><th>Latitudine</th><th>Longitudine</th><th>Actiune</th></tr></thead><tbody id="geoListBody"></tbody></table></div>
+<div id="geoListStatus" class="status"></div></section></section>
 
     </main>
   </div>
