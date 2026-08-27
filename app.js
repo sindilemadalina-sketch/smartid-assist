@@ -393,10 +393,12 @@ function renderPortalLandingForRole() {
   if (currentRole === "admin") {
     landing.classList.add("hidden");
     standard.classList.remove("hidden");
+    standard.style.removeProperty("display");
     return;
   }
 
   standard.classList.add("hidden");
+  standard.style.setProperty("display", "none", "important");
   landing.classList.remove("hidden");
 
   const allSections = [
@@ -457,7 +459,7 @@ function renderPortalLandingForRole() {
                     sum + supportMaterialsFor(section.category, item.id, block.type).length, 0);
 
                   return `
-                    <div class="support-type-group ${index === 0 ? "open" : ""}">
+                    <div class="support-type-group">
                       <button type="button" class="support-type-row" data-type-toggle>
                         <span class="support-type-icon ${block.iconClass}">${block.icon}</span>
                         <span class="support-type-name">${block.label}</span>
@@ -499,12 +501,14 @@ function renderPortalLandingForRole() {
   });
 
   landing.querySelectorAll("[data-support-equipment]").forEach(button => {
-    button.onclick = () => openSupportDocsModal(
-      button.dataset.supportCategory,
-      button.dataset.supportEquipment,
-      button.dataset.supportLabel,
-      button.dataset.supportType
-    );
+    button.onclick = () => {
+      selectedBrowseCategory = button.dataset.supportCategory || currentCategory;
+      selectedEquipment = button.dataset.supportEquipment || "";
+      selectedEquipmentLabel = button.dataset.supportLabel || "";
+      selectedMaterialType = button.dataset.supportType || "procedura";
+      renderSelectedMaterials();
+      showPage("materialsPage");
+    };
   });
 }
 
