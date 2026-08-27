@@ -198,18 +198,11 @@ function configureAccountIdentity() {
   if (currentRole === "suport") {
     badge.textContent = "SUPORT";
     badge.dataset.role = "suport";
-    el("equipmentPageTitle").textContent = "Materiale";
+    el("equipmentPageTitle").textContent = "SUPORT";
     el("carrefourBrand").classList.add("hidden");
-    el("storeWelcome").textContent = "SUPORT · Carrefour + Franciză + Suport intern";
-    hero.innerHTML = `
-      <div class="account-user-banner support-user-banner">
-        <img src="smartid-logo-visual.jfif" alt="Smart ID">
-        <div>
-          <span>SMART ID</span>
-          <strong>SUPORT</strong>
-          <p>Acces la materialele Carrefour, Franciză și Suport intern.</p>
-        </div>
-      </div>`;
+    el("storeWelcome").textContent = "Carrefour · Franciză · Suport intern";
+    if (hero) hero.innerHTML = "";
+    renderSupportPortalLanding();
   } else if (currentRole === "franciza") {
     badge.textContent = "FRANCIZĂ";
     badge.dataset.role = "franciza";
@@ -245,7 +238,7 @@ function normalizePortalRole(role, email) {
 }
 
 async function finishLogin() {
-  currentRole = normalizePortalRole(currentRole, auth.currentUser?.email || "");
+  currentRole = normalizePortalRole(currentRole, currentEmail);
   await ensureStores();
   await loadMaterials();
   await recordSession();
@@ -378,75 +371,213 @@ async function continueWithStore() {
   showPage(currentRole === "admin" ? "dashboardPage" : "equipmentPage");
 }
 
+
+function supportMaterialsFor(category, equipmentId, type = "") {
+  return materials
+    .filter(material => {
+      const status = material.status || "approved";
+      const cats = Array.isArray(material.categories) ? material.categories.map(normCategory) : [];
+      const eq = Array.isArray(material.equipment) ? material.equipment : [];
+      return status === "approved"
+        && cats.includes(category)
+        && eq.includes(equipmentId)
+        && (!type || normType(material.type) === type);
+    })
+    .sort((a,b) => Number(b.views || 0) - Number(a.views || 0));
+}
+
+function renderSupportPortalLanding() {
+  const landing = el("supportPortalLanding");
+  const standard = el("standardTypeGrid");
+  if (!landing || !standard) return;
+
+  if (currentRole !== "suport") {
+    landing.classList.add("hidden");
+    standard.classList.remove("hidden");
+    return;
+  }
+
+  standard.classList.add("hidden");
+  landing.classList.remove("hidden");
+
+  const sections = [
+    {
+      category: "carrefour",
+      title: "CARREFOUR",
+      eyebrow: "Rețea magazine",
+      description: "Toate procedurile și videoclipurile disponibile utilizatorilor Carrefour.",
+      logo: "carrefour-logo.svg",
+      visualClass: "support-card-carrefour"
+    },
+    {
+      category: "franciza",
+      title: "FRANCIZĂ",
+      eyebrow: "Carrefour Express",
+      description: "Toată documentația disponibilă utilizatorilor din Franciză.",
+      logo: "carrefour-express-verde-vertical.png",
+      visualClass: "support-card-franciza"
+    },
+    {
+      category: "suport",
+      title: "SUPORT INTERN",
+      eyebrow: "Smart ID",
+      description: "Proceduri tehnice și materiale interne dedicate echipei de Suport.",
+      logo: "smartid-logo-visual.jfif",
+      visualClass: "support-card-intern"
+    }
+  ];
+
+  const totalProcedures = sections.reduce((sum, section) =>
+    sum + materials.filter(m => (m.status || "approved") === "approved"
+      && (m.categories || []).map(normCategory).includes(section.category)
+      && normType(m.type) === "procedura").length, 0);
+
+  const totalVideos = sections.reduce((sum, section) =>
+    sum + materials.filter(m => (m.status || "approved") === "approved"
+      && (m.categories || []).map(normCategory).includes(section.category)
+      && normType(m.type) === "videoclip").length, 0);
+
+  landing.innerHTML = `
+    <div class="support-portal-intro">
+      <div>
+        <span class="support-kicker">SMART ID PORTAL</span>
+        <h2>Centru documentație Suport</h2>
+        <p>Ai într-o singură pagină exact documentația pe care o văd Carrefour și Franciză, plus materialele interne Suport.</p>
+      </div>
+      <div class="support-overview">
+        <div><strong>3</strong><span>zone</span></div>
+        <div><strong>${totalProcedures}</strong><span>proceduri</span></div>
+        <div><strong>${totalVideos}</strong><span>videoclipuri</span></div>
+      </div>
+    </div>
+
+    <div class="support-zone-stack">
+      ${sections.map(section => {
+        const equipment = EQUIPMENT[section.category] || [];
+        return `
+          <section class="support-zone-card ${section.visualClass}">
+            <div class="support-zone-visual">
+              <div class="support-zone-glow"></div>
+              <img src="${section.logo}" alt="${section.title}">
+              <span>${section.eyebrow}</span>
+            </div>
+
+            <div class="support-zone-content">
+              <div class="support-zone-title">
+                <div>
+                  <span>${section.eyebrow}</span>
+                  <h3>${section.title}</h3>
+                  <p>${section.description}</p>
+                </div>
+                <div class="support-zone-total">
+                  <b>${equipment.length}</b>
+                  <small>echipamente</small>
+                </div>
+              </div>
+
+              <div class="support-equipment-list">
+                ${equipment.map(item => {
+                  const procedures = supportMaterialsFor(section.category, item.id, "procedura");
+                  const videos = supportMaterialsFor(section.category, item.id, "videoclip");
+                  return `
+                    <button type="button"
+                            class="support-equipment-row"
+                            data-support-category="${section.category}"
+                            data-support-equipment="${item.id}"
+                            data-support-label="${escapeHtml(item.label)}">
+                      <span class="support-equipment-icon">${item.icon}</span>
+                      <span class="support-equipment-name">${escapeHtml(item.label)}</span>
+                      <span class="support-count support-count-proc">${procedures.length} proceduri</span>
+                      <span class="support-count support-count-video">${videos.length} videoclipuri</span>
+                      <span class="support-row-arrow">›</span>
+                    </button>`;
+                }).join("")}
+              </div>
+            </div>
+          </section>`;
+      }).join("")}
+    </div>
+  `;
+
+  landing.querySelectorAll("[data-support-equipment]").forEach(button => {
+    button.onclick = () => openSupportDocsModal(
+      button.dataset.supportCategory,
+      button.dataset.supportEquipment,
+      button.dataset.supportLabel
+    );
+  });
+}
+
+function openSupportDocsModal(category, equipmentId, label) {
+  const modal = el("supportDocsModal");
+  if (!modal) return;
+
+  const zoneNames = {
+    carrefour: "CARREFOUR",
+    franciza: "FRANCIZĂ",
+    suport: "SUPORT INTERN"
+  };
+
+  const procedures = supportMaterialsFor(category, equipmentId, "procedura");
+  const videos = supportMaterialsFor(category, equipmentId, "videoclip");
+
+  el("supportDocsZone").textContent = zoneNames[category] || category;
+  el("supportDocsZone").dataset.zone = category;
+  el("supportDocsTitle").textContent = label;
+  el("supportDocsSubtitle").textContent =
+    `${procedures.length} proceduri · ${videos.length} videoclipuri`;
+
+  const makeRows = (items, type) => items.length ? items.map(material => `
+    <button type="button" class="support-doc-row" data-support-material="${material.id}">
+      <span class="support-doc-icon">${type === "videoclip" ? "▶" : "▤"}</span>
+      <span class="support-doc-copy">
+        <b>${escapeHtml(material.title || "Material")}</b>
+        <small>${escapeHtml(material.description || (type === "videoclip" ? "Videoclip" : "Procedură"))}</small>
+      </span>
+      <span class="support-doc-views">👁 ${Number(material.views || 0)}</span>
+      <span class="support-doc-open">Deschide ›</span>
+    </button>
+  `).join("") : `<div class="support-doc-empty">Nu există încă ${type === "videoclip" ? "videoclipuri" : "proceduri"} pentru acest echipament.</div>`;
+
+  el("supportDocsBody").innerHTML = `
+    <section class="support-doc-section">
+      <div class="support-doc-section-title"><span>▤</span><h3>Proceduri</h3><b>${procedures.length}</b></div>
+      <div class="support-doc-list">${makeRows(procedures, "procedura")}</div>
+    </section>
+    <section class="support-doc-section">
+      <div class="support-doc-section-title"><span>▶</span><h3>Videoclipuri</h3><b>${videos.length}</b></div>
+      <div class="support-doc-list">${makeRows(videos, "videoclip")}</div>
+    </section>`;
+
+  el("supportDocsBody").querySelectorAll("[data-support-material]").forEach(button => {
+    button.onclick = () => {
+      const material = materials.find(m => String(m.id) === String(button.dataset.supportMaterial));
+      if (!material) return;
+      closeSupportDocsModal();
+      openViewer(material);
+    };
+  });
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-lock");
+}
+
+function closeSupportDocsModal() {
+  const modal = el("supportDocsModal");
+  if (!modal) return;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-lock");
+}
+
+
 function renderEquipment() {
   const page = el("materialTypePage");
 
   if (currentRole === "suport") {
-    document.body.classList.remove("support-showcase-mode");
-    el("equipmentGrid").classList.remove("support-showcase");
-
-    el("selectedMaterialTypeTitle").textContent =
-      selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
-
-    const sub = page?.querySelector(".subtitle");
-    if (sub) sub.textContent = "Alege zona și apoi echipamentul dorit.";
-
-    const sections = [
-      {
-        category: "carrefour",
-        title: "Carrefour",
-        logo: "carrefour-logo.svg",
-        logoClass: "support-list-logo-carrefour",
-        description: "Materiale pentru echipamentele din rețeaua Carrefour."
-      },
-      {
-        category: "franciza",
-        title: "Franciză",
-        logo: "carrefour-express-verde-vertical.png",
-        logoClass: "support-list-logo-franciza",
-        description: "Materiale pentru echipamentele din magazinele Franciză."
-      },
-      {
-        category: "suport",
-        title: "Suport intern",
-        logo: "smartid-logo-visual.jfif",
-        logoClass: "support-list-logo-smartid",
-        description: "Materiale tehnice interne pentru echipa Smart ID."
-      }
-    ];
-
-    el("equipmentGrid").innerHTML = sections.map(section => {
-      const items = EQUIPMENT[section.category] || [];
-      return `
-        <section class="support-user-section support-user-${section.category}">
-          <div class="support-user-section-head">
-            <div class="support-user-section-logo ${section.logoClass}">
-              <img src="${section.logo}" alt="${section.title}">
-            </div>
-            <div>
-              <h2>${section.title}</h2>
-              <p>${section.description}</p>
-            </div>
-          </div>
-
-          <div class="support-user-equipment-list">
-            ${items.map(item => `
-              <article class="equipment-card support-user-equipment-row"
-                       data-equipment="${item.id}"
-                       data-label="${escapeHtml(item.label)}"
-                       data-browse-category="${section.category}">
-                <div class="equipment-icon">${item.icon}</div>
-                <div class="support-user-equipment-copy">
-                  <h2>${escapeHtml(item.label)}</h2>
-                  <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
-                </div>
-                <span class="support-user-chevron">›</span>
-              </article>
-            `).join("")}
-          </div>
-        </section>`;
-    }).join("");
-
+    renderSupportPortalLanding();
+    return;
   } else {
     document.body.classList.remove("support-showcase-mode");
     el("equipmentGrid").classList.remove("support-showcase");
