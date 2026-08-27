@@ -1563,3 +1563,19 @@ body.modal-lock{overflow:hidden}
   .support-doc-row{grid-template-columns:36px 1fr}
   .support-doc-views,.support-doc-open{display:none}
 }
+
+/* HARD SWITCH: SUPORT must open directly on the professional 3-zone portal. */
+body.role-suport #accountHero,
+body.role-suport #standardTypeGrid { display:none !important; }
+body.role-suport #supportPortalLanding { display:block !important; }
+body.role-suport #equipmentPageTitle { font-size:34px; }
+body.role-suport #storeWelcome { font-weight:700; color:#6b7280; }
+.support-build-marker{
+  position:fixed;right:18px;bottom:18px;z-index:90;
+  padding:5px 9px;border-radius:999px;background:#111827;color:#c4b5fd;
+  font-size:9px;font-weight:900;letter-spacing:.8px;opacity:.72;
+}
+body.role-suport .content{max-width:none!important;width:100%!important;padding:26px 30px 40px!important;}
+body.role-suport .support-zone-card{min-height:300px;}
+body.role-suport .support-zone-visual img{height:205px;}
+body.role-suport .support-equipment-row{min-height:54px;}

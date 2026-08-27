@@ -196,6 +196,7 @@ function configureAccountIdentity() {
   badge?.classList.remove("hidden");
 
   if (currentRole === "suport") {
+    document.body.classList.add("role-suport");
     badge.textContent = "SUPORT";
     badge.dataset.role = "suport";
     el("equipmentPageTitle").textContent = "SUPORT";
@@ -204,6 +205,7 @@ function configureAccountIdentity() {
     if (hero) hero.innerHTML = "";
     renderSupportPortalLanding();
   } else if (currentRole === "franciza") {
+    document.body.classList.remove("role-suport");
     badge.textContent = "FRANCIZĂ";
     badge.dataset.role = "franciza";
     el("equipmentPageTitle").textContent = "Franciză";
@@ -214,6 +216,7 @@ function configureAccountIdentity() {
         <div><span>CARREFOUR</span><strong>FRANCIZĂ</strong><p>Videoclipuri și proceduri dedicate magazinelor din franciză.</p></div>
       </div>`;
   } else {
+    document.body.classList.remove("role-suport");
     badge.textContent = "CARREFOUR";
     badge.dataset.role = "carrefour";
     el("equipmentPageTitle").textContent = "Carrefour";
@@ -251,6 +254,10 @@ async function finishLogin() {
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
   configureAccountIdentity();
+  if (currentRole === "suport") {
+    renderSupportPortalLanding();
+    el("supportBuildMarker")?.classList.remove("hidden");
+  }
 
   if (currentRole === "admin") {
     await loadDashboard();
