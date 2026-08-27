@@ -233,7 +233,19 @@ function configureAccountIdentity() {
   }
 }
 
+
+function normalizePortalRole(role, email) {
+  const e = String(email || "").trim().toLowerCase();
+  const r = String(role || "").trim().toLowerCase();
+  if (e === String(PRIMARY_ADMIN_EMAIL || "").trim().toLowerCase()) return "admin";
+  if (r === "suport" || r === "support" || e.includes("suport") || e.includes("support")) return "suport";
+  if (r === "franciza" || r === "franciză") return "franciza";
+  if (r === "carrefour") return "carrefour";
+  return r || "carrefour";
+}
+
 async function finishLogin() {
+  currentRole = normalizePortalRole(currentRole, currentUser?.email || auth.currentUser?.email || "");
   await ensureStores();
   await loadMaterials();
   await recordSession();
@@ -249,7 +261,7 @@ async function finishLogin() {
 
   if (currentRole === "admin") {
     await loadDashboard();
-    showPage("dashboardPage");
+    showPage(currentRole === "admin" ? "dashboardPage" : "equipmentPage");
   } else {
     renderEquipment();
     showPage("equipmentPage");
@@ -362,6 +374,8 @@ async function continueWithStore() {
   currentStoreFormat = store.format || "";
   el("storeModal").classList.remove("open");
   await finishLogin();
+
+  showPage(currentRole === "admin" ? "dashboardPage" : "equipmentPage");
 }
 
 function renderEquipment() {
