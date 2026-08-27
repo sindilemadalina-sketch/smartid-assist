@@ -1119,3 +1119,169 @@ body.support-showcase-mode #equipmentPage .subtitle{color:inherit}
   .account-hero-inner strong{font-size:25px}
   .user-role-badge{min-width:auto}
 }
+
+/* =========================================================
+   SUPORT = USER, ACEEAȘI INTERFAȚĂ CA USER CARREFOUR
+   ========================================================= */
+.support-user-banner{
+  min-height:190px;
+  display:grid;
+  grid-template-columns:minmax(220px,340px) 1fr;
+  align-items:center;
+  gap:28px;
+  margin-bottom:18px;
+  padding:22px 30px;
+  border:1px solid #e7e8ef;
+  border-radius:22px;
+  background:linear-gradient(135deg,#ffffff,#f6f3ff 58%,#eef7ff);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.support-user-banner img{
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  border-radius:18px;
+}
+.support-user-banner span{
+  display:block;
+  color:#6d28d9;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.support-user-banner strong{
+  display:block;
+  margin-top:3px;
+  font-size:30px;
+  color:#111827;
+}
+.support-user-banner p{
+  margin-top:7px;
+  color:#667085;
+  line-height:1.45;
+}
+
+#equipmentGrid:has(.support-user-section){
+  display:block !important;
+}
+
+.support-user-section{
+  margin-bottom:18px;
+  padding:18px;
+  border:1px solid #e7e8ef;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+.support-user-section-head{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-bottom:14px;
+  padding-bottom:14px;
+  border-bottom:1px solid #edf0f5;
+}
+
+.support-user-section-head h2{
+  margin:0;
+  font-size:21px;
+  color:#111827;
+}
+
+.support-user-section-head p{
+  margin:5px 0 0;
+  color:#667085;
+  font-size:13px;
+}
+
+.support-user-section-logo{
+  width:105px;
+  height:78px;
+  flex:0 0 105px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:16px;
+  overflow:hidden;
+  background:#f8fafc;
+}
+
+.support-user-section-logo img{
+  width:90%;
+  height:90%;
+  object-fit:contain;
+}
+
+.support-list-logo-smartid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.support-user-equipment-list{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.support-user-equipment-row{
+  display:grid !important;
+  grid-template-columns:58px 1fr 32px !important;
+  align-items:center !important;
+  gap:14px !important;
+  min-height:82px !important;
+  padding:12px 16px !important;
+  margin:0 !important;
+  border-radius:16px !important;
+  box-shadow:none !important;
+  background:#fbfbfd !important;
+}
+
+.support-user-equipment-row:hover{
+  transform:translateY(-2px) !important;
+  background:#f7f4ff !important;
+}
+
+.support-user-equipment-row .equipment-icon{
+  width:52px !important;
+  height:52px !important;
+  margin:0 !important;
+  border-radius:15px !important;
+  font-size:24px !important;
+}
+
+.support-user-equipment-copy h2{
+  margin:0;
+  font-size:16px;
+}
+
+.support-user-equipment-copy p{
+  margin:4px 0 0 !important;
+  font-size:12px !important;
+  color:#667085 !important;
+}
+
+.support-user-chevron{
+  font-size:28px;
+  color:#6d28d9;
+  font-weight:700;
+}
+
+/* identitate cromatică discretă, dar rămâne UI light */
+.support-user-carrefour{border-left:5px solid #2563eb}
+.support-user-franciza{border-left:5px solid #16a34a}
+.support-user-suport{border-left:5px solid #8b5cf6}
+
+@media(max-width:720px){
+  .support-user-banner{
+    grid-template-columns:1fr;
+    padding:18px;
+  }
+  .support-user-banner img{height:125px}
+  .support-user-section-head{align-items:flex-start}
+  .support-user-section-logo{
+    width:82px;height:64px;flex-basis:82px;
+  }
+}

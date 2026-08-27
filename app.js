@@ -198,13 +198,17 @@ function configureAccountIdentity() {
   if (currentRole === "suport") {
     badge.textContent = "SUPORT";
     badge.dataset.role = "suport";
-    el("equipmentPageTitle").textContent = "Suport";
+    el("equipmentPageTitle").textContent = "Materiale";
     el("carrefourBrand").classList.add("hidden");
-    el("storeWelcome").textContent = "Acces utilizator Suport · Carrefour + Franciză + Suport intern";
+    el("storeWelcome").textContent = "SUPORT · Carrefour + Franciză + Suport intern";
     hero.innerHTML = `
-      <div class="account-hero-inner hero-suport">
+      <div class="account-user-banner support-user-banner">
         <img src="smartid-logo-visual.jfif" alt="Smart ID">
-        <div><span>SMART ID</span><strong>SUPORT</strong><p>Acces complet la materialele Carrefour, Franciză și Suport intern.</p></div>
+        <div>
+          <span>SMART ID</span>
+          <strong>SUPORT</strong>
+          <p>Acces la materialele Carrefour, Franciză și Suport intern.</p>
+        </div>
       </div>`;
   } else if (currentRole === "franciza") {
     badge.textContent = "FRANCIZĂ";
@@ -362,46 +366,106 @@ async function continueWithStore() {
 
 function renderEquipment() {
   const page = el("materialTypePage");
+
   if (currentRole === "suport") {
-    document.body.classList.add("support-showcase-mode");
-    el("selectedMaterialTypeTitle").textContent = selectedMaterialType === "videoclip" ? "SUPORT · Videoclipuri" : "SUPORT · Proceduri";
+    document.body.classList.remove("support-showcase-mode");
+    el("equipmentGrid").classList.remove("support-showcase");
+
+    el("selectedMaterialTypeTitle").textContent =
+      selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
+
     const sub = page?.querySelector(".subtitle");
-    if (sub) sub.textContent = "Acces complet: Carrefour, Franciză și Suport intern · alege echipamentul.";
+    if (sub) sub.textContent = "Alege zona și apoi echipamentul dorit.";
+
     const sections = [
-      ["carrefour", "CARREFOUR", "Proceduri și videoclipuri pentru echipamentele din rețeaua Carrefour.", "<img src='carrefour-logo.svg' alt='Carrefour' class='brand-zone-logo carrefour-blue-logo'>"],
-      ["franciza", "FRANCIZĂ", "Proceduri și videoclipuri pentru echipamentele din francizele Carrefour.", "<img src='carrefour-express-verde-vertical.png' alt='Carrefour Express' class='brand-zone-logo express-green-logo'>"],
-      ["suport", "SUPORT INTERN", "Proceduri tehnice și materiale interne pentru echipa de Suport Smart ID.", "<img src='smartid-logo-visual.jfif' alt='Smart ID' class='brand-zone-logo smartid-zone-logo'>"]
+      {
+        category: "carrefour",
+        title: "Carrefour",
+        logo: "carrefour-logo.svg",
+        logoClass: "support-list-logo-carrefour",
+        description: "Materiale pentru echipamentele din rețeaua Carrefour."
+      },
+      {
+        category: "franciza",
+        title: "Franciză",
+        logo: "carrefour-express-verde-vertical.png",
+        logoClass: "support-list-logo-franciza",
+        description: "Materiale pentru echipamentele din magazinele Franciză."
+      },
+      {
+        category: "suport",
+        title: "Suport intern",
+        logo: "smartid-logo-visual.jfif",
+        logoClass: "support-list-logo-smartid",
+        description: "Materiale tehnice interne pentru echipa Smart ID."
+      }
     ];
-    const countFor = (cat, eq, type) => materials.filter(m => materialAllowed(m) && m.type === type && (m.categories||[]).includes(cat) && (m.equipment||[]).includes(eq)).length;
-    el("equipmentGrid").classList.add("support-showcase");
-    el("equipmentGrid").innerHTML = sections.map(([cat,label,desc,visual]) => `
-      <section class="support-zone zone-${cat}">
-        <div class="support-zone-layout">
-          <div class="support-zone-visual">${visual}</div>
-          <div class="support-zone-content">
-            <div class="support-zone-head"><div><h2>${label}</h2><span>${desc}</span></div></div>
-            <div class="support-equipment-list">${(EQUIPMENT[cat] || []).map(item => `
-              <article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}" data-browse-category="${cat}">
-                <div class="equipment-icon">${item.icon}</div><h2>${escapeHtml(item.label)}</h2>
-                <span class="equipment-count">${countFor(cat,item.id,"procedura")} proceduri</span>
-                <span class="equipment-count">${countFor(cat,item.id,"videoclip")} videoclipuri</span>
-                <span class="equipment-arrow">›</span>
-              </article>`).join("")}</div>
+
+    el("equipmentGrid").innerHTML = sections.map(section => {
+      const items = EQUIPMENT[section.category] || [];
+      return `
+        <section class="support-user-section support-user-${section.category}">
+          <div class="support-user-section-head">
+            <div class="support-user-section-logo ${section.logoClass}">
+              <img src="${section.logo}" alt="${section.title}">
+            </div>
+            <div>
+              <h2>${section.title}</h2>
+              <p>${section.description}</p>
+            </div>
           </div>
-        </div>
-      </section>`).join("");
+
+          <div class="support-user-equipment-list">
+            ${items.map(item => `
+              <article class="equipment-card support-user-equipment-row"
+                       data-equipment="${item.id}"
+                       data-label="${escapeHtml(item.label)}"
+                       data-browse-category="${section.category}">
+                <div class="equipment-icon">${item.icon}</div>
+                <div class="support-user-equipment-copy">
+                  <h2>${escapeHtml(item.label)}</h2>
+                  <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
+                </div>
+                <span class="support-user-chevron">›</span>
+              </article>
+            `).join("")}
+          </div>
+        </section>`;
+    }).join("");
+
   } else {
     document.body.classList.remove("support-showcase-mode");
     el("equipmentGrid").classList.remove("support-showcase");
-    const category = ["carrefour","franciza","suport"].includes(currentCategory) ? currentCategory : "carrefour";
+
+    const category = ["carrefour","franciza","suport"].includes(currentCategory)
+      ? currentCategory
+      : "carrefour";
+
     const items = EQUIPMENT[category] || [];
-    el("equipmentGrid").innerHTML = items.map(item => `<article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}" data-browse-category="${category}"><div class="equipment-icon">${item.icon}</div><h2>${escapeHtml(item.label)}</h2><p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p></article>`).join("");
+
+    el("equipmentGrid").innerHTML = items.map(item => `
+      <article class="equipment-card"
+               data-equipment="${item.id}"
+               data-label="${escapeHtml(item.label)}"
+               data-browse-category="${category}">
+        <div class="equipment-icon">${item.icon}</div>
+        <h2>${escapeHtml(item.label)}</h2>
+        <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
+      </article>
+    `).join("");
   }
-  document.querySelectorAll(".equipment-card").forEach(card => card.addEventListener("click", () => {
-    selectedEquipment = card.dataset.equipment; selectedEquipmentLabel = card.dataset.label; selectedBrowseCategory = card.dataset.browseCategory || currentCategory;
-    renderSelectedMaterials(); showPage("materialsPage");
-  }));
+
+  document.querySelectorAll(".equipment-card").forEach(card => {
+    card.addEventListener("click", () => {
+      selectedEquipment = card.dataset.equipment;
+      selectedEquipmentLabel = card.dataset.label;
+      selectedBrowseCategory = card.dataset.browseCategory || currentCategory;
+      renderSelectedMaterials();
+      showPage("materialsPage");
+    });
+  });
 }
+
 function youtubeId(raw) {
   if (!raw) return "";
   try {
