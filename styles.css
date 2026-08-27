@@ -967,107 +967,55 @@ html,body,#app,main,.content,.page{
 .group-head{
   cursor:pointer !important;
 }
+/* SUPORT - toate cele 3 zone in aceeasi pagina */
+.support-zone{grid-column:1/-1;margin-bottom:8px;padding:20px;border:1px solid #e7e8ef;border-radius:24px;background:rgba(255,255,255,.72)}
+.support-zone-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px}.support-zone-head h2{font-size:24px;color:#312e81}.support-zone-head span{color:#667085;font-size:13px}
+.support-equipment-list{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.support-equipment-list .equipment-card{box-shadow:0 10px 28px rgba(15,23,42,.08)}
+@media(max-width:1050px){.support-equipment-list{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.support-equipment-list{grid-template-columns:1fr}.support-zone-head{align-items:flex-start;flex-direction:column}}
 
-/* FIX DEFINITIV: fara bara orizontala in Dashboard */
-html,
-body{
-  width:100% !important;
-  max-width:100% !important;
-  overflow-x:hidden !important;
-}
-
-#app,
-.content,
-#dashboardPage,
-.dashboard-page-pro,
-.dashboard-pro-list,
-.dashboard-pro-card,
-.dashboard-team-pro{
-  width:100% !important;
-  max-width:100% !important;
-  min-width:0 !important;
-  box-sizing:border-box !important;
-  overflow-x:hidden !important;
-}
-
-.content{
-  margin:0 !important;
-  padding-left:28px !important;
-  padding-right:28px !important;
-}
-
-#dashboardPage{
-  margin:0 !important;
-  padding:0 !important;
-}
-
-/* orice copil din carduri trebuie sa poata micsora fara sa forteze latimea paginii */
-.dashboard-pro-card > *,
-.dashboard-team-pro > *,
-.team-summary > *,
-.contributors-list > *{
-  min-width:0 !important;
-  max-width:100% !important;
-  box-sizing:border-box !important;
-}
-
-/* linia vizuala nu are voie sa impinga cardul */
-.metric-line{
-  min-width:0 !important;
-  width:100% !important;
-  overflow:hidden !important;
-}
-
-/* butoanele raman in interiorul cardului */
-.metric-details{
-  max-width:100% !important;
-  box-sizing:border-box !important;
-}
-
-/* eliminam explicit scrollbar-ul orizontal */
-body::-webkit-scrollbar:horizontal,
-html::-webkit-scrollbar:horizontal,
-#app::-webkit-scrollbar:horizontal,
-.content::-webkit-scrollbar:horizontal,
-#dashboardPage::-webkit-scrollbar:horizontal{
-  height:0 !important;
-  display:none !important;
-}
-
-@media(max-width:1000px){
-  .content{
-    padding-left:18px !important;
-    padding-right:18px !important;
-  }
-}
-
-.geo-safe-form{
- display:grid;grid-template-columns:1.2fr 2fr 1fr 1fr;gap:14px
-}
-.geo-safe-form label{display:block;font-weight:800;font-size:12px;margin-bottom:6px;color:#475467}
-.geo-safe-form input,.geo-safe-form select{width:100%}
-.geo-safe-actions{margin-top:16px}
-@media(max-width:900px){.geo-safe-form{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.geo-safe-form{grid-template-columns:1fr}}
-
-/* Geolocalizare bulk */
-.geo-bulk-head{
-  display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px
-}
-.geo-bulk-head p{margin:4px 0 0;color:#667085;font-size:13px}
-.geo-progress{display:flex;align-items:center;gap:12px;margin:12px 0 16px}
-.geo-progress-bar{height:9px;flex:1;background:#eeeaf7;border-radius:999px;overflow:hidden}
-.geo-progress-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#6d28d9,#c026d3);transition:width .2s}
-#geoProgressText{min-width:90px;font-weight:800;color:#5b21b6}
-.geo-list-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:14px}
-.geo-list-toolbar input{flex:1}
-.geo-list-toolbar span{font-weight:800;color:#5b21b6}
-.geo-table-wrap{overflow:auto;max-height:62vh;border:1px solid #e5e7eb;border-radius:14px}
-.geo-table{width:100%;border-collapse:collapse;background:#fff}
-.geo-table th,.geo-table td{padding:12px 14px;border-bottom:1px solid #eef0f4;text-align:left;vertical-align:middle}
-.geo-table th{position:sticky;top:0;background:#f8f7ff;z-index:1}
-.geo-table small{display:block;color:#667085;margin-top:3px}
-.geo-status-ok,.geo-status-missing{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:800}
-.geo-status-ok{background:#dcfce7;color:#166534}
-.geo-status-missing{background:#fef3c7;color:#92400e}
-@media(max-width:700px){.geo-bulk-head{align-items:flex-start;flex-direction:column}}
+/* === SUPORT SHOWCASE v3 — dark neon, 3 zones on one page === */
+body.support-showcase-mode{background:#050b1c;color:#f8fafc}
+body.support-showcase-mode .app-shell{background:radial-gradient(circle at 80% 10%,rgba(38,51,125,.20),transparent 35%),linear-gradient(180deg,#050a18,#071229 60%,#050a18)}
+body.support-showcase-mode .topbar{background:#050a18;border-bottom:1px solid rgba(255,255,255,.08)}
+body.support-showcase-mode #materialTypePage{max-width:none;width:100%;padding:18px 24px 36px}
+body.support-showcase-mode #materialTypePage>.page-head{max-width:1320px;margin:0 auto 16px}
+body.support-showcase-mode #materialTypePage>.page-head h1{color:#fff;font-size:30px}
+body.support-showcase-mode #materialTypePage>.page-head .subtitle{color:#b8c2d9}
+body.support-showcase-mode #equipmentGrid.support-showcase{display:flex!important;flex-direction:column;gap:16px;max-width:1320px;margin:0 auto}
+body.support-showcase-mode .support-zone{margin:0!important;padding:0!important;overflow:hidden;border-radius:22px;background:linear-gradient(135deg,rgba(14,23,48,.98),rgba(7,14,31,.98));box-shadow:0 18px 45px rgba(0,0,0,.28)}
+body.support-showcase-mode .support-zone.zone-carrefour{border:1px solid rgba(34,197,94,.42)}
+body.support-showcase-mode .support-zone.zone-franciza{border:1px solid rgba(168,85,247,.48)}
+body.support-showcase-mode .support-zone.zone-suport{border:1px solid rgba(14,165,233,.50)}
+body.support-showcase-mode .support-zone-layout{display:grid;grid-template-columns:300px 1fr;min-height:300px}
+body.support-showcase-mode .support-zone-visual{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at center,rgba(255,255,255,.08),transparent 68%)}
+body.support-showcase-mode .support-zone-visual img{width:100%;height:255px;object-fit:contain;filter:drop-shadow(0 18px 25px rgba(0,0,0,.45));transition:transform .35s ease,filter .35s ease}
+body.support-showcase-mode .support-zone:hover .support-zone-visual img{transform:scale(1.045);filter:drop-shadow(0 20px 32px rgba(0,0,0,.58))}
+body.support-showcase-mode .zone-franciza .support-zone-visual{font-size:128px;background:radial-gradient(circle,rgba(168,85,247,.25),transparent 62%)}
+body.support-showcase-mode .support-zone-content{padding:25px 28px;display:flex;flex-direction:column;justify-content:center}
+body.support-showcase-mode .support-zone-head{align-items:flex-start;margin:0 0 16px}
+body.support-showcase-mode .support-zone-head h2{font-size:29px;letter-spacing:.3px;margin:0}
+body.support-showcase-mode .zone-carrefour .support-zone-head h2{color:#39dc76}
+body.support-showcase-mode .zone-franciza .support-zone-head h2{color:#c066ff}
+body.support-showcase-mode .zone-suport .support-zone-head h2{color:#36bdf5}
+body.support-showcase-mode .support-zone-head span{color:#b9c2d6;font-size:14px;margin-top:7px;display:block}
+body.support-showcase-mode .support-equipment-list{display:flex!important;flex-direction:column;gap:8px}
+body.support-showcase-mode .equipment-card{min-height:50px!important;display:grid!important;grid-template-columns:40px 1fr auto auto 26px;align-items:center;gap:10px;padding:9px 12px!important;margin:0!important;border:1px solid rgba(255,255,255,.055)!important;border-radius:11px!important;background:rgba(255,255,255,.045)!important;color:#fff;box-shadow:none!important;transform:none!important}
+body.support-showcase-mode .equipment-card:hover{background:rgba(255,255,255,.085)!important;transform:translateX(3px)!important}
+body.support-showcase-mode .equipment-card .equipment-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;font-size:18px;background:rgba(255,255,255,.08)}
+body.support-showcase-mode .equipment-card h2{font-size:15px!important;color:#fff!important;margin:0!important}
+body.support-showcase-mode .equipment-card p{display:none!important}
+body.support-showcase-mode .equipment-count{font-size:11px;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.07);color:#dbe4f5;white-space:nowrap}
+body.support-showcase-mode .equipment-arrow{font-size:20px;color:#dbe4f5}
+body.support-showcase-mode .back-btn{background:#111a32;color:#fff;border-color:#273454}
+body.support-showcase-mode .viewer{background:rgba(2,6,18,.84);backdrop-filter:blur(10px)}
+body.support-showcase-mode .viewer-card{border:1px solid rgba(129,92,246,.45);box-shadow:0 28px 90px rgba(0,0,0,.55)}
+@media(max-width:850px){body.support-showcase-mode .support-zone-layout{grid-template-columns:1fr}body.support-showcase-mode .support-zone-visual{min-height:190px}body.support-showcase-mode .support-zone-visual img{height:175px}body.support-showcase-mode .equipment-card{grid-template-columns:38px 1fr 24px}.equipment-count{display:none}}
+/* Brand visuals per support zone */
+body.support-showcase-mode .support-zone-visual .brand-zone-logo{width:min(82%,360px);height:235px;object-fit:contain;transition:transform .35s ease,filter .35s ease}
+body.support-showcase-mode .zone-carrefour .support-zone-visual{background:radial-gradient(circle,rgba(0,102,204,.20),transparent 66%)}
+body.support-showcase-mode .zone-franciza .support-zone-visual{background:radial-gradient(circle,rgba(0,140,67,.20),transparent 66%)}
+body.support-showcase-mode .zone-suport .support-zone-visual{background:radial-gradient(circle,rgba(109,40,217,.20),transparent 66%)}
+body.support-showcase-mode .carrefour-blue-logo{filter:drop-shadow(0 0 24px rgba(0,102,204,.28))}
+body.support-showcase-mode .express-green-logo{filter:drop-shadow(0 0 24px rgba(0,140,67,.30))}
+body.support-showcase-mode .smartid-zone-logo{border-radius:18px;object-fit:cover;filter:drop-shadow(0 0 24px rgba(109,40,217,.28))}

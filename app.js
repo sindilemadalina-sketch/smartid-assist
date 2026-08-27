@@ -19,6 +19,7 @@ let currentStoreFormat = "";
 let selectedEquipment = "";
 let selectedEquipmentLabel = "";
 let selectedMaterialType = "";
+let selectedBrowseCategory = "";
 let materials = [];
 let storesCache = [];
 let currentOpenMaterial = null;
@@ -149,7 +150,8 @@ async function loadMaterials() {
 
 function materialAllowed(material) {
   const status = material.status || "approved";
-  if (currentRole === "admin" || currentRole === "suport") return true;
+  if (currentRole === "admin") return true;
+  if (currentRole === "suport") return status === "approved" && material.categories.includes(selectedBrowseCategory || "suport");
   return status === "approved" && material.categories.includes(currentCategory);
 }
 
@@ -203,7 +205,7 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
   currentRole = normRole(profile.role);
   currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
   currentCanManage = profile.canManage === true || currentRole === "admin";
-  currentCategory = normCategory(profile.category);
+  currentCategory = currentRole === "suport" ? "suport" : normCategory(profile.category);
 
   if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
     throw new Error("Rolul utilizatorului nu este valid.");
@@ -300,37 +302,47 @@ async function continueWithStore() {
 }
 
 function renderEquipment() {
-  const category = currentCategory === "franciza" ? "franciza" : "carrefour";
-  const items = EQUIPMENT[category] || [];
-
-  if (category === "franciza") {
-    el("equipmentPageTitle").textContent = "Franciză";
+  const page = el("materialTypePage");
+  if (currentRole === "suport") {
+    document.body.classList.add("support-showcase-mode");
+    el("selectedMaterialTypeTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri · Suport" : "Proceduri · Suport";
+    const sub = page?.querySelector(".subtitle");
+    if (sub) sub.textContent = "Acces complet: Carrefour, Franciză și Suport intern · alege echipamentul.";
+    const sections = [
+      ["carrefour", "CARREFOUR", "Proceduri și videoclipuri pentru echipamentele din rețeaua Carrefour.", "<img src='carrefour-logo.svg' alt='Carrefour' class='brand-zone-logo carrefour-blue-logo'>"],
+      ["franciza", "FRANCIZĂ", "Proceduri și videoclipuri pentru echipamentele din francizele Carrefour.", "<img src='carrefour-express-verde-vertical.png' alt='Carrefour Express' class='brand-zone-logo express-green-logo'>"],
+      ["suport", "SUPORT INTERN", "Proceduri tehnice și materiale interne pentru echipa de Suport Smart ID.", "<img src='smartid-logo-visual.jfif' alt='Smart ID' class='brand-zone-logo smartid-zone-logo'>"]
+    ];
+    const countFor = (cat, eq, type) => materials.filter(m => materialAllowed(m) && m.type === type && (m.categories||[]).includes(cat) && (m.equipment||[]).includes(eq)).length;
+    el("equipmentGrid").classList.add("support-showcase");
+    el("equipmentGrid").innerHTML = sections.map(([cat,label,desc,visual]) => `
+      <section class="support-zone zone-${cat}">
+        <div class="support-zone-layout">
+          <div class="support-zone-visual">${visual}</div>
+          <div class="support-zone-content">
+            <div class="support-zone-head"><div><h2>${label}</h2><span>${desc}</span></div></div>
+            <div class="support-equipment-list">${(EQUIPMENT[cat] || []).map(item => `
+              <article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}" data-browse-category="${cat}">
+                <div class="equipment-icon">${item.icon}</div><h2>${escapeHtml(item.label)}</h2>
+                <span class="equipment-count">${countFor(cat,item.id,"procedura")} proceduri</span>
+                <span class="equipment-count">${countFor(cat,item.id,"videoclip")} videoclipuri</span>
+                <span class="equipment-arrow">›</span>
+              </article>`).join("")}</div>
+          </div>
+        </div>
+      </section>`).join("");
   } else {
-    el("equipmentPageTitle").innerHTML = '<span class="carrefour-title"><img src="carrefour-logo.svg" alt="Carrefour"><span>Carrefour</span></span>';
+    document.body.classList.remove("support-showcase-mode");
+    el("equipmentGrid").classList.remove("support-showcase");
+    const category = ["carrefour","franciza","suport"].includes(currentCategory) ? currentCategory : "carrefour";
+    const items = EQUIPMENT[category] || [];
+    el("equipmentGrid").innerHTML = items.map(item => `<article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}" data-browse-category="${category}"><div class="equipment-icon">${item.icon}</div><h2>${escapeHtml(item.label)}</h2><p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p></article>`).join("");
   }
-  el("carrefourBrand").classList.toggle("hidden", category !== "carrefour");
-  el("storeWelcome").textContent = currentStoreName
-    ? `${currentStoreName}${currentStoreFormat ? ` · ${currentStoreFormat[0].toUpperCase()}${currentStoreFormat.slice(1)}` : ""}`
-    : "";
-
-  el("equipmentGrid").innerHTML = items.map(item => `
-    <article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}">
-      <div class="equipment-icon">${item.icon}</div>
-      <h2>${escapeHtml(item.label)}</h2>
-      <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
-    </article>
-  `).join("");
-
-  document.querySelectorAll(".equipment-card").forEach(card => {
-    card.addEventListener("click", () => {
-      selectedEquipment = card.dataset.equipment;
-      selectedEquipmentLabel = card.dataset.label;
-      renderSelectedMaterials();
-      showPage("materialsPage");
-    });
-  });
+  document.querySelectorAll(".equipment-card").forEach(card => card.addEventListener("click", () => {
+    selectedEquipment = card.dataset.equipment; selectedEquipmentLabel = card.dataset.label; selectedBrowseCategory = card.dataset.browseCategory || currentCategory;
+    renderSelectedMaterials(); showPage("materialsPage");
+  }));
 }
-
 function youtubeId(raw) {
   if (!raw) return "";
   try {
@@ -425,7 +437,7 @@ async function openViewer(material) {
 }
 
 function renderEquipmentChoices() {
-  for (const category of ["carrefour", "franciza"]) {
+  for (const category of ["carrefour", "franciza", "suport"]) {
     el(`${category}EquipmentChoices`).innerHTML = EQUIPMENT[category].map(item => `
       <label><input type="checkbox" name="${category}Equipment" value="${item.id}"> ${escapeHtml(item.label)}</label>
     `).join("");
@@ -439,7 +451,8 @@ async function saveMaterial() {
   const categories = [...document.querySelectorAll('input[name="materialCategory"]:checked')].map(input => input.value);
   const equipment = [
     ...document.querySelectorAll('input[name="carrefourEquipment"]:checked'),
-    ...document.querySelectorAll('input[name="francizaEquipment"]:checked')
+    ...document.querySelectorAll('input[name="francizaEquipment"]:checked'),
+    ...document.querySelectorAll('input[name="suportEquipment"]:checked')
   ].map(input => input.value);
 
   if (!title || !url) {
@@ -1165,7 +1178,7 @@ document.querySelectorAll(".side-btn").forEach(button => {
     const page = button.dataset.page;
     if (page === "dashboardPage") await loadDashboard();
     if (page === "equipmentPage") {
-      if (currentRole === "admin" && !["carrefour","franciza"].includes(currentCategory)) currentCategory = "carrefour";
+      if (currentRole === "admin" && !["carrefour","franciza","suport"].includes(currentCategory)) currentCategory = "carrefour";
       renderEquipment();
     }
     if (page === "manageMaterialsPage") await renderAdminMaterials();
@@ -1242,185 +1255,3 @@ onAuthStateChanged(auth, async user => {
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
   }
 });
-
-
-
-/* GEOLOCALIZARE - modul izolat, nu modifică routerul existent */
-const GEO_EXCEL_STORES = [{"name": "Barlad", "address": "Bld. Republicii nr. 320, Barlad, Jud. Vaslui"}, {"name": "Ploiesti 2", "address": "Piata 1 Decembrie 1918 nr. 1, Ploiesti, Jud. Prahova"}, {"name": "Sfantu Gheorghe", "address": "Str. Lunca Oltului nr. 31-35, Sfantu Gheorghe, Jud. Covasna"}, {"name": "Colosseum", "address": "Sos. Chitilei nr. 284-286, Bucuresti Sector 1"}, {"name": "Piatra Neamt", "address": "Bld. Decebal nr. 79, Piatra Neamt, Jud. Neamt"}, {"name": "Drobeta", "address": "Bld. Mihai Viteazul nr. 78, Drobeta-Turnu Severin, Jud. Mehedinti"}, {"name": "Alba Iulia", "address": "Str. Alexandru Ioan Cuza nr. 2, Alba Iulia, Jud. Alba"}, {"name": "Craiova", "address": "Calea Severinului nr. 61, Craiova, Jud. Dolj"}, {"name": "Arad", "address": "Calea Aurel Vlaicu nr. 14, Arad, Jud. Arad"}, {"name": "Roman", "address": "Strada Mihai Viteazul nr. 3, Roman Value Center, Roman, Jud. Neamt"}, {"name": "Targu Jiu", "address": "Strada Termocentralei nr. 10, Targu Jiu, Jud. Gorj"}, {"name": "Iasi Felicia", "address": "Str. Bucium nr. 36, Iasi, Jud. Iasi"}, {"name": "Pitesti", "address": "Strada Tudor Vladimirescu nr. 35-37, Pitesti, Jud. Arges"}, {"name": "Chiajna", "address": "Autostrada A1 km 11.4, Comuna Chiajna, Jud. Ilfov"}, {"name": "Galati", "address": "Strada George Cosbuc nr. 251, Galati, Jud. Galati"}, {"name": "Rm. Valcea", "address": "Str. Ferdinand nr. 38, Ramnicu Valcea, Jud. Valcea"}, {"name": "Braila", "address": "DN21 Sat Varsatura, Comuna Chiscani, Jud. Braila"}, {"name": "Suceava", "address": "Calea Unirii nr. 27-27bis, Suceava, Jud. Suceava"}, {"name": "City Park", "address": "Str. Alexandru Lapusneanu nr. 116c, Constanta, Jud. Constanta"}, {"name": "Bratianu", "address": "Str. Cumpenei nr. 2, Constanta, Jud. Constanta"}, {"name": "Alexandriei", "address": "Sos. Alexandria nr. 152, Bucuresti Sector 5"}, {"name": "Pantelimon", "address": "Sos. Vergului nr. 20, Bucuresti Sector 2"}, {"name": "Cluj 2", "address": "Bld. 1 Decembrie nr. 142, Cluj-Napoca, Jud. Cluj"}, {"name": "Bacau", "address": "Str. Milcov nr. 2-4, Bacau, Jud. Bacau"}, {"name": "Ploiesti Afi", "address": "Str. Calomfirescu nr. 2, Ploiesti, Jud. Prahova"}, {"name": "Lujerului", "address": "Bld. Iuliu Maniu nr. 19, Bucuresti Sector 6"}, {"name": "Drobeta 2", "address": "Aleea Constructorului nr. 1, Drobeta-Turnu Severin, Jud. Mehedinti"}, {"name": "Oradea Lotus", "address": "Str. Nufarului nr. 30, Oradea, Jud. Bihor"}, {"name": "Zalau", "address": "Bld. Mihai Viteazul nr. 58B, Zalau, Jud. Salaj"}, {"name": "Buzau", "address": "Bulevardul Unirii nr. 232, Buzau, Jud. Buzau"}, {"name": "Iasi Valea Lupului", "address": "Sat. Valea Lupului, com. Valea Lupului, jud. Iasi"}, {"name": "Gilau", "address": "Str Principala nr 229 Comuna Gilau"}, {"name": "Timisoara Bucovinei", "address": "Str. Bucovinei, nr. 47, Timisoara, jud. Timis"}, {"name": "Chilia Veche", "address": "Str. Chilia Veche, nr. 2, Bucuresti, sector 6"}, {"name": "Timisoara Rebreanu", "address": "Bd. Liviu Rebreanu, nr. 160, mun. Timisoara, jud. Timis"}, {"name": "Caramfil", "address": "Str. Nicolae Caramfil, nr. 71-73, Bucuresti, sector 1"}, {"name": "Iasi Niciman", "address": "Str. Niciman nr. 2, Iasi, jud. Iasi"}, {"name": "Braila", "address": "Str. Mihai Eminescu, nr. 90, Braila, jud. Braila"}, {"name": "Targu Jiu", "address": "Str. Ecaterina Teodoroiu, nr. 19, Targu Jiu, jud. Gorj"}, {"name": "Zalau", "address": "Str. Iuliu Maniu, nr. 25, jud. Zalau"}, {"name": "Berceni", "address": "Bd. 1 Mai, nr. 61E, Berceni, jud. Ilfov"}, {"name": "Iasi Alexandru", "address": "Piata Voievozilor nr. 1, bl. A8-A9, jud. Iasi"}, {"name": "Galati Dunarea", "address": "Bd. Brailei, nr. 220, Galati, jud. Galati"}, {"name": "Cultural (Obregia)", "address": "Bd. Alexandru Obregia, nr. 31, bloc 15, Bucuresti, sector 4"}, {"name": "Timisoara 3", "address": "Bd. Dambovita, nr. 49A, Timisoara, jud. Timis"}, {"name": "Brasov Cosmos", "address": "Str. Uranus, nr. 1, jud. Brasov"}, {"name": "Regie", "address": "Str. Economu Cezarescu, nr. 34-42, sector 6, Bucuresti"}, {"name": "Dorobanti", "address": "Calea Dorobanti, nr. 31-33, Bucuresti, sector 1"}, {"name": "Craiova Fagaras", "address": "Str. Fagaras, nr. 3-5, Craiova, jud. Dolj"}, {"name": "Subcetate", "address": "Str. Subcetate, nr. 49, sector 1, Bucuresti"}, {"name": "Brasov Zorilor", "address": "Str. Zorilor, nr. 4, jud. Brasov (Brasov 406 Zorilor)"}, {"name": "Targu Mures", "address": "Tg. Mures Dambu 1848  - BLD.1848 46A, TG, MURES"}, {"name": "Cloud9", "address": "Soseaua Pipera, nr. 61"}, {"name": "Cluj Ferdinand", "address": "Strada Regele Ferdinand nr. 22-26, Cluj-Napoca, Jud Cluj"}, {"name": "Buzias", "address": "Loc. Buziaș, Oraș Buziaș, Strada PIATA BISERICII, Nr. 15, Judet Timiș"}, {"name": "Cosmopolis Plaza", "address": "Str. Europa, Nr. 9 bis, tarla 44, jud. Ilfov"}, {"name": "Brasov Privilegio", "address": "Strada Traian Nr. 4, Brasov, Jud. Brasov"}, {"name": "Ipotesti Suceava", "address": "Str. Mihai Viteazu nr. 410C, jud. Suceava"}, {"name": "Ferdinand Bucuresti", "address": "Bulevardul Ferdinand I nr.118, București 021395"}, {"name": "Cluj Zorilor", "address": "Str. L. Pasteur nr. 75-77, Cluj-Napoca"}, {"name": "Pitesti", "address": "Str. Victoriei nr.85, Pitesti"}, {"name": "Minis Titan", "address": "Str. Barajul Dunării nr. 12A, Bl.C9, Bucuresti"}, {"name": "Rasnov", "address": "Calea Braşovului nr. 1, Rasnov"}, {"name": "Giurgiu", "address": "Str. Tineretului nr. 88 (fosta Constantin Brâncoveanu), Giurgiu"}, {"name": "Ciorogarla Darvari", "address": "Sat Dârvari, comuna Ciorogârla, Strada Adunaţi nr. 44, Jud. Ilfov"}, {"name": "Victor Brauner", "address": "Str. Victor Brauner nr. 42B, sc. A - B, parter, Lot 1, sector 3"}, {"name": "Bragadiru Cristalului", "address": "Str. Cristalului, Nr. 6, Bragadiru, jud. Ilfov"}, {"name": "Volovat", "address": "Str. Stefan cel Mare nr. 212, jud. Suceava"}, {"name": "Onesti", "address": "Bd. Belvedere, nr. 1G, jud. Bacau"}, {"name": "Lugoj2", "address": "str. Bucegi, nr. 1-3, Lugoj, jud. Timis"}, {"name": "Orsova", "address": "Str 1 Decembrie 1918 jud Mehedinti"}, {"name": "Lugoj 1", "address": "Str Nicolae Balcescu, nr 5."}, {"name": "Sanpetru", "address": "Sânpetru Shop Park, Corp 2, parter, jud. Brașov"}, {"name": "Orhideea Towers", "address": "Sos. Orhideelor, nr. 15A, Bucuresti, sector 6"}, {"name": "Cosmopolis 2", "address": "Linia de Centura, nr. 50, in incinta Complex Rezidental Cosmopolis, tarla 44, parcela 337, jud. Ilfov"}, {"name": "Iasi Nicolina", "address": "Sos. Nicolina, nr. 116, bl. 1011, sc. Tr. I, parter, ap. spatiu comercial, Iasi"}, {"name": "Sibiu", "address": "Str. Revolutiei, nr. 1A, ap. nr. 5 (partial), nr. 7, nr. 8, nr. 9, mun. Sibiu, jud. Sibiu"}, {"name": "Oradea Republicii", "address": "Calea Republicii nr. 1, jud. Bihor"}, {"name": "Brasov Muresenilor", "address": "Str. Sf. Ioan, nr. 2, jud. Brasov"}, {"name": "Cluj Septimiu Albini", "address": "Str. Septimiu Albini, nr. 140-142-144, jud. Cluj"}, {"name": "Iasi Gemi", "address": "Calea Galata, nr. 5-9, bloc F3A, parter, jud. Iasi"}, {"name": "Iasi Palas", "address": "Iasi Palas Campus, Cladirea C+D, Str. Sf. Andrei, Nr. 39A"}, {"name": "Mario Plaza", "address": "Calea Dorobantilor, nr. 172, Bucuresti, sector 1"}, {"name": "Cosmopolis 3", "address": "Str. Europa nr. 9bis, jud. Ilfov (Corp B)"}, {"name": "Craiova Valea Rosie", "address": "Str. G-ral Magheru nr. 130, Craiova, judetul Dolj"}, {"name": "Cotroceni One", "address": "Str. Sergent Nutu Ion nr. 44, Bucuresti"}, {"name": "Constanta Stefan cel Mare", "address": "Str. Stefan cel Mare nr. 24, bloc M6, parter, jud. Constanta"}, {"name": "Joy Residence", "address": "Str. Biruintei nr.87, Joy Residence, Bloc 1, scara A, jud. Ilfov"}, {"name": "Navodari Biruintei", "address": "Str. Brizei nr. 4-14, spatiul comercial nr. 1, jud. Constanta"}, {"name": "Otopeni Aeroport", "address": "Calea Bucureştilor nr. 224E, Otopeni, Ilfov"}, {"name": "Bucuresti Basarabiei", "address": "Bd. Basarabia nr. 64 si 66, sector 2, Bucuresti"}, {"name": "Voluntari 1D", "address": "Bd. Pipera 1D-6, Voluntari"}, {"name": "Bucuresti Piata Rosetti", "address": "Piata Rosetti nr. 3"}, {"name": "Bucuresti Penes Curcanul", "address": "Str. Penes Curcanul nr. 14, sector 3"}, {"name": "Brasov Galerie", "address": "Calea Bucuresti, Nr. 107, Brasov, Jud. Brasov"}, {"name": "Buzau Unirii 48A", "address": "Bd. Unirii nr. 48A"}, {"name": "Bacau", "address": "Str. Milcov nr. 55"}, {"name": "Bucuresti WIN Herastrau", "address": "Mun. Bucureşti, sector 1, str. Barajul Argeş nr. 8A, WIN HERĂSTRĂU"}, {"name": "Constanta Dezrobirii", "address": "Constanța, Strada Dezrobirii nr. 92, județul Constanța"}, {"name": "Brasov Republicii", "address": "Brașov, Strada Republicii nr. 59, ap. 9, jud. Brașov"}, {"name": "Calarasi", "address": "Prelungirea Bucuresti nr. 24, jud. Calarasi"}, {"name": "Adjud", "address": "Str. Republicii bl. 90, scara 1, parter, județul Vrancea"}, {"name": "Bolotesti", "address": "Sat Gagesti Str Principala nr 308 com Bolotesti"}, {"name": "Maicanesti", "address": "Str. Domneasca nr. 21, jud. Vrancea"}, {"name": "Voluntari 2", "address": "Bd. Voluntari nr. 72bis, oras Voluntari"}, {"name": "Targu Frumos", "address": "Str. Buznea, nr. 5, jud. Iasi"}, {"name": "Vicovu de Jos", "address": "Com. Vicovu de Jos, Sat Vicovu de Jos Nr. 1351, parter, Jud. Suceava"}, {"name": "Cluj 21 Decembrie", "address": "Bd. 21 Decembrie 1989, nr. 148, bl. B1, ap. 115, jud. Cluj"}, {"name": "Drobeta", "address": "Bd. Tudor Vladimirescu nr. 126, bl. IS4A, jud. Mehedinti"}, {"name": "Focsani", "address": "Str. Republicii nr. 41, jud. Vrancea"}, {"name": "Cluj Dionisie", "address": "Str. Dionisie Roman nr. 1"}, {"name": "Dealu Tugulea", "address": "Str. Dealul Țugulea nr. 3, bloc O1C, parter, sector 6 și Strada Roșia Montană nr. 2, bloc O1B, parter, sector 6"}, {"name": "Sacele", "address": "Loc. Săcele, Strada Viitorului nr. 23-26, jud. Brașov"}, {"name": "Brasov Piata Sfatului", "address": "Piata Sfatului nr. 5"}, {"name": "Giroc", "address": "Str. Ciocarliei nr. 6, jud. Timis"}, {"name": "Iasi Ciric", "address": "Str Ciric nr 2, Iasi"}, {"name": "Arad Ziridava", "address": "Str. Revoluţiei nr. 39-43, Arad, jud Arad,"}, {"name": "Brasov Grivitei", "address": "Str. Grivitei, nr. 47, jud. Brasov"}, {"name": "Brasov Harman", "address": "Str. Avram Iancu, nr. 45-46, com. Harman, jud. Brasov"}, {"name": "Brasov Bod", "address": "Str. Tudor Vladimirescu, nr. 271, Bod, jud. Brasov"}, {"name": "Galati Pescarus", "address": "Str. Vadul Sacalelor, nr. 1, bl. Pescarus 1, jud. Galati"}, {"name": "Brasov Branduselor", "address": "Str. Branduselor, nr. 84, jud. Brasov"}, {"name": "Galati Domneasca", "address": "Str. Domneasca, nr. 142, et. subsol+parter, ap. unit. 110, bloc B, mun. Galati, jud. Galati"}, {"name": "Harsova", "address": "Str. Revolutiei, nr. 40, Harsova, jud. Constanta"}, {"name": "Brasov Gospodarilor", "address": "Str. Gospodarilor, nr. 5, jud. Brasov"}, {"name": "Brasov Prunului", "address": "Str. Prunului, nr. 13, jud. Brasov"}, {"name": "BV Mircea cel Batran", "address": "Str. Mircea cel Batran, nr. 39, bl. 51, parter, jud. Brasov"}, {"name": "Calarasi Republicii", "address": "Bd. Republicii, nr. 1, jud. Calarasi"}, {"name": "Brasov Avantgarden", "address": "Str. Graurului, nr. 17, etaj demisol, jud. Brasov"}, {"name": "Zimnicea Mihai Viteazul", "address": "Str. Mihai Viteazul, nr. 1, Zimnicea, jud. Teleorman"}, {"name": "Brasov Zizinului", "address": "Str. Zizinului, nr. 2, bloc 40, scara C, parter, jud. Brasov"}, {"name": "Galati Faleza Marea Unire", "address": "Bd. Marea Unire, nr. 11. cartier Tiglina 1, sp. comercial 8, bl. U3, sc. 1, et. parter, jud. Galati"}, {"name": "Voluntari Market Nord", "address": "Bd. Pipera – Tunari, nr. 200A, complex Vita Bella, corp A, spatiul comercial, jud. Ilfov"}, {"name": "Targu Neamt", "address": "Bd. Mihai Eminescu, nr. 4, Targu Neamt, jud. Neamt"}, {"name": "Brasov Crinului", "address": "Str. Crinului, nr. 75, jud. Brasov"}, {"name": "Brasov Oltet", "address": "Str. Oltet, nr. 31-33, bloc 307, jud. Brasov"}, {"name": "Brasov Ion Creanga", "address": "Str. Ion Creanga, nr. 17, bloc 16, jud. Brasov"}, {"name": "Brasov Paraului", "address": "Str. Paraului, nr. 21, jud. Brasov"}, {"name": "Braila Buzaului", "address": "Sos. Buzaului, nr. 3, cartier Buzaului, bloc B2, jud. Braila"}, {"name": "Brasov Stadionului", "address": "Str. Stadionului, nr. 2, jud. Brasov"}, {"name": "Constanta Muncel", "address": "Str. Muncel, nr. 40C, jud. Constanta"}, {"name": "Bucuresti Zagazului", "address": "Str. Zagazului, nr. 13-19, Bucuresti, sector 1"}, {"name": "Afumati", "address": "Sos. Bucuresti-Urziceni, nr. 160, Afumati, jud. Ilfov"}, {"name": "Brasov Saturn", "address": "Bd. Saturn, nr. 31-33, jud. Brasov"}, {"name": "Galati Micro", "address": "Str. Brailei, nr. 196, parter, jud. Galati"}, {"name": "Buc. Postalionului", "address": "Str Postalionului nr 2-4 Bucuresti sector 4"}, {"name": "Galati Constructorilor", "address": "Str. Constructorilor, Nr. 47, parter, Galati"}, {"name": "Galati Brailei 173A", "address": "Str. Brailei, Nr. 173A, Galati"}, {"name": "Cluj Jora", "address": "Str. Campina, Nr. 10, Cluj Napoca, jud. Cluj"}, {"name": "Luduș", "address": "Str. Viitorului, nr. 12, oras Ludus, jud. Mures"}, {"name": "Craiova Balaci", "address": "Bd. Ilie Balaci nr. 1, municipiul Craiova, judet Dolj"}, {"name": "Calarasi Dor Marunt", "address": "Sos. Bucuresti-Constanta nr. 72, Sat Dor Marunt, Com. Dor Marunt, jud. Calarasi"}, {"name": "Brasov Colonia Bod", "address": "Str. Fabricii, Nr. FN, loc. Colonia Bod, judet Brasov"}, {"name": "Galati Siderurgistilor", "address": "Str. Siderurgistilor, Nr. 35, Galati, jud. Galati"}, {"name": "Craiova Enescu", "address": "Str. George Enescu, Nr. 76, Bl. 15, Craiova, jud. Dolj"}, {"name": "Cugir Market", "address": "Str. Tineretului, Nr. 4, Cugir, jud. Alba"}, {"name": "Buc. Rami Ajustorului", "address": "Str. Ajustorului, Nr. 12, parter, bloc F, sector 6, Bucuresti"}];
-let geoAdminStores = [];
-let geoBulkRunning = false;
-
-function geoNorm(v) {
-  return String(v || "")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
-
-function geoExcelAddress(store) {
-  const n = geoNorm(store?.name);
-  if (!n) return "";
-  const exact = GEO_EXCEL_STORES.find(x => geoNorm(x.name) === n);
-  if (exact) return exact.address;
-
-  const candidates = GEO_EXCEL_STORES.filter(x => {
-    const z = geoNorm(x.name);
-    return z && (z.includes(n) || n.includes(z));
-  });
-  return candidates.length === 1 ? candidates[0].address : "";
-}
-
-async function loadGeoAdminList() {
-  const snap = await getDocs(collection(db, "stores"));
-  geoAdminStores = snap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .filter(s => s.active !== false)
-    .map(s => ({ ...s, address: String(s.address || geoExcelAddress(s) || "").trim() }))
-    .sort((a, b) => String(a.name || a.id).localeCompare(String(b.name || b.id), "ro"));
-
-  renderGeoAdminList();
-}
-
-function renderGeoAdminList() {
-  const body = document.getElementById("geoListBody");
-  if (!body) return;
-
-  const q = geoNorm(document.getElementById("geoListSearch")?.value);
-  const rows = geoAdminStores.filter(s =>
-    !q || geoNorm(`${s.name} ${s.id} ${s.address}`).includes(q)
-  );
-
-  const configured = geoAdminStores.filter(s =>
-    Number.isFinite(Number(s.latitude)) && Number.isFinite(Number(s.longitude))
-  ).length;
-
-  document.getElementById("geoListCount").textContent =
-    `${configured} / ${geoAdminStores.length} cu coordonate`;
-
-  body.innerHTML = rows.map(s => {
-    const ok = Number.isFinite(Number(s.latitude)) && Number.isFinite(Number(s.longitude));
-    return `
-      <tr>
-        <td><b>${escapeHtml(s.name || s.id)}</b><small>ID ${escapeHtml(String(s.id))}</small></td>
-        <td>${escapeHtml(s.address || "Adresă indisponibilă")}</td>
-        <td>${ok ? Number(s.latitude).toFixed(7) : "—"}</td>
-        <td>${ok ? Number(s.longitude).toFixed(7) : "—"}</td>
-        <td><span class="${ok ? "geo-status-ok" : "geo-status-missing"}">${ok ? "Configurat" : "De generat"}</span></td>
-      </tr>`;
-  }).join("");
-}
-
-/* Photon este apelat direct din browser și permite CORS.
-   Returnează [longitudine, latitudine]. */
-async function geocodeAddress(address) {
-  const q = encodeURIComponent(`${address}, România`);
-  const url = `https://photon.komoot.io/api/?limit=1&q=${q}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "Accept": "application/json" }
-  });
-
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-  const data = await response.json();
-  const feature = data?.features?.[0];
-  const coords = feature?.geometry?.coordinates;
-
-  if (!Array.isArray(coords) || coords.length < 2) return null;
-
-  const longitude = Number(coords[0]);
-  const latitude = Number(coords[1]);
-  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
-
-  return { latitude, longitude };
-}
-
-function geoSleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function generateAllStoreCoordinates() {
-  if (geoBulkRunning) return;
-
-  const btn = document.getElementById("geoGenerateAllBtn");
-  const wrap = document.getElementById("geoProgressWrap");
-  const bar = document.getElementById("geoProgressBar");
-  const text = document.getElementById("geoProgressText");
-  const status = document.getElementById("geoListStatus");
-
-  const pending = geoAdminStores.filter(s =>
-    s.address &&
-    !(Number.isFinite(Number(s.latitude)) && Number.isFinite(Number(s.longitude)))
-  );
-
-  if (!pending.length) {
-    status.textContent = "Toate magazinele din listă au deja coordonate.";
-    return;
-  }
-
-  geoBulkRunning = true;
-  btn.disabled = true;
-  btn.textContent = "Se generează...";
-  wrap.classList.remove("hidden");
-  status.textContent = "Generez și salvez coordonatele. Nu închide pagina până la final.";
-
-  let done = 0;
-  let success = 0;
-  const failed = [];
-
-  try {
-    for (const store of pending) {
-      text.textContent = `${done} / ${pending.length} · ${store.name || store.id}`;
-      bar.style.width = `${Math.round((done / pending.length) * 100)}%`;
-
-      try {
-        const coords = await geocodeAddress(store.address);
-        if (!coords) {
-          failed.push(store.name || store.id);
-        } else {
-          await setDoc(doc(db, "stores", String(store.id)), {
-            address: store.address,
-            latitude: coords.latitude,
-            longitude: coords.longitude
-          }, { merge: true });
-
-          store.latitude = coords.latitude;
-          store.longitude = coords.longitude;
-          success++;
-        }
-      } catch (error) {
-        console.warn("Coordonate", store.name, error);
-        failed.push(store.name || store.id);
-      }
-
-      done++;
-      text.textContent = `${done} / ${pending.length}`;
-      bar.style.width = `${Math.round((done / pending.length) * 100)}%`;
-
-      // Pauză mică între cereri pentru stabilitate.
-      await geoSleep(650);
-
-      // Actualizăm lista din când în când, ca rezultatele să se vadă.
-      if (done % 5 === 0 || done === pending.length) renderGeoAdminList();
-    }
-
-    status.textContent = failed.length
-      ? `Gata: ${success} magazine configurate. ${failed.length} adrese nu au fost găsite automat.`
-      : `Gata: toate cele ${success} magazine au primit coordonate.`;
-
-  } finally {
-    geoBulkRunning = false;
-    btn.disabled = false;
-    btn.textContent = "📍 Generează coordonatele tuturor";
-    bar.style.width = "100%";
-    renderGeoAdminList();
-  }
-}
-
-document.getElementById("geoSafeBtn")?.addEventListener("click", async () => {
-  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-  document.getElementById("geoSafePage")?.classList.remove("hidden");
-  await loadGeoAdminList();
-});
-
-document.getElementById("geoListSearch")?.addEventListener("input", renderGeoAdminList);
-document.getElementById("geoGenerateAllBtn")?.addEventListener("click", generateAllStoreCoordinates);

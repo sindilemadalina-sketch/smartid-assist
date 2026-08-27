@@ -59,7 +59,6 @@
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
        <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
-      <button class="side-btn" id="geoSafeBtn">📍 Geolocalizare</button>
     </aside>
 
     <main class="content">
@@ -175,6 +174,7 @@
             <div id="adminCategoryChooser" class="admin-category-chooser hidden">
               <button class="category-choice active" data-admin-category="carrefour">Carrefour</button>
               <button class="category-choice" data-admin-category="franciza">Franciză</button>
+              <button class="category-choice" data-admin-category="suport">Suport</button>
             </div>
           </div>
         </div>
@@ -230,6 +230,7 @@
           <div class="choice-row">
             <label><input type="checkbox" name="materialCategory" value="carrefour" checked> Carrefour</label>
             <label><input type="checkbox" name="materialCategory" value="franciza"> Franciză</label>
+            <label><input type="checkbox" name="materialCategory" value="suport"> Suport</label>
           </div>
 
           <div class="equipment-select-block">
@@ -239,6 +240,10 @@
           <div class="equipment-select-block">
             <h3>Echipamente Franciză</h3>
             <div id="francizaEquipmentChoices" class="checkbox-grid"></div>
+          </div>
+          <div class="equipment-select-block">
+            <h3>Echipamente Suport</h3>
+            <div id="suportEquipmentChoices" class="checkbox-grid"></div>
           </div>
 
           <div class="material-form-actions">
@@ -267,7 +272,7 @@
             <option value="Dan Oros">Dan Oros</option>
             <option value="Valentin Surugiu">Valentin Surugiu</option>
           </select>
-          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option><option value="suport">Suport</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
         <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
       </section>
 
@@ -310,54 +315,6 @@
           <div id="storesList"></div>
         </section>
       </section>
-
-      
-<section id="geoSafePage" class="page hidden">
-  <div class="page-head">
-    <div>
-      <h1>Geolocalizare magazine</h1>
-      <p class="subtitle">Coordonatele magazinelor folosite pentru identificarea automată a locației.</p>
-    </div>
-  </div>
-
-  <section class="panel">
-    <div class="geo-bulk-head">
-      <div>
-        <b>Coordonate magazine</b>
-        <p>Adresele sunt încărcate deja din Excel. Nu trebuie să introduci nimic manual.</p>
-      </div>
-      <button id="geoGenerateAllBtn" class="primary" type="button">📍 Generează coordonatele tuturor</button>
-    </div>
-
-    <div class="geo-progress hidden" id="geoProgressWrap">
-      <div class="geo-progress-bar"><span id="geoProgressBar"></span></div>
-      <div id="geoProgressText">0 / 0</div>
-    </div>
-
-    <div class="geo-list-toolbar">
-      <input id="geoListSearch" placeholder="Caută magazin sau adresă...">
-      <span id="geoListCount"></span>
-    </div>
-
-    <div class="geo-table-wrap">
-      <table class="geo-table">
-        <thead>
-          <tr>
-            <th>Magazin</th>
-            <th>Adresă</th>
-            <th>Latitudine</th>
-            <th>Longitudine</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="geoListBody"></tbody>
-      </table>
-    </div>
-    <div id="geoListStatus" class="status"></div>
-  </section>
-</section>
-
-
     </main>
   </div>
 
