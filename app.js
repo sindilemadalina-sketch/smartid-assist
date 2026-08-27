@@ -403,21 +403,18 @@ function renderPortalLandingForRole() {
     {
       category: "carrefour",
       title: "CARREFOUR",
-      description: "Proceduri și videoclipuri disponibile utilizatorilor Carrefour.",
       logo: "carrefour-logo.svg",
       visualClass: "support-card-carrefour"
     },
     {
       category: "franciza",
       title: "FRANCIZĂ",
-      description: "Documentația disponibilă utilizatorilor din Franciză.",
       logo: "carrefour-express-verde-vertical.png",
       visualClass: "support-card-franciza"
     },
     {
       category: "suport",
       title: "SUPORT INTERN",
-      description: "Proceduri tehnice și materiale interne dedicate echipei de Suport.",
       logo: "smartid-logo-visual.jfif",
       visualClass: "support-card-intern"
     }
@@ -431,9 +428,16 @@ function renderPortalLandingForRole() {
     <div class="support-zone-stack ${sections.length === 1 ? "single-zone" : ""}">
       ${sections.map(section => {
         let equipment = EQUIPMENT[section.category] || [];
+
+        // În pagina Suport, SGR nu apare în Franciză.
         if (currentRole === "suport" && section.category === "franciza") {
           equipment = equipment.filter(item => item.id !== "sgr");
         }
+
+        const typeBlocks = [
+          { type:"videoclip", label:"Videoclipuri", icon:"▶", iconClass:"type-video" },
+          { type:"procedura", label:"Proceduri", icon:"▤", iconClass:"type-procedure" }
+        ];
 
         return `
           <section class="support-zone-card ${section.visualClass}">
@@ -444,28 +448,41 @@ function renderPortalLandingForRole() {
 
             <div class="support-zone-content">
               <div class="support-zone-title">
-                <div>
-                  <h3>${section.title}</h3>
-                  <p>${section.description}</p>
-                </div>
+                <h3>${section.title}</h3>
               </div>
 
-              <div class="support-equipment-list">
-                ${equipment.map(item => {
-                  const procedures = supportMaterialsFor(section.category, item.id, "procedura");
-                  const videos = supportMaterialsFor(section.category, item.id, "videoclip");
+              <div class="support-type-list">
+                ${typeBlocks.map((block, index) => {
+                  const total = equipment.reduce((sum, item) =>
+                    sum + supportMaterialsFor(section.category, item.id, block.type).length, 0);
+
                   return `
-                    <button type="button"
-                            class="support-equipment-row"
-                            data-support-category="${section.category}"
-                            data-support-equipment="${item.id}"
-                            data-support-label="${escapeHtml(item.label)}">
-                      <span class="support-equipment-icon">${item.icon}</span>
-                      <span class="support-equipment-name">${escapeHtml(item.label)}</span>
-                      <span class="support-count">${procedures.length} proceduri</span>
-                      <span class="support-count">${videos.length} videoclipuri</span>
-                      <span class="support-row-arrow">›</span>
-                    </button>`;
+                    <div class="support-type-group ${index === 0 ? "open" : ""}">
+                      <button type="button" class="support-type-row" data-type-toggle>
+                        <span class="support-type-icon ${block.iconClass}">${block.icon}</span>
+                        <span class="support-type-name">${block.label}</span>
+                        <span class="support-type-total">${total}</span>
+                        <span class="support-type-arrow">⌄</span>
+                      </button>
+
+                      <div class="support-type-equipment">
+                        ${equipment.map(item => {
+                          const count = supportMaterialsFor(section.category, item.id, block.type).length;
+                          return `
+                            <button type="button"
+                                    class="support-equipment-row support-equipment-subrow"
+                                    data-support-category="${section.category}"
+                                    data-support-equipment="${item.id}"
+                                    data-support-label="${escapeHtml(item.label)}"
+                                    data-support-type="${block.type}">
+                              <span class="support-equipment-icon">${item.icon}</span>
+                              <span class="support-equipment-name">${escapeHtml(item.label)}</span>
+                              <span class="support-count">${count} ${block.type === "videoclip" ? "videoclipuri" : "proceduri"}</span>
+                              <span class="support-row-arrow">›</span>
+                            </button>`;
+                        }).join("")}
+                      </div>
+                    </div>`;
                 }).join("")}
               </div>
             </div>
@@ -474,16 +491,24 @@ function renderPortalLandingForRole() {
     </div>
   `;
 
+  landing.querySelectorAll("[data-type-toggle]").forEach(button => {
+    button.onclick = () => {
+      const group = button.closest(".support-type-group");
+      group?.classList.toggle("open");
+    };
+  });
+
   landing.querySelectorAll("[data-support-equipment]").forEach(button => {
     button.onclick = () => openSupportDocsModal(
       button.dataset.supportCategory,
       button.dataset.supportEquipment,
-      button.dataset.supportLabel
+      button.dataset.supportLabel,
+      button.dataset.supportType
     );
   });
 }
 
-function openSupportDocsModal(category, equipmentId, label) {
+function openSupportDocsModal(category, equipmentId, label, selectedType = "") {
   const modal = el("supportDocsModal");
   if (!modal) return;
 
@@ -515,14 +540,17 @@ function openSupportDocsModal(category, equipmentId, label) {
   `).join("") : `<div class="support-doc-empty">Nu există încă ${type === "videoclip" ? "videoclipuri" : "proceduri"} pentru acest echipament.</div>`;
 
   el("supportDocsBody").innerHTML = `
-    <section class="support-doc-section">
-      <div class="support-doc-section-title"><span>▤</span><h3>Proceduri</h3><b>${procedures.length}</b></div>
-      <div class="support-doc-list">${makeRows(procedures, "procedura")}</div>
-    </section>
-    <section class="support-doc-section">
-      <div class="support-doc-section-title"><span>▶</span><h3>Videoclipuri</h3><b>${videos.length}</b></div>
-      <div class="support-doc-list">${makeRows(videos, "videoclip")}</div>
-    </section>`;
+    ${selectedType !== "videoclip" ? `
+      <section class="support-doc-section">
+        <div class="support-doc-section-title"><span>▤</span><h3>Proceduri</h3><b>${procedures.length}</b></div>
+        <div class="support-doc-list">${makeRows(procedures, "procedura")}</div>
+      </section>` : ""}
+    ${selectedType !== "procedura" ? `
+      <section class="support-doc-section">
+        <div class="support-doc-section-title"><span>▶</span><h3>Videoclipuri</h3><b>${videos.length}</b></div>
+        <div class="support-doc-list">${makeRows(videos, "videoclip")}</div>
+      </section>` : ""}
+  `;
 
   el("supportDocsBody").querySelectorAll("[data-support-material]").forEach(button => {
     button.onclick = () => {
