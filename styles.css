@@ -1579,3 +1579,33 @@ body.role-suport .content{max-width:none!important;width:100%!important;padding:
 body.role-suport .support-zone-card{min-height:300px;}
 body.role-suport .support-zone-visual img{height:205px;}
 body.role-suport .support-equipment-row{min-height:54px;}
+
+/* FINAL layout cleanup */
+#equipmentPage{
+  min-height:calc(100vh - 76px);
+  margin:-26px;
+  padding:28px;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(99,102,241,.10),transparent 22%),
+    radial-gradient(circle at 88% 8%,rgba(14,165,233,.08),transparent 20%),
+    linear-gradient(180deg,#eef2f8,#e7edf5);
+}
+#equipmentPage .page-head{margin-bottom:16px}
+#equipmentPage .subtitle:empty{display:none}
+.support-portal-intro{display:none!important}
+.support-zone-total{display:none!important}
+.support-zone-title>div>span,.support-zone-visual>span{display:none!important}
+.support-zone-stack{gap:14px!important}
+.support-zone-stack.single-zone{min-height:calc(100vh - 180px)}
+.support-zone-stack.single-zone .support-zone-card{min-height:520px}
+.support-zone-stack.single-zone .support-zone-visual{min-height:520px}
+.support-zone-stack.single-zone .support-zone-visual img{width:min(88%,360px);height:260px}
+.support-zone-stack.single-zone .support-zone-content{padding:32px 34px 32px 14px}
+.support-zone-stack.single-zone .support-zone-title h3{font-size:31px}
+.support-zone-stack.single-zone .support-equipment-row{min-height:64px;padding:10px 14px;border-radius:14px}
+.support-zone-stack.single-zone .support-equipment-name{font-size:15px}
+@media(max-width:900px){
+  #equipmentPage{margin:-18px;padding:20px}
+  .support-zone-stack.single-zone .support-zone-card,
+  .support-zone-stack.single-zone .support-zone-visual{min-height:auto}
+}

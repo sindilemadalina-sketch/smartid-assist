@@ -201,31 +201,23 @@ function configureAccountIdentity() {
     badge.dataset.role = "suport";
     el("equipmentPageTitle").textContent = "SUPORT";
     el("carrefourBrand").classList.add("hidden");
-    el("storeWelcome").textContent = "Carrefour · Franciză · Suport intern";
+    el("storeWelcome").textContent = "";
     if (hero) hero.innerHTML = "";
-    renderSupportPortalLanding();
+    renderPortalLandingForRole();
   } else if (currentRole === "franciza") {
     document.body.classList.remove("role-suport");
     badge.textContent = "FRANCIZĂ";
     badge.dataset.role = "franciza";
-    el("equipmentPageTitle").textContent = "Franciză";
+    el("equipmentPageTitle").textContent = "FRANCIZĂ";
     el("carrefourBrand").classList.add("hidden");
-    hero.innerHTML = `
-      <div class="account-hero-inner hero-franciza">
-        <img src="carrefour-express-verde-vertical.png" alt="Carrefour Express">
-        <div><span>CARREFOUR</span><strong>FRANCIZĂ</strong><p>Videoclipuri și proceduri dedicate magazinelor din franciză.</p></div>
-      </div>`;
+    if (hero) hero.innerHTML = "";
   } else {
     document.body.classList.remove("role-suport");
     badge.textContent = "CARREFOUR";
     badge.dataset.role = "carrefour";
-    el("equipmentPageTitle").textContent = "Carrefour";
+    el("equipmentPageTitle").textContent = "CARREFOUR";
     el("carrefourBrand").classList.add("hidden");
-    hero.innerHTML = `
-      <div class="account-hero-inner hero-carrefour">
-        <img src="carrefour-logo.svg" alt="Carrefour">
-        <div><span>CARREFOUR</span><strong>REȚEA MAGAZINE</strong><p>Videoclipuri și proceduri pentru echipamentele Carrefour.</p></div>
-      </div>`;
+    if (hero) hero.innerHTML = "";
   }
 }
 
@@ -255,7 +247,7 @@ async function finishLogin() {
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
   configureAccountIdentity();
   if (currentRole === "suport") {
-    renderSupportPortalLanding();
+    renderPortalLandingForRole();
     el("supportBuildMarker")?.classList.remove("hidden");
   }
 
@@ -393,12 +385,12 @@ function supportMaterialsFor(category, equipmentId, type = "") {
     .sort((a,b) => Number(b.views || 0) - Number(a.views || 0));
 }
 
-function renderSupportPortalLanding() {
+function renderPortalLandingForRole() {
   const landing = el("supportPortalLanding");
   const standard = el("standardTypeGrid");
   if (!landing || !standard) return;
 
-  if (currentRole !== "suport") {
+  if (currentRole === "admin") {
     landing.classList.add("hidden");
     standard.classList.remove("hidden");
     return;
@@ -407,78 +399,54 @@ function renderSupportPortalLanding() {
   standard.classList.add("hidden");
   landing.classList.remove("hidden");
 
-  const sections = [
+  const allSections = [
     {
       category: "carrefour",
       title: "CARREFOUR",
-      eyebrow: "Rețea magazine",
-      description: "Toate procedurile și videoclipurile disponibile utilizatorilor Carrefour.",
+      description: "Proceduri și videoclipuri disponibile utilizatorilor Carrefour.",
       logo: "carrefour-logo.svg",
       visualClass: "support-card-carrefour"
     },
     {
       category: "franciza",
       title: "FRANCIZĂ",
-      eyebrow: "Carrefour Express",
-      description: "Toată documentația disponibilă utilizatorilor din Franciză.",
+      description: "Documentația disponibilă utilizatorilor din Franciză.",
       logo: "carrefour-express-verde-vertical.png",
       visualClass: "support-card-franciza"
     },
     {
       category: "suport",
       title: "SUPORT INTERN",
-      eyebrow: "Smart ID",
       description: "Proceduri tehnice și materiale interne dedicate echipei de Suport.",
       logo: "smartid-logo-visual.jfif",
       visualClass: "support-card-intern"
     }
   ];
 
-  const totalProcedures = sections.reduce((sum, section) =>
-    sum + materials.filter(m => (m.status || "approved") === "approved"
-      && (m.categories || []).map(normCategory).includes(section.category)
-      && normType(m.type) === "procedura").length, 0);
-
-  const totalVideos = sections.reduce((sum, section) =>
-    sum + materials.filter(m => (m.status || "approved") === "approved"
-      && (m.categories || []).map(normCategory).includes(section.category)
-      && normType(m.type) === "videoclip").length, 0);
+  let sections = allSections;
+  if (currentRole === "carrefour") sections = allSections.filter(s => s.category === "carrefour");
+  if (currentRole === "franciza") sections = allSections.filter(s => s.category === "franciza");
 
   landing.innerHTML = `
-    <div class="support-portal-intro">
-      <div>
-        <span class="support-kicker">SMART ID PORTAL</span>
-        <h2>Centru documentație Suport</h2>
-        <p>Ai într-o singură pagină exact documentația pe care o văd Carrefour și Franciză, plus materialele interne Suport.</p>
-      </div>
-      <div class="support-overview">
-        <div><strong>3</strong><span>zone</span></div>
-        <div><strong>${totalProcedures}</strong><span>proceduri</span></div>
-        <div><strong>${totalVideos}</strong><span>videoclipuri</span></div>
-      </div>
-    </div>
-
-    <div class="support-zone-stack">
+    <div class="support-zone-stack ${sections.length === 1 ? "single-zone" : ""}">
       ${sections.map(section => {
-        const equipment = EQUIPMENT[section.category] || [];
+        let equipment = EQUIPMENT[section.category] || [];
+        if (currentRole === "suport" && section.category === "franciza") {
+          equipment = equipment.filter(item => item.id !== "sgr");
+        }
+
         return `
           <section class="support-zone-card ${section.visualClass}">
             <div class="support-zone-visual">
               <div class="support-zone-glow"></div>
               <img src="${section.logo}" alt="${section.title}">
-              <span>${section.eyebrow}</span>
             </div>
 
             <div class="support-zone-content">
               <div class="support-zone-title">
                 <div>
-                  <span>${section.eyebrow}</span>
                   <h3>${section.title}</h3>
                   <p>${section.description}</p>
-                </div>
-                <div class="support-zone-total">
-                  <b>${equipment.length}</b>
-                  <small>echipamente</small>
                 </div>
               </div>
 
@@ -494,8 +462,8 @@ function renderSupportPortalLanding() {
                             data-support-label="${escapeHtml(item.label)}">
                       <span class="support-equipment-icon">${item.icon}</span>
                       <span class="support-equipment-name">${escapeHtml(item.label)}</span>
-                      <span class="support-count support-count-proc">${procedures.length} proceduri</span>
-                      <span class="support-count support-count-video">${videos.length} videoclipuri</span>
+                      <span class="support-count">${procedures.length} proceduri</span>
+                      <span class="support-count">${videos.length} videoclipuri</span>
                       <span class="support-row-arrow">›</span>
                     </button>`;
                 }).join("")}
@@ -580,40 +548,39 @@ function closeSupportDocsModal() {
 
 
 function renderEquipment() {
-  const page = el("materialTypePage");
-
-  if (currentRole === "suport") {
-    renderSupportPortalLanding();
+  if (currentRole !== "admin") {
+    renderPortalLandingForRole();
     return;
-  } else {
-    document.body.classList.remove("support-showcase-mode");
-    el("equipmentGrid").classList.remove("support-showcase");
-
-    const category = ["carrefour","franciza","suport"].includes(currentCategory)
-      ? currentCategory
-      : "carrefour";
-
-    const items = EQUIPMENT[category] || [];
-
-    el("equipmentGrid").innerHTML = items.map(item => `
-      <article class="equipment-card"
-               data-equipment="${item.id}"
-               data-label="${escapeHtml(item.label)}"
-               data-browse-category="${category}">
-        <div class="equipment-icon">${item.icon}</div>
-        <h2>${escapeHtml(item.label)}</h2>
-        <p>${selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri"} pentru acest echipament.</p>
-      </article>
-    `).join("");
   }
+
+  const category = currentCategory === "franciza" ? "franciza" : "carrefour";
+  const items = EQUIPMENT[category] || [];
+
+  if (category === "franciza") {
+    el("equipmentPageTitle").textContent = "FRANCIZĂ";
+  } else {
+    el("equipmentPageTitle").innerHTML = '<span class="carrefour-title"><img src="carrefour-logo.svg" alt="Carrefour"><span>Carrefour</span></span>';
+  }
+
+  el("carrefourBrand").classList.toggle("hidden", category !== "carrefour");
+  el("storeWelcome").textContent = currentStoreName
+    ? `${currentStoreName}${currentStoreFormat ? ` · ${currentStoreFormat[0].toUpperCase()}${currentStoreFormat.slice(1)}` : ""}`
+    : "";
+
+  el("equipmentGrid").innerHTML = items.map(item => `
+    <article class="equipment-card" data-equipment="${item.id}" data-label="${escapeHtml(item.label)}">
+      <div class="equipment-icon">${item.icon}</div>
+      <h2>${escapeHtml(item.label)}</h2>
+      <p>Alege materialele pentru acest echipament.</p>
+    </article>
+  `).join("");
 
   document.querySelectorAll(".equipment-card").forEach(card => {
     card.addEventListener("click", () => {
       selectedEquipment = card.dataset.equipment;
       selectedEquipmentLabel = card.dataset.label;
-      selectedBrowseCategory = card.dataset.browseCategory || currentCategory;
-      renderSelectedMaterials();
-      showPage("materialsPage");
+      selectedBrowseCategory = category;
+      showPage("materialTypePage");
     });
   });
 }
