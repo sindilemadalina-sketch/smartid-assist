@@ -102,6 +102,30 @@ function showPage(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+
+const VERIFIED_STORE_COORDINATES = [{"id": "3051", "name": "Barlad", "latitude": 46.2433521, "longitude": 27.6798427}, {"id": "3052", "name": "Ploiesti 2", "latitude": 44.9278032, "longitude": 26.0336054}, {"id": "3050", "name": "Sfantu Gheorghe", "latitude": 45.8694957, "longitude": 25.8005023}, {"id": "27", "name": "Colosseum", "latitude": 44.491235, "longitude": 26.0148839}, {"id": "40", "name": "Piatra Neamt", "latitude": 46.9331422, "longitude": 26.347287}, {"id": "26", "name": "Drobeta", "latitude": 44.6323999, "longitude": 22.6642357}, {"id": "3053", "name": "Alba Iulia", "latitude": 46.0858748, "longitude": 23.5941804}, {"id": "3054", "name": "Craiova", "latitude": 44.3295487, "longitude": 23.7700859}, {"id": "3055", "name": "Arad", "latitude": 46.1948587, "longitude": 21.3021771}, {"id": "42", "name": "Roman", "latitude": 46.9373475, "longitude": 26.9235043}, {"id": "163", "name": "Targu Jiu", "latitude": 45.028129, "longitude": 23.2707127}, {"id": "10", "name": "Iasi Felicia", "latitude": 47.1445711, "longitude": 27.6114519}, {"id": "3056", "name": "Pitesti", "latitude": 44.8549692, "longitude": 24.874922}, {"id": "1", "name": "Chiajna", "latitude": 44.4388959, "longitude": 25.9564844}, {"id": "33", "name": "Galati", "latitude": 45.453685, "longitude": 28.0310582}, {"id": "41", "name": "Rm. Valcea", "latitude": 45.1117617, "longitude": 24.381556}, {"id": "11", "name": "Braila", "latitude": 45.2717228, "longitude": 27.9671303}, {"id": "12", "name": "Suceava", "latitude": 47.6642493, "longitude": 26.2650005}, {"id": "3061", "name": "City Park", "latitude": 44.2034381, "longitude": 28.6309113}, {"id": "3058", "name": "Bratianu", "latitude": 44.1691478, "longitude": 28.6117506}, {"id": "3059", "name": "Alexandriei", "latitude": 44.3984957, "longitude": 26.0487894}, {"id": "3066", "name": "Pantelimon", "latitude": 44.4381842, "longitude": 26.186549}, {"id": "3064", "name": "Cluj 2", "latitude": 46.7591587, "longitude": 23.5408016}, {"id": "3060", "name": "Bacau", "latitude": 45.2442136, "longitude": 26.7124142}, {"id": "3057", "name": "Ploiesti Afi", "latitude": 44.9468423, "longitude": 26.0324134}, {"id": "3065", "name": "Lujerului", "latitude": 44.4333157, "longitude": 26.0364995}, {"id": "3062", "name": "Drobeta 2", "latitude": 44.6374919, "longitude": 22.6763099}, {"id": "18", "name": "Oradea Lotus", "latitude": 47.0358968, "longitude": 21.9501909}, {"id": "46", "name": "Zalau", "latitude": 47.1808509, "longitude": 23.0527944}, {"id": "19", "name": "Buzau", "latitude": 45.1630072, "longitude": 26.8177615}, {"id": "317", "name": "Iasi Valea Lupului", "latitude": 47.1773857, "longitude": 27.5021393}, {"id": "280", "name": "Gilau", "latitude": 44.0106226, "longitude": 24.0165133}, {"id": "338", "name": "Timisoara Bucovinei", "latitude": 45.7702715, "longitude": 21.2119241}, {"id": "181", "name": "Chilia Veche", "latitude": 44.4171186, "longitude": 26.0282112}, {"id": "826", "name": "Timisoara Rebreanu", "latitude": 45.7370687, "longitude": 21.2449762}, {"id": "286", "name": "Caramfil", "latitude": 44.4822499, "longitude": 26.0920666}, {"id": "352", "name": "Iasi Niciman", "latitude": 47.1727365, "longitude": 27.5593474}, {"id": "118", "name": "Braila", "latitude": 45.2717228, "longitude": 27.9671303}, {"id": "65", "name": "Zalau", "latitude": 47.1808509, "longitude": 23.0527944}, {"id": "224", "name": "Berceni", "latitude": 44.3087462, "longitude": 26.1884907}, {"id": "867", "name": "Iasi Alexandru", "latitude": 47.162591, "longitude": 27.5642112}, {"id": "124", "name": "Galati Dunarea", "latitude": 45.4168862, "longitude": 28.0113772}, {"id": "125", "name": "Cultural (Obregia)", "latitude": 44.3817214, "longitude": 26.1160524}, {"id": "114", "name": "Timisoara 3", "latitude": 45.7340938, "longitude": 21.2016782}, {"id": "411", "name": "Brasov Cosmos", "latitude": 46.2520444, "longitude": 26.7690349}, {"id": "394", "name": "Regie", "latitude": 44.4418446, "longitude": 26.0565968}, {"id": "115", "name": "Dorobanti", "latitude": 44.4484295, "longitude": 26.0988595}, {"id": "393", "name": "Craiova Fagaras", "latitude": 44.3297523, "longitude": 23.7903509}, {"id": "388", "name": "Subcetate", "latitude": 44.48596, "longitude": 26.03313}, {"id": "840", "name": "Brasov Zorilor", "latitude": 45.6386512, "longitude": 25.6213839}, {"id": "872", "name": "Targu Mures", "latitude": 46.5280029, "longitude": 24.5956287}, {"id": "454", "name": "Cloud9", "latitude": 44.4841091, "longitude": 26.1090662}, {"id": "856", "name": "Cluj Ferdinand", "latitude": 46.7725853, "longitude": 23.5888739}, {"id": "457", "name": "Buzias", "latitude": 45.64688, "longitude": 21.5983638}, {"id": "455", "name": "Cosmopolis Plaza", "latitude": 44.5378704, "longitude": 26.1690217}, {"id": "166", "name": "Brasov Privilegio", "latitude": 45.6493081, "longitude": 25.6217643}, {"id": "461", "name": "Ipotesti Suceava", "latitude": 47.8372636, "longitude": 25.9272119}, {"id": "852", "name": "Ferdinand Bucuresti", "latitude": 44.4442073, "longitude": 26.1304445}, {"id": "858", "name": "Cluj Zorilor", "latitude": 46.7550437, "longitude": 23.5781187}, {"id": "121", "name": "Pitesti", "latitude": 44.8549692, "longitude": 24.874922}, {"id": "851", "name": "Minis Titan", "latitude": 44.4287502, "longitude": 26.1676642}, {"id": "844", "name": "Rasnov", "latitude": 45.5996206, "longitude": 25.4643359}, {"id": "815", "name": "Giurgiu", "latitude": 43.9066938, "longitude": 25.9773513}, {"id": "467", "name": "Ciorogarla Darvari", "latitude": 44.4228772, "longitude": 25.8774913}, {"id": "481", "name": "Victor Brauner", "latitude": 44.4112287, "longitude": 26.198837}, {"id": "486", "name": "Bragadiru Cristalului", "latitude": 44.392075, "longitude": 26.007381}, {"id": "487", "name": "Volovat", "latitude": 47.8083388, "longitude": 25.8945815}, {"id": "496", "name": "Onesti", "latitude": 46.256962, "longitude": 26.7780312}, {"id": "198", "name": "Lugoj2", "latitude": 45.6834558, "longitude": 21.9003314}, {"id": "871", "name": "Orsova", "latitude": 44.7249242, "longitude": 22.3989332}, {"id": "57", "name": "Lugoj 1", "latitude": 46.216202, "longitude": 24.7944634}, {"id": "316", "name": "Cosmopolis 2", "latitude": 44.5379429, "longitude": 26.1681528}, {"id": "315", "name": "Iasi Nicolina", "latitude": 47.1435354, "longitude": 27.5773711}, {"id": "319", "name": "Sibiu", "latitude": 45.7771959, "longitude": 24.1673848}, {"id": "325", "name": "Oradea Republicii", "latitude": 47.5219628, "longitude": 22.1321851}, {"id": "327", "name": "Brasov Muresenilor", "latitude": 45.6425562, "longitude": 25.6322564}, {"id": "309", "name": "Cluj Septimiu Albini", "latitude": 46.7613213, "longitude": 23.6138423}, {"id": "329", "name": "Iasi Gemi", "latitude": 47.1532589, "longitude": 27.5703787}, {"id": "453", "name": "Iasi Palas", "latitude": 47.1689253, "longitude": 27.5680793}, {"id": "328", "name": "Mario Plaza", "latitude": 44.4589317, "longitude": 26.0954311}, {"id": "464", "name": "Cosmopolis 3", "latitude": 44.3917722, "longitude": 26.0064829}, {"id": "302", "name": "Craiova Valea Rosie", "latitude": 44.3056654, "longitude": 23.8178492}, {"id": "390", "name": "Cotroceni One", "latitude": 44.4261624, "longitude": 26.0629}, {"id": "476", "name": "Constanta Stefan cel Mare", "latitude": 44.1756823, "longitude": 28.6429174}, {"id": "477", "name": "Joy Residence", "latitude": 44.3622525, "longitude": 26.1522168}, {"id": "478", "name": "Navodari Biruintei", "latitude": 44.3203409, "longitude": 28.6089395}, {"id": "876", "name": "Otopeni Aeroport", "latitude": 44.568339, "longitude": 26.1025536}, {"id": "479", "name": "Bucuresti Basarabiei", "latitude": 44.4373883, "longitude": 26.1693521}, {"id": "480", "name": "Voluntari 1D", "latitude": 44.4946549, "longitude": 26.1246933}, {"id": "483", "name": "Bucuresti Piata Rosetti", "latitude": 44.4361268, "longitude": 26.1058735}, {"id": "484", "name": "Bucuresti Penes Curcanul", "latitude": 44.4131226, "longitude": 26.1262678}, {"id": "485", "name": "Brasov Galerie", "latitude": 45.6318884, "longitude": 25.6389413}, {"id": "489", "name": "Buzau Unirii 48A", "latitude": 47.8009091, "longitude": 22.8728673}, {"id": "490", "name": "Bacau", "latitude": 45.2442136, "longitude": 26.7124142}, {"id": "491", "name": "Bucuresti WIN Herastrau", "latitude": 44.481109, "longitude": 26.0899801}, {"id": "493", "name": "Constanta Dezrobirii", "latitude": 44.1813027, "longitude": 28.6178357}, {"id": "488", "name": "Brasov Republicii", "latitude": 45.6424946, "longitude": 25.5907723}, {"id": "494", "name": "Calarasi", "latitude": 44.2048775, "longitude": 27.3140099}, {"id": "497", "name": "Adjud", "latitude": 46.1008679, "longitude": 27.179941}, {"id": "495", "name": "Bolotesti", "latitude": 45.8649764, "longitude": 27.0401053}, {"id": "492", "name": "Maicanesti", "latitude": 45.5025186, "longitude": 27.495112}, {"id": "475", "name": "Voluntari 2", "latitude": 44.4983106, "longitude": 26.1945472}, {"id": "498", "name": "Targu Frumos", "latitude": 47.1550933, "longitude": 27.5842186}, {"id": "499", "name": "Vicovu de Jos", "latitude": 47.9037609, "longitude": 25.7292389}, {"id": "500", "name": "Cluj 21 Decembrie", "latitude": 46.7773533, "longitude": 23.6108102}, {"id": "502", "name": "Drobeta", "latitude": 44.6323999, "longitude": 22.6642357}, {"id": "503", "name": "Focsani", "latitude": 45.6997857, "longitude": 27.1840805}, {"id": "501", "name": "Cluj Dionisie", "latitude": 46.7780721, "longitude": 23.6352219}, {"id": "506", "name": "Dealu Tugulea", "latitude": 45.1902986, "longitude": 28.4600317}, {"id": "504", "name": "Sacele", "latitude": 45.616651, "longitude": 25.6910299}, {"id": "5002", "name": "Brasov Grivitei", "latitude": 45.6581144, "longitude": 25.5979308}, {"id": "5013", "name": "Brasov Harman", "latitude": 45.7144989, "longitude": 25.6808761}, {"id": "5015", "name": "Brasov Bod", "latitude": 45.7706691, "longitude": 25.6468983}, {"id": "5017", "name": "Galati Pescarus", "latitude": 45.4316123, "longitude": 28.0538596}, {"id": "5019", "name": "Brasov Branduselor", "latitude": 45.6543097, "longitude": 25.6250927}, {"id": "5018", "name": "Galati Domneasca", "latitude": 45.4359302, "longitude": 28.0560703}, {"id": "5020", "name": "Harsova", "latitude": 44.6845194, "longitude": 27.9573428}, {"id": "5021", "name": "Brasov Gospodarilor", "latitude": 45.6653523, "longitude": 25.5706499}, {"id": "5022", "name": "Brasov Prunului", "latitude": 45.6159929, "longitude": 25.6391775}, {"id": "5023", "name": "BV Mircea cel Batran", "latitude": 45.6576813, "longitude": 25.6016409}, {"id": "5033", "name": "Calarasi Republicii", "latitude": 44.2023125, "longitude": 27.3214818}, {"id": "5034", "name": "Brasov Avantgarden", "latitude": 45.6684782, "longitude": 25.620476}, {"id": "5037", "name": "Zimnicea Mihai Viteazul", "latitude": 43.6576599, "longitude": 25.3653059}, {"id": "5032", "name": "Brasov Zizinului", "latitude": 45.6507939, "longitude": 25.6166841}, {"id": "5029", "name": "Galati Faleza Marea Unire", "latitude": 45.6459363, "longitude": 25.6192119}, {"id": "5040", "name": "Voluntari Market Nord", "latitude": 44.5067354, "longitude": 26.1370539}, {"id": "5038", "name": "Targu Neamt", "latitude": 47.202197, "longitude": 26.3582693}, {"id": "5036", "name": "Brasov Crinului", "latitude": 45.6484048, "longitude": 25.6300114}, {"id": "5026", "name": "Brasov Oltet", "latitude": 45.6655788, "longitude": 25.599345}, {"id": "5005", "name": "Brasov Ion Creanga", "latitude": 45.4130057, "longitude": 23.3703757}, {"id": "5045", "name": "Brasov Paraului", "latitude": 45.7112579, "longitude": 25.6310188}, {"id": "5046", "name": "Braila Buzaului", "latitude": 45.2508773, "longitude": 27.9408392}, {"id": "5049", "name": "Brasov Stadionului", "latitude": 46.2520444, "longitude": 26.7690349}, {"id": "5051", "name": "Constanta Muncel", "latitude": 44.1811029, "longitude": 28.6177596}, {"id": "5047", "name": "Bucuresti Zagazului", "latitude": 44.4780913, "longitude": 26.0939324}, {"id": "5052", "name": "Afumati", "latitude": 44.5020061, "longitude": 26.2101751}, {"id": "5044", "name": "Brasov Saturn", "latitude": 45.6407732, "longitude": 25.637011}, {"id": "5053", "name": "Galati Micro", "latitude": 45.4262991, "longitude": 28.0352288}, {"id": "5054", "name": "Buc. Postalionului", "latitude": 44.3678979, "longitude": 26.115165}, {"id": "5060", "name": "Galati Constructorilor", "latitude": 45.4313607, "longitude": 28.0273425}, {"id": "5059", "name": "Galati Brailei 173A", "latitude": 45.4262991, "longitude": 28.0352288}, {"id": "5061", "name": "Cluj Jora", "latitude": 46.7882652, "longitude": 23.6165001}, {"id": "5063", "name": "Luduș", "latitude": 46.4833006, "longitude": 24.0950842}, {"id": "5064", "name": "Craiova Balaci", "latitude": 44.3116947, "longitude": 23.7815894}, {"id": "5066", "name": "Calarasi Dor Marunt", "latitude": 44.4333048, "longitude": 27.0665332}, {"id": "5065", "name": "Brasov Colonia Bod", "latitude": 45.7552953, "longitude": 25.5977201}, {"id": "5070", "name": "Galati Siderurgistilor", "latitude": 45.4365713, "longitude": 28.0234852}, {"id": "5071", "name": "Craiova Enescu", "latitude": 44.3364867, "longitude": 23.7778357}, {"id": "5069", "name": "Cugir Market", "latitude": 45.8404678, "longitude": 23.3625175}, {"id": "5058", "name": "Buc. Rami Ajustorului", "latitude": 44.4433547, "longitude": 26.0235286}];
+
+async function ensureVerifiedCoordinates() {
+  try {
+    const markerRef = doc(db, "system", "verifiedCoordinatesV1");
+    const marker = await getDoc(markerRef);
+    if (marker.exists()) return;
+    for (const item of VERIFIED_STORE_COORDINATES) {
+      await setDoc(doc(db, "stores", String(item.id)), {
+        latitude:item.latitude,
+        longitude:item.longitude
+      }, { merge:true });
+    }
+    await setDoc(markerRef, {
+      imported:true,
+      count:VERIFIED_STORE_COORDINATES.length,
+      createdAt:serverTimestamp()
+    });
+  } catch(error) {
+    console.warn("Coordonatele verificate nu au putut fi sincronizate.", error);
+  }
+}
+
 async function ensureStores() {
   try {
     const markerRef = doc(db, "system", "storesSeedV3");
@@ -235,6 +259,7 @@ function normalizePortalRole(role, email) {
 async function finishLogin() {
   currentRole = normalizePortalRole(currentRole, currentEmail);
   await ensureStores();
+  await ensureVerifiedCoordinates();
   await loadMaterials();
   await recordSession();
 
@@ -269,7 +294,7 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
   if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
 
   const profile = profileSnap.data();
-  currentRole = normRole(profile.role);
+  currentRole = normalizePortalRole(normRole(profile.role), currentEmail);
   currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
   currentCanManage = profile.canManage === true || currentRole === "admin";
   currentCategory = currentRole === "suport" ? "suport" : normCategory(profile.category);
@@ -648,7 +673,7 @@ function renderSelectedMaterials() {
   });
 
   el("materialsTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
-  el("materialsSubtitle").textContent = `${selectedEquipmentLabel} · în ordinea celor mai vizionate`;
+  el("materialsSubtitle").textContent = selectedEquipmentLabel;
 
   const makeCard = (material, position) => {
     const yt = youtubeId(material.url || "");
@@ -690,14 +715,17 @@ function driveSamePageUrl(raw) {
     const u = new URL(raw);
     if (u.hostname.includes("drive.google.com")) {
       const m = u.pathname.match(/\/file\/d\/([^/]+)/);
-      if (m) {
-        const download = `https://drive.google.com/uc?export=download&id=${m[1]}`;
-        return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(download)}`;
-      }
+      if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+    }
+    if (u.hostname.includes("docs.google.com")) return raw;
+    const ext=(u.pathname.split(".").pop()||"").toLowerCase();
+    if (["doc","docx","xls","xlsx","ppt","pptx","pdf"].includes(ext)) {
+      return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(raw)}`;
     }
   } catch {}
   return raw;
 }
+
 async function openViewer(material) {
   currentOpenMaterial = material;
   el("viewerTitle").textContent = material.title || "Material";
@@ -1322,6 +1350,71 @@ async function recommendStoreByLocation(){
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
 }
 
+
+async function loadUsers() {
+  if (!isPrimaryAdmin()) return;
+  try {
+    const snap = await getDocs(collection(db,"users"));
+    const rows = snap.docs.map(d => ({email:d.id,...d.data()}))
+      .sort((a,b)=>String(a.displayName||a.email).localeCompare(String(b.displayName||b.email),"ro"));
+    el("usersList").innerHTML = rows.length ? rows.map(u=>`
+      <div class="user-admin-row">
+        <div><b>${escapeHtml(u.displayName || u.email)}</b><small>${escapeHtml(u.email)}</small></div>
+        <div class="user-admin-meta">
+          <span>${escapeHtml(u.role || "—")}</span>
+          <span>${u.canAdd ? "Adaugă" : "Fără adăugare"}</span>
+          <span>${u.canManage ? "Gestionează" : "Fără gestionare"}</span>
+        </div>
+        <button type="button" class="secondary" data-edit-user="${escapeHtml(u.email)}">Edit</button>
+      </div>`).join("") : '<div class="empty">Nu există conturi configurate.</div>';
+
+    el("usersList").querySelectorAll("[data-edit-user]").forEach(btn=>{
+      btn.onclick=()=>{
+        const u=rows.find(x=>x.email===btn.dataset.editUser); if(!u)return;
+        el("userEmail").value=u.email||"";
+        if(el("userDisplayName")) el("userDisplayName").value=u.displayName||"";
+        el("userRole").value=u.role||"suport";
+        el("userCategory").value=u.category||"all";
+        el("userCanAdd").checked=u.canAdd===true;
+        el("userCanManage").checked=u.canManage===true;
+        el("userStatus").textContent=`Editezi ${u.displayName||u.email}.`;
+      };
+    });
+  } catch(error) {
+    console.error("Utilizatori:",error);
+    el("usersList").innerHTML='<div class="empty">Utilizatorii nu au putut fi încărcați.</div>';
+  }
+}
+
+
+async function loadGeoAdminPage() {
+  if (currentRole !== "admin") return;
+  await loadStores();
+  renderGeoAdminPage();
+}
+function renderGeoAdminPage() {
+  const body=el("geoAdminBody"); if(!body)return;
+  const q=String(el("geoAdminSearch")?.value||"").trim().toLowerCase();
+  const rows=storesCache.filter(s=>!q || `${s.id} ${s.name||""} ${s.address||""}`.toLowerCase().includes(q))
+    .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ro"));
+  const configured=storesCache.filter(s=>Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude))).length;
+  el("geoConfiguredCount").textContent=configured;
+  el("geoMissingCount").textContent=storesCache.length-configured;
+  body.innerHTML=rows.map(s=>{
+    const ok=Number.isFinite(Number(s.latitude))&&Number.isFinite(Number(s.longitude));
+    return `<tr>
+      <td><b>${escapeHtml(s.name||s.id)}</b><small>ID ${escapeHtml(String(s.id))}</small></td>
+      <td>${escapeHtml(s.format||s.category||"—")}</td>
+      <td>${escapeHtml(s.address||"—")}</td>
+      <td>${ok ? Number(s.latitude).toFixed(7) : "—"}</td>
+      <td>${ok ? Number(s.longitude).toFixed(7) : "—"}</td>
+      <td><span class="${ok?"geo-ok":"geo-missing"}">${ok?"Configurat":"Lipsă"}</span></td>
+    </tr>`;
+  }).join("");
+  el("geoAdminStatus").textContent = configured===storesCache.length
+    ? "Toate magazinele din baza portalului au coordonate."
+    : `${storesCache.length-configured} magazine din baza portalului nu au încă o potrivire sigură.`;
+}
 async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
 el("userStatus").textContent="Drepturile au fost salvate.";
 await loadUsers();}
@@ -1458,6 +1551,7 @@ document.querySelectorAll(".side-btn").forEach(button => {
     if (page === "manageMaterialsPage") await renderAdminMaterials();
     if (page === "usersPage") await loadUsers();
     if (page === "storesPage") await loadStores();
+    if (page === "geoAdminPage") await loadGeoAdminPage();
     showPage(page);
     closeMenu();
   });
@@ -1491,6 +1585,7 @@ document.querySelectorAll("[data-back]").forEach(button => {
 onIfPresent("detectLocationBtn", "click", recommendStoreByLocation);
 onIfPresent("manageMaterialSearch", "input", renderAdminMaterials);
 onIfPresent("manageMaterialType", "change", renderAdminMaterials);
+onIfPresent("geoAdminSearch", "input", renderGeoAdminPage);
 
 
 onIfPresent("saveUserBtn", "click", saveUserProfile);

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=final-clean-lists-0827">
+  <link rel="stylesheet" href="styles.css?v=admin-geo-users-0827">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -60,6 +60,7 @@
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
        <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
       <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
+      <button class="side-btn" data-page="geoAdminPage" data-permission="users">📍 Geolocalizare</button>
     </aside>
 
     <main class="content">
@@ -319,6 +320,24 @@
           <div id="storesList"></div>
         </section>
       </section>
+
+      <section id="geoAdminPage" class="page hidden">
+        <div class="page-head">
+          <div><h1>Geolocalizare</h1><p class="subtitle">Coordonatele magazinelor folosite pentru identificarea automată.</p></div>
+        </div>
+        <section class="panel">
+          <div class="geo-admin-summary">
+            <div><strong id="geoConfiguredCount">0</strong><span>configurate</span></div>
+            <div><strong id="geoMissingCount">0</strong><span>fără coordonate</span></div>
+            <input id="geoAdminSearch" placeholder="Caută magazin, ID sau adresă...">
+          </div>
+          <div class="geo-admin-table-wrap">
+            <table class="geo-admin-table"><thead><tr><th>Magazin</th><th>Format</th><th>Adresă</th><th>Latitudine</th><th>Longitudine</th><th>Status</th></tr></thead><tbody id="geoAdminBody"></tbody></table>
+          </div>
+          <div id="geoAdminStatus" class="status"></div>
+        </section>
+      </section>
+
     </main>
   </div>
 
@@ -365,7 +384,7 @@
     </section>
   </div>
 
-  <script type="module" src="app.js?v=final-clean-lists-0827"></script>
+  <script type="module" src="app.js?v=admin-geo-users-0827"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">
