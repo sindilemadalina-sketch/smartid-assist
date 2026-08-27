@@ -245,7 +245,7 @@ function normalizePortalRole(role, email) {
 }
 
 async function finishLogin() {
-  currentRole = normalizePortalRole(currentRole, currentUser?.email || auth.currentUser?.email || "");
+  currentRole = normalizePortalRole(currentRole, auth.currentUser?.email || "");
   await ensureStores();
   await loadMaterials();
   await recordSession();
