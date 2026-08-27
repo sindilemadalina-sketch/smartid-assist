@@ -1019,3 +1019,103 @@ body.support-showcase-mode .zone-suport .support-zone-visual{background:radial-g
 body.support-showcase-mode .carrefour-blue-logo{filter:drop-shadow(0 0 24px rgba(0,102,204,.28))}
 body.support-showcase-mode .express-green-logo{filter:drop-shadow(0 0 24px rgba(0,140,67,.30))}
 body.support-showcase-mode .smartid-zone-logo{border-radius:18px;object-fit:cover;filter:drop-shadow(0 0 24px rgba(109,40,217,.28))}
+
+/* ==========================================================
+   IDENTITATE CONT USER - Carrefour / Franciza / Suport
+   ========================================================== */
+.user-role-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:92px;
+  padding:9px 13px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.7px;
+  color:#fff;
+  background:rgba(255,255,255,.08);
+}
+.user-role-badge[data-role="carrefour"]{border-color:rgba(37,99,235,.6);background:rgba(37,99,235,.18);color:#93c5fd}
+.user-role-badge[data-role="franciza"]{border-color:rgba(34,197,94,.58);background:rgba(22,163,74,.17);color:#86efac}
+.user-role-badge[data-role="suport"]{border-color:rgba(168,85,247,.65);background:rgba(126,34,206,.20);color:#d8b4fe}
+
+.account-hero{
+  width:100%;
+  margin:0 0 18px;
+}
+.account-hero:empty{display:none}
+.account-hero-inner{
+  min-height:210px;
+  display:grid;
+  grid-template-columns:minmax(230px,360px) 1fr;
+  align-items:center;
+  gap:34px;
+  padding:22px 34px;
+  border-radius:24px;
+  overflow:hidden;
+  color:#fff;
+  box-shadow:0 18px 50px rgba(15,23,42,.15);
+}
+.account-hero-inner img{
+  width:100%;
+  height:170px;
+  object-fit:contain;
+  transition:transform .3s ease,filter .3s ease;
+}
+.account-hero-inner:hover img{transform:scale(1.045)}
+.account-hero-inner span{
+  display:block;
+  margin-bottom:5px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:1.2px;
+  opacity:.82;
+}
+.account-hero-inner strong{
+  display:block;
+  font-size:32px;
+  letter-spacing:.4px;
+}
+.account-hero-inner p{
+  margin:8px 0 0;
+  max-width:650px;
+  line-height:1.5;
+  color:#dbe4f3;
+}
+.hero-carrefour{
+  border:1px solid rgba(37,99,235,.45);
+  background:radial-gradient(circle at 18% 50%,rgba(37,99,235,.28),transparent 30%),linear-gradient(135deg,#071528,#071126);
+}
+.hero-carrefour img{filter:drop-shadow(0 0 25px rgba(37,99,235,.34))}
+.hero-carrefour strong{color:#60a5fa}
+
+.hero-franciza{
+  border:1px solid rgba(34,197,94,.45);
+  background:radial-gradient(circle at 18% 50%,rgba(34,197,94,.24),transparent 30%),linear-gradient(135deg,#071d17,#071126);
+}
+.hero-franciza img{filter:drop-shadow(0 0 25px rgba(34,197,94,.30))}
+.hero-franciza strong{color:#4ade80}
+
+.hero-suport{
+  border:1px solid rgba(168,85,247,.48);
+  background:radial-gradient(circle at 18% 50%,rgba(109,40,217,.30),transparent 32%),linear-gradient(135deg,#11102b,#071126);
+}
+.hero-suport img{
+  border-radius:18px;
+  object-fit:cover;
+  filter:drop-shadow(0 0 25px rgba(139,92,246,.33));
+}
+.hero-suport strong{color:#c084fc}
+
+/* Suport este user, nu admin */
+body.support-showcase-mode #equipmentPage .page-head h1,
+body.support-showcase-mode #equipmentPage .subtitle{color:inherit}
+
+@media(max-width:760px){
+  .account-hero-inner{grid-template-columns:1fr;padding:20px}
+  .account-hero-inner img{height:135px}
+  .account-hero-inner strong{font-size:25px}
+  .user-role-badge{min-width:auto}
+}

@@ -171,6 +171,64 @@ async function recordSession() {
   }
 }
 
+
+function configureAccountIdentity() {
+  const badge = el("userRoleBadge");
+  const hero = el("accountHero");
+  const sidebarSubtitle = el("sidebarSubtitle");
+
+  // Reset vizibilitate meniu.
+  document.querySelectorAll('.side-btn[data-page="dashboardPage"], .side-btn[data-page="usersPage"], .side-btn[data-page="storesPage"]')
+    .forEach(btn => btn.classList.toggle("hidden", currentRole !== "admin"));
+
+  // Adăugare/Gestionare rămân strict după drepturile deja existente.
+  document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
+  document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
+
+  if (currentRole === "admin") {
+    badge?.classList.add("hidden");
+    if (sidebarSubtitle) sidebarSubtitle.textContent = "Administrare SmartID Portal";
+    if (hero) hero.innerHTML = "";
+    return;
+  }
+
+  if (sidebarSubtitle) sidebarSubtitle.textContent = "Navigare SmartID Portal";
+  badge?.classList.remove("hidden");
+
+  if (currentRole === "suport") {
+    badge.textContent = "SUPORT";
+    badge.dataset.role = "suport";
+    el("equipmentPageTitle").textContent = "Suport";
+    el("carrefourBrand").classList.add("hidden");
+    el("storeWelcome").textContent = "Acces utilizator Suport · Carrefour + Franciză + Suport intern";
+    hero.innerHTML = `
+      <div class="account-hero-inner hero-suport">
+        <img src="smartid-logo-visual.jfif" alt="Smart ID">
+        <div><span>SMART ID</span><strong>SUPORT</strong><p>Acces complet la materialele Carrefour, Franciză și Suport intern.</p></div>
+      </div>`;
+  } else if (currentRole === "franciza") {
+    badge.textContent = "FRANCIZĂ";
+    badge.dataset.role = "franciza";
+    el("equipmentPageTitle").textContent = "Franciză";
+    el("carrefourBrand").classList.add("hidden");
+    hero.innerHTML = `
+      <div class="account-hero-inner hero-franciza">
+        <img src="carrefour-express-verde-vertical.png" alt="Carrefour Express">
+        <div><span>CARREFOUR</span><strong>FRANCIZĂ</strong><p>Videoclipuri și proceduri dedicate magazinelor din franciză.</p></div>
+      </div>`;
+  } else {
+    badge.textContent = "CARREFOUR";
+    badge.dataset.role = "carrefour";
+    el("equipmentPageTitle").textContent = "Carrefour";
+    el("carrefourBrand").classList.add("hidden");
+    hero.innerHTML = `
+      <div class="account-hero-inner hero-carrefour">
+        <img src="carrefour-logo.svg" alt="Carrefour">
+        <div><span>CARREFOUR</span><strong>REȚEA MAGAZINE</strong><p>Videoclipuri și proceduri pentru echipamentele Carrefour.</p></div>
+      </div>`;
+  }
+}
+
 async function finishLogin() {
   await ensureStores();
   await loadMaterials();
@@ -183,6 +241,7 @@ async function finishLogin() {
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
+  configureAccountIdentity();
 
   if (currentRole === "admin") {
     await loadDashboard();
@@ -305,7 +364,7 @@ function renderEquipment() {
   const page = el("materialTypePage");
   if (currentRole === "suport") {
     document.body.classList.add("support-showcase-mode");
-    el("selectedMaterialTypeTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri · Suport" : "Proceduri · Suport";
+    el("selectedMaterialTypeTitle").textContent = selectedMaterialType === "videoclip" ? "SUPORT · Videoclipuri" : "SUPORT · Proceduri";
     const sub = page?.querySelector(".subtitle");
     if (sub) sub.textContent = "Acces complet: Carrefour, Franciză și Suport intern · alege echipamentul.";
     const sections = [

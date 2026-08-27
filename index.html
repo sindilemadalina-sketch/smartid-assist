@@ -45,6 +45,7 @@
           <span>⌕</span>
           <input id="searchInput" class="search" placeholder="Caută după titlu, descriere sau tag...">
         </div>
+        <div id="userRoleBadge" class="user-role-badge hidden"></div>
         <button id="logoutBtn" class="logout">Logout</button>
       </div>
     </header>
@@ -53,7 +54,7 @@
     <aside id="sidebar" class="sidebar">
       <button id="closeMenuBtn" class="close-menu">×</button>
       <h2>Meniu</h2>
-      <p class="sidebar-subtitle">Administrare SmartID Portal</p>
+      <p id="sidebarSubtitle" class="sidebar-subtitle">Administrare SmartID Portal</p>
       <button class="side-btn" data-page="dashboardPage">📊 Dashboard</button>
       <button class="side-btn" data-page="addMaterialPage" data-permission="add">＋ Adăugare materiale</button>
        <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
@@ -178,6 +179,7 @@
             </div>
           </div>
         </div>
+        <div id="accountHero" class="account-hero"></div>
         <div class="type-grid">
           <article class="type-card" data-material-type="videoclip">
             <span>▶</span><h2>Videoclipuri</h2>
