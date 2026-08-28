@@ -281,7 +281,7 @@ async function finishLogin() {
     showPage(currentRole === "admin" ? "dashboardPage" : "equipmentPage");
   } else {
     renderEquipment();
-    showPage("equipmentPage");
+    showPage(currentRole === "suport" ? "supportHubPage" : "equipmentPage");
   }
 }
 
@@ -358,7 +358,7 @@ async function continueWithStore() {
     el("storeModal").classList.remove("open");
     await loadMaterials();
     renderEquipment();
-    showPage("equipmentPage");
+    showPage(currentRole === "suport" ? "supportHubPage" : "equipmentPage");
     return;
   }
 
@@ -1564,7 +1564,7 @@ document.querySelectorAll("[data-admin-category]").forEach(button => {
     currentCategory = button.dataset.adminCategory;
     document.querySelectorAll("[data-admin-category]").forEach(b=>b.classList.toggle("active", b===button));
     renderEquipment();
-    showPage("equipmentPage");
+    showPage(currentRole === "suport" ? "supportHubPage" : "equipmentPage");
   });
 });
 
@@ -1622,5 +1622,21 @@ onAuthStateChanged(auth, async user => {
     el("loginPage").style.display = "flex";
     el("app").classList.add("hidden");
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
+  }
+});
+
+
+/* SMARTID_BACK_NAV_FIX */
+window.addEventListener("popstate", () => {
+  const viewer = document.getElementById("viewerModal");
+  if (viewer && !viewer.classList.contains("hidden")) {
+    if (typeof closeViewer === "function") closeViewer();
+    return;
+  }
+
+  const materials = document.getElementById("materialsPage");
+  if (materials && !materials.classList.contains("hidden")) {
+    const destination = currentRole === "suport" ? "supportHubPage" : "equipmentPage";
+    if (typeof showPage === "function") showPage(destination);
   }
 });
