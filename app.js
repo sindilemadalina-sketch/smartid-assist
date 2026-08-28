@@ -1537,7 +1537,7 @@ el("newStoreCategory").addEventListener("change", toggleStoreFormat);
 el("storeSearch").addEventListener("input", renderStores);
 el("storeFilter").addEventListener("change", renderStores);
 el("searchInput").addEventListener("input", () => {
-  if (!el("materialsPage").classList.contains("hidden")) renderSelectedMaterials();
+  if (el("materialsPage") && !el("materialsPage").classList.contains("hidden")) renderSelectedMaterials();
 });
 
 document.querySelectorAll(".side-btn").forEach(button => {
@@ -1626,17 +1626,25 @@ onAuthStateChanged(auth, async user => {
 });
 
 
-/* SMARTID_BACK_NAV_FIX */
-window.addEventListener("popstate", () => {
-  const viewer = document.getElementById("viewerModal");
-  if (viewer && !viewer.classList.contains("hidden")) {
-    if (typeof closeViewer === "function") closeViewer();
-    return;
-  }
 
-  const materials = document.getElementById("materialsPage");
-  if (materials && !materials.classList.contains("hidden")) {
-    const destination = currentRole === "suport" ? "supportHubPage" : "equipmentPage";
-    if (typeof showPage === "function") showPage(destination);
+
+/* SMARTID_BACK_NAV_SAFE_FIX */
+window.addEventListener("popstate", () => {
+  try {
+    const viewer = document.getElementById("viewerModal");
+    if (viewer && viewer.classList && !viewer.classList.contains("hidden")) {
+      if (typeof closeViewer === "function") closeViewer();
+      return;
+    }
+
+    const materials = document.getElementById("materialsPage");
+    if (materials && materials.classList && !materials.classList.contains("hidden")) {
+      const destination = (typeof currentRole !== "undefined" && currentRole === "suport")
+        ? "supportHubPage"
+        : "equipmentPage";
+      if (typeof showPage === "function") showPage(destination);
+    }
+  } catch (error) {
+    console.warn("Navigare Back:", error);
   }
 });
