@@ -1939,3 +1939,59 @@ html,body{
   background:rgba(124,58,237,.28);
   transform:translateY(-1px);
 }
+
+.manage-material-actions{
+  display:flex!important;justify-content:space-between;align-items:center;
+  gap:12px;margin:0 0 18px 0;padding:0;
+}
+.manage-back-btn,.manage-add-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:11px 18px;border-radius:12px;
+  font-weight:900;font-size:14px;cursor:pointer;
+}
+.manage-back-btn{
+  color:#fff;background:rgba(91,33,182,.22);
+  border:1px solid rgba(167,139,250,.55);
+}
+.manage-add-btn{
+  color:#fff;border:0;
+  background:linear-gradient(135deg,#7c3aed,#d21bbd);
+  box-shadow:0 8px 24px rgba(124,58,237,.25);
+}
+@media(max-width:650px){
+  .manage-material-actions{flex-direction:column;align-items:stretch}
+  .manage-back-btn,.manage-add-btn{width:100%}
+}
+
+/* FINAL: SmartID Support Intern - aceeași dimensiune vizuală ca Carrefour/Franciză */
+.support-zone-card.support-card-intern{
+  min-height:0 !important;
+  height:auto !important;
+  max-height:none !important;
+}
+.support-zone-card.support-card-intern > .support-zone-visual,
+.support-zone-card.support-card-intern > .support-zone-content{
+  min-height:270px !important;
+  height:270px !important;
+  max-height:270px !important;
+}
+.support-zone-card.support-card-intern > .support-zone-visual{
+  padding:0 !important;
+  background-size:cover !important;
+  background-position:center center !important;
+}
+@media(max-width:900px){
+  .support-zone-card.support-card-intern > .support-zone-visual,
+  .support-zone-card.support-card-intern > .support-zone-content{
+    min-height:220px !important;
+    height:auto !important;
+    max-height:none !important;
+  }
+}
+
+body.support-colleague-view .sidebar{display:none!important}
+body.support-colleague-view .main-content,body.support-colleague-view main{margin-left:0!important;width:100%!important;max-width:none!important}
+.support-zone-card.support-card-intern>.support-zone-visual,
+.support-zone-card.support-card-intern>.support-zone-content{min-height:240px!important;height:240px!important;max-height:240px!important}
+.support-zone-card.support-card-intern>.support-zone-visual{background-size:cover!important;background-position:center!important}
+@media(max-width:900px){.support-zone-card.support-card-intern>.support-zone-visual,.support-zone-card.support-card-intern>.support-zone-content{height:auto!important;max-height:none!important;min-height:210px!important}}

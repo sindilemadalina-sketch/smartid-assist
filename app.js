@@ -202,6 +202,7 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
+setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
   const sidebarSubtitle = el("sidebarSubtitle");
@@ -1576,7 +1577,7 @@ document.querySelectorAll(".side-btn").forEach(button => {
       if (currentRole === "admin" && !["carrefour","franciza","suport"].includes(currentCategory)) currentCategory = "carrefour";
       renderEquipment();
     }
-    if (page === "manageMaterialsPage") await renderAdminMaterials();
+    if (page === "manageMaterialsPage") { syncManageMaterialActions(); await renderAdminMaterials(); }
     if (page === "usersPage") await loadUsers();
     if (page === "storesPage") await loadStores();
     if (page === "geoAdminPage") await loadGeoAdminPage();
@@ -1623,6 +1624,16 @@ onIfPresent("manageMaterialsBackBtn", "click", () => {
     showPage("equipmentPage");
   }
 });
+
+onIfPresent("manageMaterialsAddBtn", "click", () => {
+  if (!currentCanAdd) {
+    alert("Nu ai dreptul de a adăuga materiale.");
+    return;
+  }
+  if (typeof resetMaterialForm === "function") resetMaterialForm();
+  showPage("addMaterialPage");
+});
+
 
 onIfPresent("geoAdminSearch", "input", renderGeoAdminPage);
 
@@ -1687,3 +1698,10 @@ window.addEventListener("popstate", () => {
     console.warn("Navigare Back:", error);
   }
 });
+
+function syncManageMaterialActions(){
+  const addBtn=document.getElementById("manageMaterialsAddBtn");
+  if(addBtn) addBtn.style.display=currentCanAdd ? "inline-flex" : "none";
+}
+
+function syncSupportColleagueLayout(){document.body.classList.toggle("support-colleague-view",currentRole==="suport");}
