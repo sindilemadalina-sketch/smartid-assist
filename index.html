@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartID Portal</title>
+  <link rel="icon" type="image/png" href="smartid-favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=admin-geo-users-0827">
+  <link rel="stylesheet" href="styles.css?v=back-manage-0901">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -261,7 +262,13 @@
 
 
       <section id="manageMaterialsPage" class="page hidden">
-        <div class="page-head"><div><h1>Gestionare materiale</h1><p class="subtitle">Gestionează materialele și aprobă publicarea celor încărcate de echipă.</p></div></div>
+        <div class="page-head manage-materials-head">
+          <div>
+            <button id="manageMaterialsBackBtn" class="portal-back-btn" type="button">← Înapoi la meniul principal</button>
+            <h1>Gestionare materiale</h1>
+            <p class="subtitle">Gestionează materialele și aprobă publicarea celor încărcate de echipă.</p>
+          </div>
+        </div>
         <section class="panel"><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
       </section>
 
@@ -384,7 +391,7 @@
     </section>
   </div>
 
-  <script type="module" src="app.js?v=support-load-fix-v2-0828"></script>
+  <script type="module" src="app.js?v=back-manage-0901"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">

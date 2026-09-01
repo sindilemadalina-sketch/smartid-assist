@@ -300,8 +300,25 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
 
   const profile = profileSnap.data();
   currentRole = normalizePortalRole(normRole(profile.role), currentEmail);
-  currentCanAdd = profile.canAdd === true || ["admin","suport"].includes(currentRole);
-  currentCanManage = profile.canManage === true || currentRole === "admin";
+
+  const colleagueName = String(profile.displayName || "").trim().toLowerCase();
+  const supportEditors = ["nistor ionut","apetrei andrei","andreea ianos","valentin surugiu"];
+  const supportAddOnly = ["robert neagu","dan oros"];
+
+  if (currentRole === "admin") {
+    currentCanAdd = true;
+    currentCanManage = true;
+  } else if (currentRole === "suport" && supportAddOnly.includes(colleagueName)) {
+    currentCanAdd = true;
+    currentCanManage = false;
+  } else if (currentRole === "suport" && supportEditors.includes(colleagueName)) {
+    currentCanAdd = true;
+    currentCanManage = true;
+  } else {
+    currentCanAdd = profile.canAdd === true;
+    currentCanManage = profile.canManage === true;
+  }
+
   currentCategory = currentRole === "suport" ? "suport" : normCategory(profile.category);
 
   if (!["admin", "suport", "carrefour", "franciza"].includes(currentRole)) {
@@ -752,6 +769,10 @@ function renderEquipmentChoices() {
 }
 
 async function saveMaterial() {
+  if (!(editingMaterialId ? currentCanManage : currentCanAdd)) {
+    el("materialStatus").textContent = "Nu ai drepturi pentru această acțiune.";
+    return;
+  }
   const title = el("materialTitle").value.trim();
   const url = el("materialUrl").value.trim();
   const type = el("materialType").value;
@@ -824,6 +845,7 @@ function resetMaterialForm() {
 }
 
 function startEditMaterial(materialId) {
+  if (!currentCanManage) return;
   const material = materials.find(item => item.id === materialId);
   if (!material) return;
 
@@ -879,10 +901,10 @@ async function renderAdminMaterials() {
           (material.status || "approved") === "pending" ? "În așteptare" : (material.status || "approved") === "rejected" ? "Respins" : "Aprobat"
         }</span></div>
         <div class="row-actions">
-          <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
+          ${currentCanManage ? `<button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>` : ""}
           ${isPrimaryAdmin() && (material.status || "approved") !== "approved" ? `<button class="primary" data-approve-material="${material.id}">✓ Aprobă</button>` : ""}
           ${isPrimaryAdmin() && (material.status || "approved") !== "rejected" ? `<button class="secondary" data-reject-material="${material.id}">Respinge</button>` : ""}
-          ${isPrimaryAdmin() ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
+          ${currentCanManage ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
         </div>
       </div>
     `;
@@ -913,6 +935,7 @@ async function renderAdminMaterials() {
 
   container.querySelectorAll("[data-delete-material]").forEach(button => {
     button.addEventListener("click", async () => {
+      if (!currentCanManage) return;
       if (!confirm("Ștergi materialul?")) return;
       const material=materials.find(x=>x.id===button.dataset.deleteMaterial);
       await deleteDoc(doc(db, "videos", button.dataset.deleteMaterial));
@@ -1590,6 +1613,17 @@ document.querySelectorAll("[data-back]").forEach(button => {
 onIfPresent("detectLocationBtn", "click", recommendStoreByLocation);
 onIfPresent("manageMaterialSearch", "input", renderAdminMaterials);
 onIfPresent("manageMaterialType", "change", renderAdminMaterials);
+
+onIfPresent("manageMaterialsBackBtn", "click", () => {
+  if (currentRole === "admin") {
+    showPage("dashboardPage");
+    loadDashboard();
+  } else {
+    renderEquipment();
+    showPage("equipmentPage");
+  }
+});
+
 onIfPresent("geoAdminSearch", "input", renderGeoAdminPage);
 
 
