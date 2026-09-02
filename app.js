@@ -202,6 +202,7 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
+setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
@@ -1705,3 +1706,11 @@ function syncManageMaterialActions(){
 }
 
 function syncSupportColleagueLayout(){document.body.classList.toggle("support-colleague-view",currentRole==="suport");}
+
+function enforceSupportHeader(){
+  if(currentRole!=="suport") return;
+  document.querySelectorAll("button").forEach(b=>{
+    const t=(b.textContent||"").trim();
+    if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
+  });
+}

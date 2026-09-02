@@ -2106,3 +2106,31 @@ body.role-suport .support-zone-card [aria-label="More"]{
 .support-zone-card.support-card-intern>.support-zone-visual::before,.support-zone-card.support-card-intern>.support-zone-visual::after,.support-zone-card.support-card-intern>.support-zone-visual .support-zone-glow{display:none!important;content:none!important}
 .support-zone-card.support-card-intern>.support-zone-visual>img{display:block!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;object-fit:contain!important}
 body.role-suport .support-zone-card button:empty,body.support-colleague-view .support-zone-card button:empty{display:none!important}
+
+/* FINAL HEADER SUPPORT — fără hamburger / trei linii */
+body.role-suport .menu-toggle,
+body.role-suport #menuToggle,
+body.role-suport .hamburger,
+body.role-suport .hamburger-btn,
+body.role-suport .sidebar-toggle,
+body.role-suport [aria-label*="meniu" i],
+body.support-colleague-view .menu-toggle,
+body.support-colleague-view #menuToggle,
+body.support-colleague-view .hamburger,
+body.support-colleague-view .hamburger-btn,
+body.support-colleague-view .sidebar-toggle{
+  display:none !important;
+}
+
+/* Eticheta simplă din dreapta sus */
+.support-top-label{
+  display:none;
+}
+body.role-suport .support-top-label,
+body.support-colleague-view .support-top-label{
+  display:block !important;
+  margin-left:auto !important;
+  color:#fff !important;
+  font-weight:800 !important;
+  font-size:16px !important;
+}
