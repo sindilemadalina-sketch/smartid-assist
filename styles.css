@@ -2101,3 +2101,8 @@ body.role-suport .support-zone-card [aria-label="More"]{
     width:min(78%,240px) !important;
   }
 }
+
+.support-zone-card.support-card-intern>.support-zone-visual{border:0!important;box-shadow:none!important;background-color:transparent!important;background-image:none!important}
+.support-zone-card.support-card-intern>.support-zone-visual::before,.support-zone-card.support-card-intern>.support-zone-visual::after,.support-zone-card.support-card-intern>.support-zone-visual .support-zone-glow{display:none!important;content:none!important}
+.support-zone-card.support-card-intern>.support-zone-visual>img{display:block!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;object-fit:contain!important}
+body.role-suport .support-zone-card button:empty,body.support-colleague-view .support-zone-card button:empty{display:none!important}
