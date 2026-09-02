@@ -630,6 +630,7 @@ function closeSupportDocsModal() {
 function renderEquipment() {
   if (currentRole !== "admin") {
     renderPortalLandingForRole();
+    setTimeout(cleanSupportLandingExtras,0);
     return;
   }
 
@@ -1705,3 +1706,11 @@ function syncManageMaterialActions(){
 }
 
 function syncSupportColleagueLayout(){document.body.classList.toggle("support-colleague-view",currentRole==="suport");}
+
+function cleanSupportLandingExtras(){
+ if(currentRole!=="suport")return;
+ document.querySelectorAll(".support-zone-card button,.support-zone-card span,.support-zone-card div").forEach(n=>{
+  const t=(n.textContent||"").trim();
+  if((t==="⋮"||t==="..."||t==="•••")&&n.children.length===0)n.style.display="none";
+ });
+}
