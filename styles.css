@@ -2134,3 +2134,33 @@ body.support-colleague-view .support-top-label{
   font-weight:800 !important;
   font-size:16px !important;
 }
+
+/* FIX FINAL: Header cont Support identic cu ceilalți useri */
+body.role-suport .topbar,
+body.support-colleague-view .topbar{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+}
+body.role-suport .brand-row,
+body.support-colleague-view .brand-row{
+  flex:0 0 auto !important;
+}
+body.role-suport .top-actions,
+body.support-colleague-view .top-actions{
+  margin-left:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:12px !important;
+}
+body.role-suport #userRoleBadge,
+body.support-colleague-view #userRoleBadge{
+  display:inline-flex !important;
+}
+body.role-suport #menuBtn,
+body.support-colleague-view #menuBtn,
+body.role-suport .support-top-label,
+body.support-colleague-view .support-top-label{
+  display:none !important;
+}

@@ -465,7 +465,7 @@ function renderPortalLandingForRole() {
     },
     {
       category: "suport",
-      title: "SUPORT INTERN",
+      title: "PROCEDURI INTERNE",
       logo: "smartid-logo-visual.jfif",
       visualClass: "support-card-intern"
     }
@@ -568,7 +568,7 @@ function openSupportDocsModal(category, equipmentId, label, selectedType = "") {
   const zoneNames = {
     carrefour: "CARREFOUR",
     franciza: "FRANCIZĂ",
-    suport: "SUPORT INTERN"
+    suport: "PROCEDURI INTERNE"
   };
 
   const procedures = supportMaterialsFor(category, equipmentId, "procedura");
