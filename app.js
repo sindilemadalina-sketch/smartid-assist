@@ -13,6 +13,7 @@ const el = id => document.getElementById(id);
 let currentRole = "";
 let currentCategory = "";
 let currentEmail = "";
+let currentDisplayName = "";
 let currentStoreId = "";
 let currentStoreName = "";
 let currentStoreFormat = "";
@@ -202,12 +203,23 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
-setTimeout(()=>{syncBodyRoleClass();applyExactRoleRights();},0);
 setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
   const sidebarSubtitle = el("sidebarSubtitle");
+  const userNameEl = el("currentUserName");
+  const supportManageBtn = el("supportManageBtn");
+  const menuButton = el("menuBtn");
+
+  if (menuButton) menuButton.classList.toggle("hidden", currentRole !== "admin");
+  if (userNameEl) {
+    userNameEl.textContent = currentRole === "suport" ? currentDisplayName : "";
+    userNameEl.classList.toggle("hidden", currentRole !== "suport" || !currentDisplayName);
+  }
+  if (supportManageBtn) {
+    supportManageBtn.classList.toggle("hidden", currentRole !== "suport");
+  }
 
   // Reset vizibilitate meniu.
   document.querySelectorAll('.side-btn[data-page="dashboardPage"], .side-btn[data-page="usersPage"], .side-btn[data-page="storesPage"]')
@@ -273,7 +285,7 @@ async function finishLogin() {
 
   el("loginPage").style.display = "none";
   el("app").classList.remove("hidden");
-  el("menuBtn").classList.remove("hidden");
+  el("menuBtn").classList.toggle("hidden", currentRole !== "admin");
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
@@ -302,24 +314,22 @@ async function applyAuthenticatedUser(user, { restored = false } = {}) {
   if (!profileSnap.exists()) throw new Error("Contul nu are rol atribuit în Firestore.");
 
   const profile = profileSnap.data();
+  currentDisplayName = String(profile.displayName || "").trim();
   currentRole = normalizePortalRole(normRole(profile.role), currentEmail);
 
   const colleagueName = String(profile.displayName || "").trim().toLowerCase();
-  const supportEditors = ["nistor ionut","apetrei andrei","andreea ianos","valentin surugiu"];
-  const supportAddOnly = ["robert neagu","dan oros"];
+  const supportAddOnly = ["dan oros","robert neagu","apetrei andrei","nistor ionut"];
+  const supportFullManage = ["andreea ianos","valentin surugiu"];
 
   if (currentRole === "admin") {
     currentCanAdd = true;
     currentCanManage = true;
-  } else if (currentRole === "suport" && supportAddOnly.includes(colleagueName)) {
-    currentCanAdd = true;
-    currentCanManage = false;
-  } else if (currentRole === "suport" && supportEditors.includes(colleagueName)) {
-    currentCanAdd = true;
-    currentCanManage = true;
+  } else if (currentRole === "suport") {
+    currentCanAdd = supportAddOnly.includes(colleagueName) || supportFullManage.includes(colleagueName);
+    currentCanManage = supportFullManage.includes(colleagueName);
   } else {
-    currentCanAdd = profile.canAdd === true;
-    currentCanManage = profile.canManage === true;
+    currentCanAdd = false;
+    currentCanManage = false;
   }
 
   currentCategory = currentRole === "suport" ? "suport" : normCategory(profile.category);
@@ -630,7 +640,10 @@ function closeSupportDocsModal() {
 
 
 function renderEquipment() {
-  if (currentRole === "suport") { renderPortalLandingForRole(); return; }
+  if (currentRole !== "admin") {
+    renderPortalLandingForRole();
+    return;
+  }
 
   const category = currentCategory === "franciza" ? "franciza" : "carrefour";
   const items = EQUIPMENT[category] || [];
@@ -1614,6 +1627,13 @@ onIfPresent("detectLocationBtn", "click", recommendStoreByLocation);
 onIfPresent("manageMaterialSearch", "input", renderAdminMaterials);
 onIfPresent("manageMaterialType", "change", renderAdminMaterials);
 
+onIfPresent("supportManageBtn", "click", async () => {
+  if (currentRole !== "suport") return;
+  showPage("manageMaterialsPage");
+  syncManageMaterialActions();
+  await renderAdminMaterials();
+});
+
 onIfPresent("manageMaterialsBackBtn", "click", () => {
   if (currentRole === "admin") {
     showPage("dashboardPage");
@@ -1711,49 +1731,4 @@ function enforceSupportHeader(){
     const t=(b.textContent||"").trim();
     if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
   });
-}
-
-function normalizePersonName(v){
-  return (v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
-}
-function applyExactRoleRights(){
-  const name = normalizePersonName(currentUserProfile?.name || currentUserProfile?.displayName || currentUser?.displayName || currentUser?.email || "");
-  const addOnly = ["dan oros","robert neagu","apetrei andrei","nistor ionut"];
-  const canDelete = ["andreea ianos","valentin surugiu"];
-
-  if(currentRole==="suport"){
-    currentCanAdd = addOnly.includes(name) || canDelete.includes(name) || currentRole==="admin";
-    currentCanManage = canDelete.includes(name) || currentRole==="admin";
-  }
-
-  const nm=document.getElementById("currentUserName");
-  if(nm){
-    const shown=currentUserProfile?.name || currentUserProfile?.displayName || currentUser?.displayName || "";
-    nm.textContent = shown ? shown : "";
-    nm.classList.toggle("hidden", !shown);
-  }
-
-  const roleBadge=document.getElementById("userRoleBadge");
-  if(roleBadge){
-    roleBadge.textContent = currentRole==="suport" ? "SUPORT" : (currentRole==="franciza" ? "FRANCIZĂ" : (currentRole==="carrefour" ? "CARREFOUR" : "ADMIN"));
-  }
-
-  const manageBtn=document.getElementById("supportManageBtn");
-  if(manageBtn){
-    const show=currentRole==="suport";
-    manageBtn.classList.toggle("hidden", !show);
-    manageBtn.textContent="Gestionare materiale";
-  }
-}
-
-document.addEventListener("click",(e)=>{
-  if(e.target && e.target.id==="supportManageBtn"){
-    showPage("manageMaterialsPage");
-    if(typeof renderAdminMaterials==="function") renderAdminMaterials();
-  }
-});
-
-function syncBodyRoleClass(){
-  document.body.classList.remove("role-admin","role-suport","role-carrefour","role-franciza");
-  if(currentRole) document.body.classList.add("role-"+currentRole);
 }
