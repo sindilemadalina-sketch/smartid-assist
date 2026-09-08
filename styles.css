@@ -2164,3 +2164,32 @@ body.role-suport .support-top-label,
 body.support-colleague-view .support-top-label{
   display:none !important;
 }
+
+/* Viewer roles don't need the left menu button */
+body.role-suport .menu-toggle,
+body.role-suport #menuToggle,
+body.role-suport .hamburger,
+body.role-suport .hamburger-btn,
+body.role-suport .sidebar-toggle,
+body.role-carrefour .menu-toggle,
+body.role-carrefour #menuToggle,
+body.role-carrefour .hamburger,
+body.role-carrefour .hamburger-btn,
+body.role-carrefour .sidebar-toggle,
+body.role-franciza .menu-toggle,
+body.role-franciza #menuToggle,
+body.role-franciza .hamburger,
+body.role-franciza .hamburger-btn,
+body.role-franciza .sidebar-toggle{
+  display:none !important;
+}
+.current-user-name{color:#fff;font-weight:700;font-size:14px;margin-left:8px}
+.support-manage-btn{
+  border:1px solid rgba(168,85,247,.7);
+  background:rgba(126,34,206,.18);
+  color:#fff;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+}

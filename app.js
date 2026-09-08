@@ -202,6 +202,7 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
+setTimeout(()=>{syncBodyRoleClass();applyExactRoleRights();},0);
 setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
@@ -629,10 +630,7 @@ function closeSupportDocsModal() {
 
 
 function renderEquipment() {
-  if (currentRole !== "admin") {
-    renderPortalLandingForRole();
-    return;
-  }
+  if (currentRole === "suport") { renderPortalLandingForRole(); return; }
 
   const category = currentCategory === "franciza" ? "franciza" : "carrefour";
   const items = EQUIPMENT[category] || [];
@@ -1713,4 +1711,49 @@ function enforceSupportHeader(){
     const t=(b.textContent||"").trim();
     if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
   });
+}
+
+function normalizePersonName(v){
+  return (v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+}
+function applyExactRoleRights(){
+  const name = normalizePersonName(currentUserProfile?.name || currentUserProfile?.displayName || currentUser?.displayName || currentUser?.email || "");
+  const addOnly = ["dan oros","robert neagu","apetrei andrei","nistor ionut"];
+  const canDelete = ["andreea ianos","valentin surugiu"];
+
+  if(currentRole==="suport"){
+    currentCanAdd = addOnly.includes(name) || canDelete.includes(name) || currentRole==="admin";
+    currentCanManage = canDelete.includes(name) || currentRole==="admin";
+  }
+
+  const nm=document.getElementById("currentUserName");
+  if(nm){
+    const shown=currentUserProfile?.name || currentUserProfile?.displayName || currentUser?.displayName || "";
+    nm.textContent = shown ? shown : "";
+    nm.classList.toggle("hidden", !shown);
+  }
+
+  const roleBadge=document.getElementById("userRoleBadge");
+  if(roleBadge){
+    roleBadge.textContent = currentRole==="suport" ? "SUPORT" : (currentRole==="franciza" ? "FRANCIZĂ" : (currentRole==="carrefour" ? "CARREFOUR" : "ADMIN"));
+  }
+
+  const manageBtn=document.getElementById("supportManageBtn");
+  if(manageBtn){
+    const show=currentRole==="suport";
+    manageBtn.classList.toggle("hidden", !show);
+    manageBtn.textContent="Gestionare materiale";
+  }
+}
+
+document.addEventListener("click",(e)=>{
+  if(e.target && e.target.id==="supportManageBtn"){
+    showPage("manageMaterialsPage");
+    if(typeof renderAdminMaterials==="function") renderAdminMaterials();
+  }
+});
+
+function syncBodyRoleClass(){
+  document.body.classList.remove("role-admin","role-suport","role-carrefour","role-franciza");
+  if(currentRole) document.body.classList.add("role-"+currentRole);
 }
