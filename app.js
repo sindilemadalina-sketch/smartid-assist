@@ -279,7 +279,7 @@ function normalizePortalRole(role, email) {
 async function finishLogin() {
   currentRole = normalizePortalRole(currentRole, currentEmail);
   await ensureStores();
-  await ensureVerifiedCoordinates();
+  // Coordonatele exista deja in stores-seed.js; nu mai blocam pornirea cu ~150 scrieri Firestore la login.
   await loadMaterials();
   await recordSession();
 
