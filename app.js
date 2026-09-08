@@ -202,7 +202,7 @@ async function recordSession() {
 }
 
 
-function configureAccountIdentity() {\nsetTimeout(syncViewerRoleClassFinal,0);
+function configureAccountIdentity() {
 setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
@@ -1731,10 +1731,4 @@ function enforceSupportHeader(){
     const t=(b.textContent||"").trim();
     if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
   });
-}
-
-function syncViewerRoleClassFinal(){
- document.body.classList.remove("role-carrefour","role-franciza");
- if(currentRole==="carrefour") document.body.classList.add("role-carrefour");
- if(currentRole==="franciza") document.body.classList.add("role-franciza");
 }

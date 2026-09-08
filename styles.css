@@ -2185,9 +2185,3 @@ body.support-colleague-view .support-top-label{
   cursor:pointer;
 }
 .support-manage-btn.hidden,.current-user-name.hidden{display:none!important}
-
-/* FIX: ascunde doar titlul mare din stânga deasupra cardului pentru userii Carrefour/Franciză */
-body.role-carrefour #equipmentPage > .page-head,
-body.role-franciza #equipmentPage > .page-head{
-  display:none !important;
-}
